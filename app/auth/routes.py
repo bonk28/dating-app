@@ -75,3 +75,40 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+@bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Générer un token de réinitialisation
+            token = user.get_reset_token()
+            # En production, envoyer par email. Pour l'instant, on affiche le token
+            flash(f'Lien de réinitialisation (simulation) : /reset-password/{token}', 'info')
+        else:
+            flash('Si cet email existe, un lien a été envoyé.', 'info')
+        
+        return redirect(url_for('auth.forgot_password'))
+    
+    return render_template('auth/forgot_password.html')
+
+@bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = User.verify_reset_token(token)
+    if not user:
+        flash('Lien invalide ou expiré.', 'error')
+        return redirect(url_for('auth.login'))
+    
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        if len(password) < 6:
+            flash('Mot de passe trop court.', 'error')
+        else:
+            user.set_password(password)
+            db.session.commit()
+            flash('Mot de passe mis à jour ! Connecte-toi.', 'success')
+            return redirect(url_for('auth.login'))
+    
+    return render_template('auth/reset_password.html')
