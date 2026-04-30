@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpion - Dating App</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f5f5f5; }
+        .board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; justify-content: center; margin: 20px; }
+        .cell {
+            width: 100px; height: 100px; background: white;
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-size: 3em; cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .cell:hover { background: #667eea20; }
+        .cell.x { color: #f44336; }
+        .cell.o { color: #2196F3; }
+        .turn { font-size: 1.2em; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h2>🎮 Morpion avec ton match</h2>
+    <div class="turn" id="turn">Tour de : ❤️</div>
+    <div class="board" id="board"></div>
+    <button onclick="resetGame()" style="padding:10px 30px;background:#667eea;color:white;border:none;border-radius:25px;cursor:pointer;">🔄 Recommencer</button>
+    <br><br>
+    <a href="javascript:history.back()">← Retour au chat</a>
+
+    <script>
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = '❤️';
+        let gameActive = true;
+        
+        function createBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+            board.forEach((cell, i) => {
+                const div = document.createElement('div');
+                div.className = 'cell';
+                div.textContent = cell;
+                div.onclick = () => makeMove(i);
+                boardEl.appendChild(div);
+            });
+        }
+        
+        function makeMove(index) {
+            if (!gameActive || board[index] !== '') return;
+            board[index] = currentPlayer;
+            document.getElementById('turn').textContent = 'Tour de : ' + (currentPlayer === '❤️' ? '💙' : '❤️');
+            
+            // Vérifier victoire
+            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let w of wins) {
+                if (board[w[0]] && board[w[0]] === board[w[1]] && board[w[0]] === board[w[2]]) {
+                    alert(board[w[0]] + ' a gagné ! 🎉');
+                    gameActive = false;
+                }
+            }
+            
+            if (!board.includes('') && gameActive) {
+                alert('Match nul ! 🤝');
+                gameActive = false;
+            }
+            
+            currentPlayer = currentPlayer === '❤️' ? '💙' : '❤️';
+            createBoard();
+        }
+        
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = '❤️';
+            gameActive = true;
+            document.getElementById('turn').textContent = 'Tour de : ❤️';
+            createBoard();
+        }
+        
+        createBoard();
+    </script>
+</body>
+</html>

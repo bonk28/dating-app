@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Défis</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#f5f5f5; padding-bottom:20px; }
+        .header { background:linear-gradient(135deg,#f44336,#ff6b6b); color:white; padding:20px; display:flex; align-items:center; gap:15px; }
+        .header a { color:white; text-decoration:none; font-size:1.3em; }
+        .container { max-width:500px; margin:15px auto; padding:15px; }
+        .create-btn { display:block; width:100%; padding:15px; background:#f44336; color:white; border:none; border-radius:15px; font-size:1.1em; cursor:pointer; margin-bottom:15px; font-weight:bold; }
+        .defi-card { background:white; border-radius:15px; padding:20px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        .defi-header { display:flex; justify-content:space-between; align-items:start; }
+        .defi-type { display:inline-block; padding:5px 12px; border-radius:15px; font-size:0.7em; font-weight:bold; }
+        .type-danse { background:#e91e6320; color:#e91e63; }
+        .type-chant { background:#9c27b020; color:#9c27b0; }
+        .type-photo { background:#2196F320; color:#2196F3; }
+        .type-general { background:#FF980020; color:#FF9800; }
+        .defi-title { font-size:1.2em; font-weight:bold; margin:10px 0; }
+        .defi-desc { color:#666; font-size:0.9em; }
+        .defi-stats { display:flex; gap:15px; margin-top:10px; font-size:0.8em; color:#999; }
+        .defi-actions { display:flex; gap:10px; margin-top:15px; }
+        .btn { padding:10px 20px; border:none; border-radius:25px; cursor:pointer; font-weight:bold; transition:transform 0.2s; }
+        .btn:active { transform:scale(0.95); }
+        .btn-join { background:#4CAF50; color:white; }
+        .btn-vote { background:#FF9800; color:white; }
+        .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; }
+        .modal.show { display:flex; }
+        .modal-content { background:white; border-radius:20px; padding:25px; max-width:350px; width:90%; }
+        .modal-content h3 { margin-bottom:15px; }
+        .modal-content input, .modal-content textarea, .modal-content select { width:100%; padding:12px; border:2px solid #e0e0e0; border-radius:10px; margin-bottom:10px; font-family:inherit; }
+        .modal-content textarea { height:80px; resize:vertical; }
+        .modal-content button { width:100%; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/features">←</a>
+        <h2>🏆 Défis</h2>
+    </div>
+    <div class="container">
+        <button class="create-btn" onclick="openModal()">🚀 Lancer un défi</button>
+        
+        <div id="defisContainer">
+            <p style="text-align:center;color:#999;">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- MODAL CRÉATION -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <h3>🚀 Nouveau défi</h3>
+            <input type="text" id="defiTitle" placeholder="Titre du défi">
+            <textarea id="defiDesc" placeholder="Description..."></textarea>
+            <select id="defiType">
+                <option value="general">🎯 Général</option>
+                <option value="danse">💃 Danse</option>
+                <option value="chant">🎤 Chant</option>
+                <option value="photo">📸 Photo</option>
+            </select>
+            <select id="defiDuration">
+                <option value="6">6 heures</option>
+                <option value="12">12 heures</option>
+                <option value="24" selected>24 heures</option>
+                <option value="48">48 heures</option>
+            </select>
+            <button style="background:#f44336;color:white;" onclick="createDefi()">Lancer le défi 🚀</button>
+            <button style="background:#ddd;margin-top:5px;" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+
+    <script>
+        function loadDefis() {
+            fetch('/api/defis')
+                .then(r => r.json())
+                .then(defis => {
+                    const c = document.getElementById('defisContainer');
+                    if (defis.length === 0) {
+                        c.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">Aucun défi en cours. Lance le premier !</p>';
+                        return;
+                    }
+                    c.innerHTML = defis.map(d => `
+                        <div class="defi-card">
+                            <div class="defi-header">
+                                <span class="defi-type type-${d.defi_type}">${d.defi_type}</span>
+                                <span style="font-size:0.8em;color:#999;">par ${d.creator}</span>
+                            </div>
+                            <div class="defi-title">${d.title}</div>
+                            <div class="defi-desc">${d.description}</div>
+                            <div class="defi-stats">
+                                <span>👥 ${d.participants} participants</span>
+                                <span>🗳️ ${d.votes} votes</span>
+                                <span>🏆 ${d.reward}</span>
+                            </div>
+                            <div class="defi-actions">
+                                <button class="btn btn-join" onclick="joinDefi(${d.id})">🎯 Participer</button>
+                                <button class="btn btn-vote" onclick="voteDefi(${d.id})">🗳️ Voter</button>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+        
+        function openModal() { document.getElementById('createModal').classList.add('show'); }
+        function closeModal() { document.getElementById('createModal').classList.remove('show'); }
+        
+        function createDefi() {
+            const title = document.getElementById('defiTitle').value.trim();
+            const desc = document.getElementById('defiDesc').value.trim();
+            const type = document.getElementById('defiType').value;
+            const duration = document.getElementById('defiDuration').value;
+            
+            if (!title) { alert('Donne un titre !'); return; }
+            
+            fetch('/api/defis/create', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({title, description:desc, defi_type:type, duration:parseInt(duration), reward:'⭐'})
+            }).then(r => r.json()).then(d => {
+                if (d.success) { closeModal(); loadDefis(); }
+            });
+        }
+        
+        function joinDefi(id) {
+            const content = prompt('Ta participation (texte, lien photo...) :');
+            if (!content) return;
+            fetch(`/api/defis/${id}/join`, {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({content})
+            }).then(r => r.json()).then(d => {
+                if (d.success) { alert('✅ Participation enregistrée !'); loadDefis(); }
+            });
+        }
+        
+        function voteDefi(id) {
+            const participantId = prompt('ID du participant pour lequel voter :');
+            if (!participantId) return;
+            fetch(`/api/defis/${id}/vote/${participantId}`, {method:'POST'})
+                .then(r => r.json()).then(d => {
+                    if (d.success) alert('✅ Vote enregistré !');
+                    else alert(d.error);
+                    loadDefis();
+                });
+        }
+        
+        loadDefis();
+        setInterval(loadDefis, 10000);
+    </script>
+</body>
+</html>

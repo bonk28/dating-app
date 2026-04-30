@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Statistiques</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        h1 { text-align: center; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5em; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card {
+            background: rgba(255,255,255,0.1); border-radius: 15px;
+            padding: 20px; text-align: center; backdrop-filter: blur(10px);
+        }
+        .stat-value { font-size: 2.5em; font-weight: bold; }
+        .stat-label { font-size: 0.8em; color: #aaa; margin-top: 5px; }
+        .rank-badge { text-align: center; margin: 20px 0; }
+        .rank-icon { font-size: 5em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Mon Wrapped</h1>
+        <p style="text-align:center;color:#aaa;">Tes stats de dating</p>
+        
+        <div class="rank-badge">
+            <div class="rank-icon">
+                {% if stats.total_matches >= 10 %}👑
+                {% elif stats.total_matches >= 5 %}⭐
+                {% elif stats.total_matches >= 1 %}💕
+                {% else %}🌱{% endif %}
+            </div>
+            <p>
+                {% if stats.total_matches >= 10 %}Légende du dating !
+                {% elif stats.total_matches >= 5 %}Super connecteur !
+                {% elif stats.total_matches >= 1 %}En bonne voie !
+                {% else %}Débutant 🌱{% endif %}
+            </p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_likes_sent }}</div>
+                <div class="stat-label">💚 Likes envoyés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_likes_received }}</div>
+                <div class="stat-label">❤️ Likes reçus</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_matches }}</div>
+                <div class="stat-label">💕 Matches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_messages }}</div>
+                <div class="stat-label">💬 Messages</div>
+            </div>
+        </div>
+        
+        <a href="/dashboard" style="display:block;text-align:center;color:white;margin-top:20px;">← Retour</a>
+    </div>
+</body>
+</html>

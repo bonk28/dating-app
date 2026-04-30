@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Plus</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#f5f5f5; padding-bottom:30px; }
+        .nav { background:white; padding:12px; display:flex; justify-content:space-around; box-shadow:0 2px 10px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100; }
+        .nav a { text-decoration:none; color:#667eea; font-weight:bold; font-size:0.8em; }
+        .container { max-width:650px; margin:15px auto; padding:15px; }
+        h2 { text-align:center; margin-bottom:10px; }
+        .cat-title { color:#999; margin:20px 0 10px; font-size:0.8em; text-transform:uppercase; letter-spacing:2px; }
+        .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+        .card { background:white; border-radius:12px; padding:15px 6px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.06); cursor:pointer; transition:all 0.2s; text-decoration:none; color:inherit; }
+        .card:active { transform:scale(0.95); }
+        .icon { font-size:1.8em; margin-bottom:4px; display:block; }
+        .title { font-weight:600; font-size:0.7em; color:#333; }
+        .badge { display:inline-block; padding:2px 5px; border-radius:6px; font-size:0.55em; margin-top:2px; color:white; }
+        .b-new { background:#4CAF50; } .b-hot { background:#f44336; } .b-fun { background:#FF9800; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/dashboard">🏠</a><a href="/matches">💕</a><a href="/search">🔍</a><a href="/features">➕</a><a href="/profile">👤</a>
+    </div>
+    <div class="container">
+        <h2>✨ Fonctionnalités</h2>
+        
+        <p class="cat-title">💘 Rencontres</p>
+        <div class="grid">
+            <a href="/stories" class="card"><span class="icon">📸</span><span class="title">Stories</span><span class="badge b-new">24h</span></a>
+            <a href="/blind-date" class="card"><span class="icon">🎭</span><span class="title">Blind Date</span></a>
+            <a href="/roulette" class="card"><span class="icon">🎰</span><span class="title">Roulette</span></a>
+            <a href="/night-mode" class="card"><span class="icon">🌙</span><span class="title">Mode Nuit</span></a>
+            <a href="/love-letter" class="card"><span class="icon">💌</span><span class="title">Love Letter</span></a>
+            <a href="/love-weather" class="card"><span class="icon">🌦️</span><span class="title">Météo Love</span></a>
+        </div>
+        
+        <p class="cat-title">🎮 Jeux & Fun</p>
+        <div class="grid">
+            <a href="/quiz-page" class="card"><span class="icon">📝</span><span class="title">Quiz</span></a>
+            <a href="/pet-match" class="card"><span class="icon">🐾</span><span class="title">Pet Match</span></a>
+            <a href="/icebreakers-page" class="card"><span class="icon">🧊</span><span class="title">Ice Breakers</span></a>
+            <a href="/compliments" class="card"><span class="icon">💝</span><span class="title">Compliments</span></a>
+            <a href="/confessions" class="card"><span class="icon">💬</span><span class="title">Confessions</span></a>
+            <a href="/wall" class="card"><span class="icon">📢</span><span class="title">Mur</span><span class="badge b-new">NEW</span></a>
+            <a href="/defis" class="card"><span class="icon">🏆</span><span class="title">Défis</span><span class="badge b-hot">NEW</span></a>
+        </div>
+        
+        <p class="cat-title">🎵 Médias & Plus</p>
+        <div class="grid">
+            <a href="/playlist" class="card"><span class="icon">🎵</span><span class="title">Playlist</span><span class="badge b-fun">MINI</span></a>
+            <a href="/achievements-page" class="card"><span class="icon">🏆</span><span class="title">Succès</span></a>
+            <a href="/top-profiles" class="card"><span class="icon">🌟</span><span class="title">Top Profils</span></a>
+            <a href="/my-stats" class="card"><span class="icon">📊</span><span class="title">Mes Stats</span></a>
+            <a href="/daily-question-page" class="card"><span class="icon">📊</span><span class="title">Question</span></a>
+            <a href="/settings" class="card"><span class="icon">⚙️</span><span class="title">Paramètres</span></a>
+        </div>
+    </div>
+<script src="/static/js/global-player.js"></script>
+{% include 'music_float.html' %}
+</body>
+</html>

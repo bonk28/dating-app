@@ -1,0 +1,89 @@
+<div class="icebreakers-section">
+    <h3>🧊 Brise-Glaces</h3>
+    <div class="categories" id="ice-categories"></div>
+    <div class="icebreaker-card" id="current-icebreaker">
+        <p id="icebreaker-text">Chargement...</p>
+        <button onclick="newIcebreaker()">🔄 Un autre</button>
+        <button onclick="sendIcebreaker()">📤 Envoyer</button>
+    </div>
+</div>
+
+<style>
+.icebreakers-section {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.categories {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+.cat-btn {
+    padding: 8px 15px;
+    border: 2px solid #667eea;
+    border-radius: 20px;
+    background: white;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.cat-btn:hover, .cat-btn.active {
+    background: #667eea;
+    color: white;
+}
+.icebreaker-card {
+    text-align: center;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+.icebreaker-card p {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+.icebreaker-card button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+}
+</style>
+
+<script>
+let currentIcebreaker = null;
+
+function loadIcebreakers(category = null) {
+    const url = category ? `/api/icebreakers?category=${category}` : '/api/icebreakers';
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            currentIcebreaker = data.icebreaker;
+            document.getElementById('icebreaker-text').textContent = 
+                typeof currentIcebreaker === 'string' ? currentIcebreaker : currentIcebreaker.message;
+            
+            // Catégories
+            document.getElementById('ice-categories').innerHTML = 
+                data.categories.map(c => 
+                    `<button class="cat-btn" onclick="loadIcebreakers('${c}')">${c}</button>`
+                ).join('');
+        });
+}
+
+function newIcebreaker() {
+    loadIcebreakers();
+}
+
+function sendIcebreaker() {
+    const msg = typeof currentIcebreaker === 'string' ? 
+        currentIcebreaker : currentIcebreaker.message;
+    // Envoyer via l'API chat existante
+}
+
+loadIcebreakers();
+</script>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appel - {{ other_user.username }}</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#000;height:100vh;overflow:hidden;}
+        .videos{position:relative;width:100%;height:100%;}
+        #remoteVideo{width:100%;height:100%;object-fit:cover;}
+        #localVideo{position:absolute;bottom:20px;right:20px;width:150px;height:200px;border-radius:15px;object-fit:cover;border:3px solid white;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:10;}
+        .controls{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:25px;z-index:20;}
+        .ctrl-btn{width:65px;height:65px;border-radius:50%;border:none;font-size:1.8em;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+        .ctrl-btn:active{transform:scale(0.9);}
+        .btn-end{background:#f44336;color:white;}
+        .btn-mute{background:rgba(255,255,255,0.3);color:white;}
+        .btn-video{background:rgba(255,255,255,0.3);color:white;}
+        .btn-speaker{background:rgba(255,255,255,0.3);color:white;}
+        .btn-mute.active,.btn-video.active{background:white;color:#333;}
+        .caller-info{position:absolute;top:30px;left:50%;transform:translateX(-50%);color:white;text-align:center;z-index:10;}
+        .caller-name{font-size:1.3em;font-weight:bold;}
+        .call-status{font-size:0.9em;opacity:0.8;}
+        .avatar-large{width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:4em;margin:0 auto 10px;}
+    </style>
+</head>
+<body>
+    <div class="videos">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <video id="localVideo" autoplay playsinline muted></video>
+        
+        <div class="caller-info" id="callerInfo">
+            <div class="avatar-large">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">{% else %}👤{% endif %}</div>
+            <div class="caller-name">{{ other_user.username }}</div>
+            <div class="call-status" id="callStatus">Connexion...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="ctrl-btn btn-mute" id="muteBtn" onclick="toggleMute()">🎤</button>
+            <button class="ctrl-btn btn-video" id="videoBtn" onclick="toggleVideo()">📹</button>
+            <button class="ctrl-btn btn-end" onclick="endCall()">📞</button>
+            <button class="ctrl-btn btn-speaker" onclick="toggleSpeaker()">🔊</button>
+        </div>
+    </div>
+    
+    <script>
+        let localStream;
+        let pc;
+        let isMuted = false;
+        let isVideoOff = false;
+        const matchId = {{ match.id }};
+        const userId = {{ current_user.id }};
+        
+        // Configuration WebRTC
+        const config = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
+        
+        async function startCall() {
+            try {
+                // Demander caméra + micro
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                document.getElementById('localVideo').srcObject = localStream;
+                
+                // Créer la connexion peer-to-peer
+                pc = new RTCPeerConnection(config);
+                
+                // Ajouter les flux locaux
+                localStream.getTracks().forEach(track => {
+                    pc.addTrack(track, localStream);
+                });
+                
+                // Recevoir le flux distant
+                pc.ontrack = (event) => {
+                    document.getElementById('remoteVideo').srcObject = event.streams[0];
+                    document.getElementById('callStatus').textContent = 'En ligne ✅';
+                    document.getElementById('callerInfo').style.display = 'none';
+                };
+                
+                // Créer l'offre
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                document.getElementById('callStatus').textContent = 'Appel en cours... 📞';
+                
+                // Simuler une réponse (en production, utiliser WebSocket)
+                simulateConnection();
+                
+            } catch(err) {
+                console.error('Erreur:', err);
+                alert('Impossible d\'accéder à la caméra/micro. Vérifiez les permissions.');
+            }
+        }
+        
+        function simulateConnection() {
+            // En vrai, on utiliserait WebSocket pour échanger les SDP
+            setTimeout(() => {
+                document.getElementById('callStatus').textContent = 'En ligne ✅';
+                document.getElementById('callerInfo').style.display = 'none';
+            }, 2000);
+        }
+        
+        function toggleMute() {
+            if (localStream) {
+                isMuted = !isMuted;
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+                document.getElementById('muteBtn').classList.toggle('active', isMuted);
+                document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🎤';
+            }
+        }
+        
+        function toggleVideo() {
+            if (localStream) {
+                isVideoOff = !isVideoOff;
+                localStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+                document.getElementById('videoBtn').classList.toggle('active', isVideoOff);
+                document.getElementById('videoBtn').textContent = isVideoOff ? '📷❌' : '📹';
+            }
+        }
+        
+        function toggleSpeaker() {
+            const audio = document.getElementById('remoteVideo');
+            audio.muted = !audio.muted;
+        }
+        
+        function endCall() {
+            if (pc) pc.close();
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            window.location.href = '/chat/{{ match.id }}';
+        }
+        
+        // Démarrer l'appel
+        startCall();
+    </script>
+</body>
+</html>

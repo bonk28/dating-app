@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Match - Dating App</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1DB954, #191414); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        h1 { text-align: center; }
+        .playlist { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 15px 0; }
+        .song { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; }
+        .song:hover { background: rgba(255,255,255,0.2); }
+        .song-icon { font-size: 2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Music Match</h1>
+        <p style="text-align:center">Goûts musicaux communs avec {{ other_user.username }}</p>
+        
+        <div class="playlist">
+            <h3>🎸 Artistes que vous pourriez aimer</h3>
+            <div class="song"><span class="song-icon">🎵</span> The Weeknd - Blinding Lights</div>
+            <div class="song"><span class="song-icon">🎵</span> Daft Punk - Get Lucky</div>
+            <div class="song"><span class="song-icon">🎵</span> Stromae - Alors on danse</div>
+        </div>
+        
+        <div class="playlist">
+            <h3>❤️ Vos styles communs</h3>
+            <p>Pop, Electro, RnB</p>
+        </div>
+        
+        <a href="/chat/{{ match.id }}" style="color:white;display:block;text-align:center;margin-top:20px;">← Retour au chat</a>
+    </div>
+</body>
+</html>

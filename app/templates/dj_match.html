@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Match 🎧</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1DB954, #191414); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        h1 { text-align: center; font-size: 2.5em; }
+        .genre-card { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 10px 0; cursor: pointer; display: flex; align-items: center; gap: 15px; }
+        .genre-card:hover { background: rgba(255,255,255,0.2); }
+        .genre-icon { font-size: 2.5em; }
+        .genre-info { flex: 1; }
+        .genre-bar { height: 5px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-top: 8px; overflow: hidden; }
+        .genre-fill { height: 100%; border-radius: 5px; }
+        .match-btn { display: block; width: 100%; padding: 20px; margin-top: 20px; background: #1DB954; color: white; border: none; border-radius: 50px; font-size: 1.3em; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 DJ Match</h1>
+        <p style="text-align:center;">Trouve quelqu'un qui a les mêmes goûts musicaux !</p>
+        
+        <div class="genre-card" onclick="selectGenre('pop')">
+            <div class="genre-icon">🎤</div>
+            <div class="genre-info">
+                <strong>Pop</strong>
+                <div class="genre-bar"><div class="genre-fill" style="width:85%;background:#FF69B4;"></div></div>
+                <small>85% compatible</small>
+            </div>
+        </div>
+        <div class="genre-card" onclick="selectGenre('rock')">
+            <div class="genre-icon">🎸</div>
+            <div class="genre-info">
+                <strong>Rock</strong>
+                <div class="genre-bar"><div class="genre-fill" style="width:60%;background:#f44336;"></div></div>
+                <small>60% compatible</small>
+            </div>
+        </div>
+        <div class="genre-card" onclick="selectGenre('electro')">
+            <div class="genre-icon">🎹</div>
+            <div class="genre-info">
+                <strong>Électro</strong>
+                <div class="genre-bar"><div class="genre-fill" style="width:72%;background:#2196F3;"></div></div>
+                <small>72% compatible</small>
+            </div>
+        </div>
+        
+        <button class="match-btn" onclick="findDJMatch()">🎵 Trouver mon DJ Match</button>
+    </div>
+    <script>
+        function selectGenre(g) { alert('Genre sélectionné : ' + g); }
+        function findDJMatch() { alert('🎉 23 profils compatibles trouvés !'); }
+    </script>
+</body>
+</html>

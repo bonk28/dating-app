@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Événements - Dating App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        .header {
+            background: white; padding: 20px; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header a { color: #667eea; text-decoration: none; font-size: 1.5em; }
+        .container { max-width: 500px; margin: 20px auto; padding: 20px; }
+        .event-card {
+            background: white; border-radius: 15px; padding: 20px;
+            margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .event-type {
+            display: inline-block; padding: 5px 15px; border-radius: 15px;
+            font-size: 0.8em; font-weight: bold; margin-bottom: 10px;
+        }
+        .type-speed { background: #f4433620; color: #f44336; }
+        .type-game { background: #4CAF5020; color: #4CAF50; }
+        .type-quiz { background: #2196F320; color: #2196F3; }
+        .event-title { font-size: 1.3em; font-weight: bold; margin-bottom: 5px; }
+        .event-desc { color: #666; margin-bottom: 10px; }
+        .event-date { color: #999; font-size: 0.9em; }
+        .join-btn {
+            display: block; width: 100%; padding: 15px; margin-top: 15px;
+            background: #667eea; color: white; border: none; border-radius: 10px;
+            font-size: 1.1em; cursor: pointer; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/features">←</a>
+        <h2>🎪 Événements</h2>
+        <div></div>
+    </div>
+
+    <div class="container" id="events-container">
+        Chargement...
+    </div>
+
+    <script>
+        fetch('/api/events')
+            .then(r => r.json())
+            .then(events => {
+                const container = document.getElementById('events-container');
+                if (events.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;padding:50px;color:#999;">Aucun événement prévu</p>';
+                    return;
+                }
+                container.innerHTML = events.map(e => `
+                    <div class="event-card">
+                        <span class="event-type type-${e.event_type}">${e.event_type}</span>
+                        <div class="event-title">${e.title}</div>
+                        <div class="event-desc">${e.description}</div>
+                        <div class="event-date">📅 ${new Date(e.date).toLocaleString()} | 👥 ${e.participants}/${e.max_participants}</div>
+                        <button class="join-btn" onclick="joinEvent(${e.id})">🎉 Participer</button>
+                    </div>
+                `).join('');
+            });
+        
+        function joinEvent(eventId) {
+            fetch('/api/events/' + eventId + '/join', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) alert('✅ Inscrit !');
+                    else alert('❌ ' + data.error);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<div class="achievements-section">
+    <h3>🏆 Mes Succès</h3>
+    <div class="achievements-grid" id="achievements-grid">
+        Chargement...
+    </div>
+</div>
+
+<style>
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
+}
+.achievement-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+.achievement-card.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+.achievement-card.unlocked {
+    border: 2px solid #4CAF50;
+}
+.achievement-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+.achievement-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.achievement-desc {
+    font-size: 0.8em;
+    color: #666;
+}
+</style>
+
+<script>
+fetch('/api/achievements')
+    .then(r => r.json())
+    .then(achievements => {
+        const grid = document.getElementById('achievements-grid');
+        grid.innerHTML = achievements.map(a => `
+            <div class="achievement-card ${a.unlocked ? 'unlocked' : 'locked'}">
+                <div class="achievement-icon">${a.icon}</div>
+                <div class="achievement-name">${a.name}</div>
+                <div class="achievement-desc">${a.description}</div>
+                ${a.unlocked ? '<small>✅ Débloqué</small>' : '<small>🔒 Verrouillé</small>'}
+            </div>
+        `).join('');
+    });
+</script>

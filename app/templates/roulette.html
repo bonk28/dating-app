@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Dating 🎰</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .container { max-width: 400px; }
+        .wheel { width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#f44336 0deg 60deg, #2196F3 60deg 120deg, #4CAF50 120deg 180deg, #FF9800 180deg 240deg, #9C27B0 240deg 300deg, #00BCD4 300deg 360deg); margin: 30px auto; box-shadow: 0 0 50px rgba(255,255,255,0.3); animation: none; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
+        .spinning { animation: spin 3s ease-out; }
+        .arrow { font-size: 3em; margin-top: -20px; }
+        .btn-spin { padding: 20px 50px; background: linear-gradient(135deg, #f44336, #ff6b6b); color: white; border: none; border-radius: 50px; font-size: 1.3em; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .result { margin-top: 20px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Roulette Dating</h1>
+        <p>Un match surprise t'attend !</p>
+        <div class="wheel" id="wheel"></div>
+        <div class="arrow">👇</div>
+        <button class="btn-spin" id="spinBtn" onclick="spinWheel()">🎲 TENTER MA CHANCE</button>
+        <div class="result" id="result"></div>
+        <a href="/dashboard" style="color:white;display:block;margin-top:20px;">← Retour</a>
+    </div>
+    <script>
+        function spinWheel() {
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            btn.textContent = '🎰 Ça tourne...';
+            document.getElementById('wheel').classList.add('spinning');
+            document.getElementById('result').textContent = '';
+            
+            setTimeout(() => {
+                document.getElementById('wheel').classList.remove('spinning');
+                const prizes = ['🌟 Match VIP trouvé !', '💎 Super Like offert !', '🎁 24h de premium !', '💬 Message prioritaire !', '🔄 Relance gratuite !', '💝 Un compliment offert !'];
+                const prize = prizes[Math.floor(Math.random() * prizes.length)];
+                document.getElementById('result').innerHTML = '🎉 ' + prize;
+                btn.disabled = false;
+                btn.textContent = '🎲 RETENTER';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

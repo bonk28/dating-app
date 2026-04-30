@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Dating App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 2em; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; margin-top: 5px; }
+        .section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f5f5f5; font-weight: 600; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-success { background: #4CAF50; color: white; }
+        .badge { padding: 5px 10px; border-radius: 15px; font-size: 0.8em; }
+        .badge-active { background: #4CAF5020; color: #4CAF50; }
+        .badge-inactive { background: #f4433620; color: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Dashboard Admin</h1>
+            <a href="/dashboard">← Retour à l'app</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_users }}</div>
+                <div class="stat-label">👥 Utilisateurs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_matches }}</div>
+                <div class="stat-label">💕 Matches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_messages }}</div>
+                <div class="stat-label">💬 Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.new_today }}</div>
+                <div class="stat-label">🆕 Aujourd'hui</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.active_today }}</div>
+                <div class="stat-label">🟢 Actifs aujourd'hui</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.reports }}</div>
+                <div class="stat-label">🚩 Signalements</div>
+            </div>
+        </div>
+
+        {% if pending_reports %}
+        <div class="section">
+            <h2>🚩 Signalements en attente</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Signalé</th>
+                        <th>Par</th>
+                        <th>Raison</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in pending_reports %}
+                    <tr>
+                        <td>ID: {{ report.reported_id }}</td>
+                        <td>ID: {{ report.reporter_id }}</td>
+                        <td>{{ report.reason[:100] }}</td>
+                        <td>{{ report.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <a href="/admin/report/{{ report.id }}/resolve" class="btn btn-success">Résoudre</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <div class="section">
+            <h2>👥 Derniers utilisateurs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Genre</th>
+                        <th>Âge</th>
+                        <th>Inscription</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.gender }}</td>
+                        <td>{{ user.age }}</td>
+                        <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span class="badge {% if user.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                                {{ 'Actif' if user.is_active else 'Inactif' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/admin/user/{{ user.id }}/toggle" class="btn btn-{{ 'danger' if user.is_active else 'success' }}">
+                                {{ 'Désactiver' if user.is_active else 'Activer' }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>💕 Derniers matches</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Utilisateur 1</th>
+                        <th>Utilisateur 2</th>
+                        <th>Compatibilité</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in recent_matches %}
+                    <tr>
+                        <td>{{ match.id }}</td>
+                        <td>ID: {{ match.user1_id }}</td>
+                        <td>ID: {{ match.user2_id }}</td>
+                        <td>{{ match.compatibility }}%</td>
+                        <td>{{ match.created_at.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

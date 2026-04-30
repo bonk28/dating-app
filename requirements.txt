@@ -1,0 +1,17 @@
+flask
+flask-login
+flask-cors
+flask-sqlalchemy
+flask-socketio
+flask-migrate
+flask-wtf
+email-validator
+pillow
+PyJWT
+gunicorn
+gevent
+gevent-websocket
+python-dotenv
+redis
+celery
+python-socketio

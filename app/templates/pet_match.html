@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Match 🐾</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #a8e6cf, #dcedc1); min-height: 100vh; padding: 20px; }
+        .container { max-width: 450px; margin: 0 auto; text-align: center; }
+        h1 { color: #2d3436; }
+        .pets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .pet { background: white; border-radius: 20px; padding: 30px; cursor: pointer; transition: transform 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .pet:hover { transform: translateY(-5px); }
+        .pet-icon { font-size: 4em; }
+        .pet-name { font-weight: bold; margin-top: 10px; }
+        .match-result { background: white; border-radius: 20px; padding: 20px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Pet Match</h1>
+        <p>Choisis ton animal préféré et trouve l'âme sœur !</p>
+        
+        <div class="pets">
+            <div class="pet" onclick="selectPet('dog')"><div class="pet-icon">🐶</div><div class="pet-name">Chien</div></div>
+            <div class="pet" onclick="selectPet('cat')"><div class="pet-icon">🐱</div><div class="pet-name">Chat</div></div>
+            <div class="pet" onclick="selectPet('rabbit')"><div class="pet-icon">🐰</div><div class="pet-name">Lapin</div></div>
+            <div class="pet" onclick="selectPet('bird')"><div class="pet-icon">🦜</div><div class="pet-name">Oiseau</div></div>
+        </div>
+        
+        <div class="match-result" id="petResult">
+            <p>🐾 Sélectionne un animal pour voir les profils compatibles !</p>
+        </div>
+        
+        <a href="/dashboard" style="color:#2d3436;display:block;margin-top:20px;">← Retour</a>
+    </div>
+    <script>
+        function selectPet(pet) {
+            const matches = { dog: 42, cat: 38, rabbit: 25, bird: 15 };
+            document.getElementById('petResult').innerHTML = `<p style="font-size:3em;">🐾</p><p><strong>${matches[pet]} profils</strong> compatibles trouvés !</p><button style="padding:12px 30px;background:#2d3436;color:white;border:none;border-radius:25px;cursor:pointer;margin-top:10px;">🔍 Voir les profils</button>`;
+        }
+    </script>
+</body>
+</html>

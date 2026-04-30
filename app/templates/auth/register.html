@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+        .card{background:white;border-radius:20px;padding:30px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+        h2{text-align:center;margin-bottom:20px;}
+        .flash{background:#f4433620;color:#f44336;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center;}
+        .form-group{margin-bottom:12px;}
+        label{display:block;margin-bottom:4px;color:#666;font-size:0.9em;}
+        input,select{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;}
+        input:focus,select:focus{outline:none;border-color:#667eea;}
+        button{width:100%;padding:15px;background:#667eea;color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer;}
+        .link{text-align:center;margin-top:15px;color:#666;}
+        .link a{color:#667eea;text-decoration:none;font-weight:bold;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>❤️ Inscription</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash" style="background:{{'#4CAF5020' if category=='success' else '#f4433620'}};color:{{'#4CAF50' if category=='success' else '#f44336'}};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Nom d'utilisateur</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" name="password" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label>Âge</label>
+                <input type="number" name="age" min="18" max="100" required>
+            </div>
+            <div class="form-group">
+                <label>Genre</label>
+                <select name="gender" required>
+                    <option value="">Sélectionne</option>
+                    <option value="homme">Homme</option>
+                    <option value="femme">Femme</option>
+                    <option value="non-binaire">Non-binaire</option>
+                </select>
+            </div>
+            <button type="submit">🚀 S'inscrire</button>
+        </form>
+        <p class="link">Déjà un compte ? <a href="/login">Se connecter</a></p>
+    </div>
+</body>
+</html>

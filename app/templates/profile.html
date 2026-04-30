@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,sans-serif;background:#f5f5f5;}
+        .nav{background:white;padding:12px;display:flex;justify-content:space-around;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+        .nav a{text-decoration:none;color:#667eea;font-weight:bold;font-size:0.85em;}
+        .container{max-width:500px;margin:0 auto;padding:15px;}
+        .profile-header{text-align:center;margin:20px 0;}
+        .avatar{width:120px;height:120px;border-radius:50%;margin:0 auto 15px;overflow:hidden;border:4px solid white;box-shadow:0 5px 20px rgba(0,0,0,0.2);background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:4em;}
+        .avatar img{width:100%;height:100%;object-fit:cover;}
+        .badge-row{display:flex;gap:8px;justify-content:center;margin:10px 0;flex-wrap:wrap;}
+        .badge{padding:5px 12px;border-radius:15px;font-size:0.75em;font-weight:bold;}
+        .badge-verified{background:#2196F3;color:white;}
+        .badge-premium{background:#FFD700;color:#333;}
+        .badge-popular{background:#f44336;color:white;}
+        .section{background:white;border-radius:15px;padding:20px;margin:15px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+        .section h3{margin-bottom:15px;color:#333;}
+        .form-group{margin-bottom:12px;}
+        label{display:block;margin-bottom:4px;color:#666;font-size:0.85em;}
+        input,select,textarea{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:1em;font-family:inherit;}
+        textarea{min-height:80px;resize:vertical;}
+        input:focus,select:focus,textarea:focus{outline:none;border-color:#667eea;}
+        .btn{padding:12px 25px;border:none;border-radius:25px;font-weight:bold;cursor:pointer;}
+        .btn-primary{background:#667eea;color:white;width:100%;}
+        .btn-danger{background:#f44336;color:white;margin-top:10px;}
+        .btn-outline{background:white;color:#667eea;border:2px solid #667eea;}
+        .photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+        .photo-item{aspect-ratio:1;border-radius:10px;overflow:hidden;background:#e0e0e0;position:relative;}
+        .photo-item img{width:100%;height:100%;object-fit:cover;}
+        .photo-delete{position:absolute;top:5px;right:5px;background:#f44336;color:white;border:none;border-radius:50%;width:25px;height:25px;cursor:pointer;font-size:0.8em;}
+        .stats{display:flex;justify-content:space-around;text-align:center;}
+        .stat-value{font-size:1.5em;font-weight:bold;color:#667eea;}
+        .stat-label{font-size:0.8em;color:#666;}
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/dashboard">🏠 Découvrir</a>
+        <a href="/matches">💕 Matches</a>
+        <a href="/search">🔍</a>
+        <a href="/features">➕</a>
+        <a href="/profile">👤</a>
+    </div>
+    <div class="container">
+        <div class="profile-header">
+            <div class="avatar">
+                {% if user.photo %}<img src="/static/uploads/{{ user.photo }}" alt="{{ user.username }}">
+                {% else %}👤{% endif %}
+            </div>
+            <h2>{{ user.username }}</h2>
+            <p style="color:#666;">{{ user.age }} ans • {{ user.location or 'Localisation non définie' }}</p>
+            <div class="badge-row">
+                {% if user.is_verified %}<span class="badge badge-verified">✅ Vérifié</span>{% endif %}
+                <span class="badge badge-premium">⭐ Membre</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="stats">
+                <div><div class="stat-value">{{ user.likes_received.count() }}</div><div class="stat-label">Likes reçus</div></div>
+                <div><div class="stat-value">{{ user.likes_sent.count() }}</div><div class="stat-label">Likes envoyés</div></div>
+                <div><div class="stat-value">{{ match_count }}</div><div class="stat-label">Matches</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📝 Modifier mon profil</h3>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" placeholder="Parle de toi...">{{ user.bio or '' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Intérêts (séparés par des virgules)</label>
+                    <input type="text" name="interests" value="{{ user.interests or '' }}" placeholder="Ex: voyage, musique, sport">
+                </div>
+                <div class="form-group">
+                    <label>Localisation</label>
+                    <input type="text" name="location" value="{{ user.location or '' }}" placeholder="Ville">
+                </div>
+                <div class="form-group">
+                    <label>Je recherche</label>
+                    <select name="looking_for">
+                        <option value="">Peu importe</option>
+                        <option value="homme" {{ 'selected' if user.looking_for=='homme' }}>Homme</option>
+                        <option value="femme" {{ 'selected' if user.looking_for=='femme' }}>Femme</option>
+                        <option value="non-binaire" {{ 'selected' if user.looking_for=='non-binaire' }}>Non-binaire</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Distance max (km)</label>
+                    <input type="number" name="max_distance" value="{{ user.max_distance or 50 }}" min="1" max="500">
+                </div>
+                <div class="form-group">
+                    <label>Photo de profil</label>
+                    <input type="file" name="photo" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Sauvegarder</button>
+            </form>
+            
+            <a href="/delete-account" class="btn btn-danger" style="display:block;text-align:center;margin-top:10px;">🗑️ Supprimer mon compte</a>
+        </div>
+    </div>
+    {% include 'music_float.html' %}
+</body>
+</html>

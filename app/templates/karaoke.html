@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karaoké Chat 🎤</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .big-message { font-size: 4em; text-align: center; animation: karaoke 3s ease-in-out infinite; padding: 20px; }
+        @keyframes karaoke { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .input-bar { position: fixed; bottom: 30px; display: flex; gap: 10px; width: 90%; max-width: 500px; }
+        input { flex: 1; padding: 20px; border-radius: 30px; border: none; font-size: 1.2em; background: rgba(255,255,255,0.2); color: white; }
+        button { padding: 20px 30px; border-radius: 30px; border: none; background: #f44336; color: white; font-size: 1.2em; cursor: pointer; }
+        .color-btn { padding: 15px; border-radius: 50%; border: none; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="big-message" id="bigMessage">🎤 Envoie un message !</div>
+    <div>
+        <button class="color-btn" style="background:#f44336;" onclick="changeColor('#f44336')"></button>
+        <button class="color-btn" style="background:#2196F3;" onclick="changeColor('#2196F3')"></button>
+        <button class="color-btn" style="background:#4CAF50;" onclick="changeColor('#4CAF50')"></button>
+        <button class="color-btn" style="background:#FF9800;" onclick="changeColor('#FF9800')"></button>
+        <button class="color-btn" style="background:#9C27B0;" onclick="changeColor('#9C27B0')"></button>
+    </div>
+    <div class="input-bar">
+        <input type="text" id="msgInput" placeholder="Ton message en grand..." onkeypress="if(event.key==='Enter')sendBig()">
+        <button onclick="sendBig()">📢</button>
+    </div>
+    <script>
+        let currentColor = '#fff';
+        function changeColor(c) { currentColor = c; document.getElementById('bigMessage').style.color = c; }
+        function sendBig() {
+            const msg = document.getElementById('msgInput').value.trim();
+            if (msg) {
+                const el = document.getElementById('bigMessage');
+                el.textContent = msg;
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = 'karaoke 3s ease-in-out infinite';
+                document.getElementById('msgInput').value = '';
+            }
+        }
+    </script>
+</body>
+</html>

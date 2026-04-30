@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#000; color:white; }
+        .header { padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+        .header a { color:white; text-decoration:none; }
+        .stories-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; padding:0; }
+        .story-card { aspect-ratio:9/16; background:#1a1a1a; cursor:pointer; position:relative; overflow:hidden; }
+        .story-card img, .story-card video { width:100%; height:100%; object-fit:cover; }
+        .story-add { display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed #333; }
+        .story-add span { font-size:3em; }
+        .story-user { position:absolute; bottom:10px; left:10px; font-weight:bold; font-size:0.9em; text-shadow:0 2px 4px rgba(0,0,0,0.8); }
+        
+        .viewer { position:fixed; top:0; left:0; right:0; bottom:0; background:#000; z-index:1000; display:none; }
+        .viewer img, .viewer video { width:100%; height:100%; object-fit:contain; }
+        .viewer-close { position:absolute; top:20px; right:20px; font-size:2em; cursor:pointer; z-index:1001; color:white; }
+        .viewer-reply { position:absolute; bottom:30px; left:20px; right:20px; display:flex; gap:10px; }
+        .viewer-reply input { flex:1; padding:12px; border-radius:25px; border:none; background:rgba(255,255,255,0.2); color:white; }
+        .viewer-reply button { padding:12px 20px; border-radius:25px; border:none; background:#e91e63; color:white; font-weight:bold; }
+        
+        .reactions { position:absolute; bottom:80px; left:20px; display:flex; gap:10px; flex-wrap:wrap; }
+        .reaction { background:rgba(255,255,255,0.2); padding:8px 12px; border-radius:20px; cursor:pointer; font-size:1.2em; }
+        .reaction:hover { background:rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/features">←</a>
+        <h3>📸 Stories</h3>
+        <span></span>
+    </div>
+    <div class="stories-grid" id="storiesGrid">
+        <div class="story-card story-add" onclick="document.getElementById('storyFile').click()">
+            <span>➕</span>
+            <small>Ajouter</small>
+        </div>
+    </div>
+    <input type="file" id="storyFile" accept="image/*,video/*" style="display:none" onchange="addStory(this.files[0])">
+    
+    <div class="viewer" id="viewer">
+        <span class="viewer-close" onclick="closeViewer()">✕</span>
+        <div id="viewerMedia"></div>
+        <div class="reactions" id="reactions">
+            <span class="reaction" onclick="sendReaction('❤️')">❤️</span>
+            <span class="reaction" onclick="sendReaction('😂')">😂</span>
+            <span class="reaction" onclick="sendReaction('🔥')">🔥</span>
+            <span class="reaction" onclick="sendReaction('😍')">😍</span>
+            <span class="reaction" onclick="sendReaction('👏')">👏</span>
+            <span class="reaction" onclick="sendReaction('💯')">💯</span>
+        </div>
+        <div class="viewer-reply">
+            <input type="text" id="replyInput" placeholder="Réagir à cette story...">
+            <button onclick="sendReply()">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        let stories = JSON.parse(localStorage.getItem('myStories') || '[]');
+        let currentStoryIndex = 0;
+        
+        function addStory(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                stories.unshift({
+                    type: file.type.startsWith('video') ? 'video' : 'image',
+                    dataUrl: e.target.result,
+                    user: 'Moi',
+                    time: new Date().toLocaleTimeString(),
+                    replies: [],
+                    reactions: []
+                });
+                localStorage.setItem('myStories', JSON.stringify(stories));
+                renderStories();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function renderStories() {
+            const grid = document.getElementById('storiesGrid');
+            grid.innerHTML = `
+                <div class="story-card story-add" onclick="document.getElementById('storyFile').click()">
+                    <span>➕</span><small>Ajouter</small>
+                </div>
+            ` + stories.map((s, i) => `
+                <div class="story-card" onclick="viewStory(${i})">
+                    ${s.type === 'video' ? `<video src="${s.dataUrl}"></video>` : `<img src="${s.dataUrl}">`}
+                    <div class="story-user">Moi • ${s.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function viewStory(index) {
+            currentStoryIndex = index;
+            const story = stories[index];
+            const viewer = document.getElementById('viewer');
+            const media = document.getElementById('viewerMedia');
+            
+            media.innerHTML = story.type === 'video' 
+                ? `<video src="${story.dataUrl}" autoplay loop controls></video>`
+                : `<img src="${story.dataUrl}">`;
+            viewer.style.display = 'block';
+        }
+        
+        function closeViewer() {
+            document.getElementById('viewer').style.display = 'none';
+        }
+        
+        function sendReaction(emoji) {
+            stories[currentStoryIndex].reactions.push(emoji);
+            localStorage.setItem('myStories', JSON.stringify(stories));
+            // Animation de l'emoji qui flotte
+            const el = document.createElement('div');
+            el.textContent = emoji;
+            el.style.cssText = 'position:fixed;font-size:2em;animation:floatUp 2s ease-out;z-index:2000;left:50%;bottom:150px;';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+        
+        function sendReply() {
+            const input = document.getElementById('replyInput');
+            const text = input.value.trim();
+            if (!text) return;
+            stories[currentStoryIndex].replies.push({ text, time: new Date().toLocaleTimeString() });
+            localStorage.setItem('myStories', JSON.stringify(stories));
+            input.value = '';
+            alert('💬 Réponse envoyée : ' + text);
+        }
+        
+        // Animation CSS
+        const style = document.createElement('style');
+        style.textContent = '@keyframes floatUp { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-200px) scale(2); } }';
+        document.head.appendChild(style);
+        
+        renderStories();
+    </script>
+</body>
+</html>

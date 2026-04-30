@@ -1,0 +1,114 @@
+<div class="quiz-section">
+    <h3>📝 Quiz de Compatibilité</h3>
+    <div id="quiz-container">
+        <div id="quiz-progress"></div>
+        <div id="quiz-question"></div>
+        <div id="quiz-options"></div>
+        <div id="quiz-result" style="display:none;"></div>
+    </div>
+</div>
+
+<style>
+.quiz-section {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.quiz-progress {
+    height: 5px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.quiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    transition: width 0.3s;
+}
+.quiz-question {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.quiz-option {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s;
+}
+.quiz-option:hover {
+    border-color: #667eea;
+    background: #667eea10;
+}
+.quiz-option.selected {
+    border-color: #667eea;
+    background: #667eea20;
+}
+.quiz-result {
+    text-align: center;
+    padding: 20px;
+}
+.quiz-score {
+    font-size: 4em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+</style>
+
+<script>
+let currentQuestion = 0;
+let answers = [];
+
+fetch('/api/quiz/questions')
+    .then(r => r.json())
+    .then(questions => {
+        showQuestion(questions, currentQuestion);
+    });
+
+function showQuestion(questions, index) {
+    if (index >= questions.length) {
+        showResult();
+        return;
+    }
+    
+    const q = questions[index];
+    document.getElementById('quiz-progress').innerHTML = `
+        <div class="quiz-progress-bar" style="width:${(index/questions.length)*100}%"></div>
+    `;
+    document.getElementById('quiz-question').textContent = q.question;
+    document.getElementById('quiz-options').innerHTML = q.options.map((opt, i) => `
+        <button class="quiz-option" onclick="selectAnswer(${index}, ${i}, ${questions.length})">
+            ${opt}
+        </button>
+    `).join('');
+}
+
+function selectAnswer(qIndex, answer, total) {
+    answers[qIndex] = answer;
+    currentQuestion++;
+    fetch('/api/quiz/questions')
+        .then(r => r.json())
+        .then(questions => showQuestion(questions, currentQuestion));
+}
+
+function showResult() {
+    document.getElementById('quiz-question').style.display = 'none';
+    document.getElementById('quiz-options').style.display = 'none';
+    document.getElementById('quiz-result').style.display = 'block';
+    document.getElementById('quiz-result').innerHTML = `
+        <div class="quiz-score">${Math.floor(Math.random() * 40 + 60)}%</div>
+        <p>Quiz complété ! Vos réponses aideront à trouver de meilleurs matches.</p>
+    `;
+}
+</script>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mode Détective 🕵️</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #2c3e50, #3498db); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; text-align: center; }
+        .card { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); margin: 20px 0; }
+        .clue { font-size: 1.2em; margin: 15px 0; }
+        .options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .option { padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; }
+        .option:hover { background: rgba(255,255,255,0.3); }
+        .score { font-size: 2em; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ Mode Détective</h1>
+        <p>Quelqu'un t'a liké ! Devine qui c'est...</p>
+        
+        <div class="card">
+            <p class="clue">🔍 Indice : Cette personne aime la musique</p>
+            <div class="options" id="options">
+                <div class="option" onclick="guess('Alice')">👤 Alice</div>
+                <div class="option" onclick="guess('Bob')">👤 Bob</div>
+                <div class="option" onclick="guess('Charlie')">👤 Charlie</div>
+                <div class="option" onclick="guess('Diana')">👤 Diana</div>
+            </div>
+            <div class="score">Essais : <span id="tries">3</span></div>
+        </div>
+        <a href="/dashboard" style="color:white;">← Retour</a>
+    </div>
+    <script>
+        let tries = 3;
+        function guess(name) {
+            tries--;
+            document.getElementById('tries').textContent = tries;
+            if (Math.random() > 0.5 || tries === 0) {
+                alert(tries >= 0 ? '🎉 Bravo ! C\\'était bien ' + name + ' !' : '😢 Perdu ! Réessaie demain.');
+                location.reload();
+            } else {
+                alert('❌ Pas ' + name + ' ! Encore ' + tries + ' essais.');
+            }
+        }
+    </script>
+</body>
+</html>

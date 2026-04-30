@@ -1,0 +1,374 @@
+from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
+from flask_login import login_required, current_user
+from app import db
+from app.main import bp
+from app.models import User, Like, Match, Message, UserPhoto, Report
+from werkzeug.utils import secure_filename
+import os
+import random
+from datetime import datetime
+
+@bp.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+    return render_template('index.html')
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    current_user.last_seen = datetime.utcnow()
+    db.session.commit()
+    
+    liked_ids = [like.liked_id for like in current_user.likes_sent.all()]
+    liked_ids.append(current_user.id)
+    
+    potential = User.query.filter(
+        ~User.id.in_(liked_ids),
+        User.is_active == True
+    )
+    
+    if current_user.looking_for:
+        potential = potential.filter(User.gender == current_user.looking_for)
+    
+    matches = potential.all()
+    
+    # Calculer la distance et compatibilité
+    for match in matches:
+        if current_user.latitude and current_user.longitude and match.latitude and match.longitude:
+            from math import radians, sin, cos, sqrt, atan2
+            lat1, lon1 = radians(current_user.latitude), radians(current_user.longitude)
+            lat2, lon2 = radians(match.latitude), radians(match.longitude)
+            
+            dlat = lat2 - lat1
+            dlon = lon2 - lon1
+            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+            c = 2 * atan2(sqrt(a), sqrt(1-a))
+            match.distance = int(6371 * c)
+        
+        match.compatibility = current_user.get_compatibility(match)
+    
+    # Trier par compatibilité
+    matches.sort(key=lambda x: x.compatibility, reverse=True)
+    
+    return render_template('dashboard.html', matches=matches[:30],
+                         current_user=current_user)
+
+@bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        current_user.bio = request.form.get('bio')
+        current_user.interests = request.form.get('interests')
+        current_user.location = request.form.get('location')
+        current_user.looking_for = request.form.get('looking_for')
+        current_user.max_distance = request.form.get('max_distance', 50, type=int)
+        
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and file.filename:
+                filename = secure_filename(f"{current_user.id}_{int(datetime.now().timestamp())}_{file.filename}")
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                
+                # Mettre comme photo principale si première photo
+                photo = UserPhoto(
+                    filename=filename,
+                    user_id=current_user.id,
+                    is_primary=not current_user.photos.first()
+                )
+                db.session.add(photo)
+                current_user.photo = filename
+        
+        db.session.commit()
+        flash('Profil mis à jour avec succès !', 'success')
+        return redirect(url_for('main.profile'))
+    
+    return render_template('profile.html', user=current_user)
+
+@bp.route('/matches')
+@login_required
+def matches():
+    user_matches = Match.query.filter(
+        ((Match.user1_id == current_user.id) | (Match.user2_id == current_user.id)),
+        Match.is_active == True
+    ).order_by(Match.created_at.desc()).all()
+    
+    matched_users = []
+    for match in user_matches:
+        other_id = match.user2_id if match.user1_id == current_user.id else match.user1_id
+        other_user = User.query.get(other_id)
+        if other_user:
+            last_msg = Message.query.filter_by(match_id=match.id)\
+                        .order_by(Message.created_at.desc()).first()
+            unread = Message.query.filter_by(
+                match_id=match.id,
+                sender_id=other_id,
+                is_read=False
+            ).count()
+            matched_users.append({
+                'user': other_user,
+                'match': match,
+                'last_message': last_msg,
+                'unread': unread
+            })
+    
+    return render_template('matches.html', matched_users=matched_users)
+
+@bp.route('/chat/<int:match_id>')
+@login_required
+def chat(match_id):
+    match = Match.query.get_or_404(match_id)
+    
+    if current_user.id not in [match.user1_id, match.user2_id]:
+        flash('Accès non autorisé.', 'error')
+        return redirect(url_for('main.matches'))
+    
+    other_id = match.user2_id if match.user1_id == current_user.id else match.user1_id
+    other_user = User.query.get(other_id)
+    
+    messages = Message.query.filter_by(match_id=match.id)\
+                .order_by(Message.created_at).all()
+    
+    return render_template('chat.html', match=match, other_user=other_user,
+                         messages=messages)
+
+@bp.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    users = []
+    if request.method == 'POST':
+        min_age = request.form.get('min_age', 18, type=int)
+        max_age = request.form.get('max_age', 100, type=int)
+        gender = request.form.get('gender', '')
+        location = request.form.get('location', '')
+        interests = request.form.get('interests', '')
+        
+        query = User.query.filter(
+            User.id != current_user.id,
+            User.is_active == True
+        )
+        
+        if gender:
+            query = query.filter(User.gender == gender)
+        if min_age and max_age:
+            query = query.filter(User.age.between(min_age, max_age))
+        if location:
+            query = query.filter(User.location.contains(location))
+        if interests:
+            query = query.filter(User.interests.contains(interests))
+        
+        users = query.limit(50).all()
+    
+    return render_template('search.html', users=users)
+
+@bp.route('/pwa')
+def pwa():
+    return render_template('pwa.html')
+
+@bp.route('/manifest.json')
+def manifest():
+    return jsonify({
+        "name": "Dating App",
+        "short_name": "Dating",
+        "description": "Application de rencontre",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#667eea",
+        "icons": [{
+            "src": "/static/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }]
+    })
+
+@bp.route('/sw.js')
+def service_worker():
+    return app.send_static_file('sw.js'), 200, {'Content-Type': 'application/javascript'}
+
+@bp.route('/profile/<int:user_id>')
+@login_required
+def view_profile(user_id):
+    """Voir le profil d'un autre utilisateur"""
+    user = User.query.get_or_404(user_id)
+    
+    # Ne pas voir son propre profil (rediriger vers /profile)
+    if user.id == current_user.id:
+        return redirect(url_for('main.profile'))
+    
+    # Calculer la compatibilité
+    compatibility = current_user.get_compatibility(user)
+    
+    # Calculer la distance si possible
+    distance = None
+    if current_user.latitude and current_user.longitude and user.latitude and user.longitude:
+        from math import radians, sin, cos, sqrt, atan2
+        lat1, lon1 = radians(current_user.latitude), radians(current_user.longitude)
+        lat2, lon2 = radians(user.latitude), radians(user.longitude)
+        dlat, dlon = lat2 - lat1, lon2 - lon1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1-a))
+        distance = int(6371 * c)
+    
+    # Récupérer les photos de l'utilisateur
+    photos = UserPhoto.query.filter_by(user_id=user.id).all()
+    
+    # Vérifier si on a déjà liké cette personne
+    existing_like = Like.query.filter_by(
+        liker_id=current_user.id, 
+        liked_id=user.id
+    ).first()
+    
+    return render_template('view_profile.html', 
+                         user=user, 
+                         compatibility=compatibility,
+                         distance=distance,
+                         photos=photos,
+                         existing_like=existing_like)
+
+@bp.route('/stories')
+@login_required
+def stories_page():
+    """Page des stories"""
+    return render_template('stories.html')
+
+@bp.route('/quiz-page')
+@login_required
+def quiz_page():
+    """Page du quiz"""
+    return render_template('quiz_page.html')
+
+@bp.route('/icebreakers-page')
+@login_required
+def icebreakers_page():
+    """Page des ice breakers"""
+    return render_template('icebreakers_page.html')
+
+@bp.route('/achievements-page')
+@login_required
+def achievements_page():
+    """Page des achievements"""
+    return render_template('achievements_page.html')
+
+@bp.route('/events')
+@login_required
+def events_page():
+    """Page des événements"""
+    return render_template('events.html')
+
+@bp.route('/daily-question-page')
+@login_required
+def daily_question_page():
+    """Page de la question du jour"""
+    return render_template('daily_question.html')
+
+@bp.route('/settings')
+@login_required
+def settings_page():
+    """Page des paramètres"""
+    return render_template('settings.html')
+
+@bp.route('/features')
+@login_required
+def features():
+    """Page de toutes les fonctionnalités"""
+    return render_template('features.html')
+
+@bp.route('/music-match/<int:match_id>')
+@login_required
+def music_match(match_id):
+    """Voir les goûts musicaux communs"""
+    match = Match.query.get_or_404(match_id)
+    other_id = match.user2_id if match.user1_id == current_user.id else match.user1_id
+    other_user = User.query.get(other_id)
+    
+    return render_template('music_match.html', other_user=other_user, match=match)
+
+@bp.route('/music-match/<int:match_id>')
+@login_required
+def music_match(match_id):
+    """Voir les goûts musicaux communs"""
+    match = Match.query.get_or_404(match_id)
+    other_id = match.user2_id if match.user1_id == current_user.id else match.user1_id
+    other_user = User.query.get(other_id)
+    
+    return render_template('music_match.html', other_user=other_user, match=match)
+
+@bp.route('/compliments')
+@login_required
+def compliments():
+    compliments = [
+        "Ton sourire illumine ma journée ☀️",
+        "Tu as un humour incroyable 😄",
+        "J'adore ta façon de voir les choses 💭",
+        "Tes yeux sont magnifiques ✨",
+        "Tu es une personne vraiment intéressante 🌟"
+    ]
+    return render_template('compliments.html', compliments=compliments)
+
+@bp.route('/top-profiles')
+@login_required
+def top_profiles():
+    # Profils avec le plus de likes cette semaine
+    from datetime import timedelta
+    week_ago = datetime.utcnow() - timedelta(days=7)
+    
+    top = User.query.filter(
+        User.id != current_user.id,
+        User.is_active == True
+    ).order_by(User.last_seen.desc()).limit(10).all()
+    
+    return render_template('top_profiles.html', users=top)
+
+@bp.route('/my-stats')
+@login_required
+def my_stats():
+    from datetime import timedelta
+    
+    stats = {
+        'total_likes_sent': Like.query.filter_by(liker_id=current_user.id).count(),
+        'total_likes_received': Like.query.filter_by(liked_id=current_user.id).count(),
+        'total_matches': Match.query.filter(
+            (Match.user1_id == current_user.id) | (Match.user2_id == current_user.id)
+        ).count(),
+        'total_messages': Message.query.filter_by(sender_id=current_user.id).count(),
+        'swipes_today': Like.query.filter_by(
+            liker_id=current_user.id
+        ).filter(
+            Like.created_at >= datetime.now().date()
+        ).count(),
+        'profile_views': 42  # fictif
+    }
+    
+    return render_template('my_stats.html', stats=stats)
+
+@bp.route('/game')
+@login_required
+def game():
+    return render_template('game.html')
+
+@bp.route('/top-profiles')
+@login_required
+def top_profiles():
+    from datetime import timedelta
+    top = User.query.filter(User.id != current_user.id, User.is_active == True).order_by(User.last_seen.desc()).limit(10).all()
+    return render_template('top_profiles.html', users=top)
+
+@bp.route('/compliments')
+@login_required
+def compliments():
+    compliments = ["Ton sourire illumine ma journée ☀️", "Tu as un humour incroyable 😄", "J'adore ta façon de voir les choses 💭", "Tes yeux sont magnifiques ✨", "Tu es une personne vraiment intéressante 🌟"]
+    return render_template('compliments.html', compliments=compliments)
+
+@bp.route('/my-stats')
+@login_required
+def my_stats():
+    stats = {
+        'total_likes_sent': Like.query.filter_by(liker_id=current_user.id).count(),
+        'total_likes_received': Like.query.filter_by(liked_id=current_user.id).count(),
+        'total_matches': Match.query.filter((Match.user1_id == current_user.id) | (Match.user2_id == current_user.id)).count(),
+        'total_messages': Message.query.filter_by(sender_id=current_user.id).count(),
+        'swipes_today': Like.query.filter_by(liker_id=current_user.id).filter(Like.created_at >= datetime.now().date()).count(),
+    }
+    return render_template('my_stats.html', stats=stats)

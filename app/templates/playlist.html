@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Playlist</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#0f0f1a; color:white; min-height:100vh; }
+        .header { padding:15px; display:flex; align-items:center; gap:15px; background:#1a1a2e; }
+        .header a { color:white; text-decoration:none; font-size:1.3em; }
+        .container { max-width:500px; margin:0 auto; padding:15px; }
+        .upload-area { border:2px dashed #333; border-radius:15px; padding:30px; text-align:center; margin:15px 0; cursor:pointer; }
+        .upload-area:hover { border-color:#1DB954; }
+        .track { display:flex; align-items:center; gap:12px; padding:12px; border-radius:10px; cursor:pointer; margin:3px 0; }
+        .track:hover { background:rgba(255,255,255,0.05); }
+        .track.active { background:rgba(29,185,84,0.2); }
+        .track-num { width:30px; text-align:center; font-weight:bold; color:#aaa; }
+        .track-info { flex:1; }
+        .track-artist { font-size:0.8em; color:#888; }
+        .delete-track { color:#f44336; cursor:pointer; padding:5px; }
+        .nav-links { display:flex; gap:8px; margin:10px 0; flex-wrap:wrap; }
+        .nav-links a { color:#1DB954; text-decoration:none; font-size:0.75em; padding:6px 10px; border:1px solid #1DB954; border-radius:15px; }
+        input[type=file] { display:none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/features">←</a>
+        <h2>🎵 Playlist</h2>
+    </div>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/dashboard">🏠 Accueil</a>
+            <a href="/matches">💕 Matches</a>
+            <a href="/profile">👤 Profil</a>
+        </div>
+        
+        <div class="upload-area" onclick="document.getElementById('musicFile').click()">
+            <p>📁 Ajouter des MP3</p>
+            <small>Formats : MP3, WAV, OGG</small>
+        </div>
+        <input type="file" id="musicFile" accept="audio/*" multiple onchange="uploadMusic(this.files)">
+        
+        <div id="playlistContainer"></div>
+    </div>
+
+    <script>
+        let playlist = getGlobalPlaylist ? getGlobalPlaylist() : [];
+        let currentIndex = getCurrentTrackIndex ? getCurrentTrackIndex() : -1;
+        
+        function save() { localStorage.setItem('_playerState', JSON.stringify({playlist, currentIndex, isPlaying: isGlobalPlaying ? isGlobalPlaying() : false})); }
+        
+        function uploadMusic(files) {
+            for (let file of files) {
+                if (!file.type.startsWith('audio/')) continue;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const track = {
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        artist: 'Ma bibliothèque',
+                        dataUrl: e.target.result,
+                        duration: '--:--'
+                    };
+                    playlist.push(track);
+                    if (typeof addToGlobalPlaylist === 'function') addToGlobalPlaylist(track);
+                    save(); renderPlaylist();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function renderPlaylist() {
+            const c = document.getElementById('playlistContainer');
+            if (playlist.length === 0) {
+                c.innerHTML = '<p style="text-align:center;color:#888;padding:30px;">Aucune musique</p>';
+                return;
+            }
+            c.innerHTML = playlist.map((t,i) => `
+                <div class="track ${i===currentIndex?'active':''}" onclick="playTrack(${i})">
+                    <span class="track-num">${i===currentIndex?'🔊':i+1}</span>
+                    <div class="track-info"><div>${t.title}</div><div class="track-artist">${t.artist}</div></div>
+                    <span class="delete-track" onclick="deleteTrack(event,${i})">🗑️</span>
+                </div>`).join('');
+        }
+        
+        function playTrack(index) {
+            currentIndex = index;
+            if (typeof playGlobalTrack === 'function') playGlobalTrack(index);
+            renderPlaylist();
+        }
+        
+        function deleteTrack(e,i) {
+            e.stopPropagation();
+            playlist.splice(i,1);
+            if (currentIndex===i) currentIndex=-1;
+            else if (currentIndex>i) currentIndex--;
+            save(); renderPlaylist();
+        }
+        
+        renderPlaylist();
+    </script>
+</body>
+</html>

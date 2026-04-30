@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Profils</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #ffd700, #ff8c00); min-height: 100vh; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        h1 { text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .profile-card {
+            background: white; border-radius: 15px; padding: 15px; margin: 10px 0;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .rank { font-size: 2em; font-weight: bold; min-width: 40px; text-align: center; }
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+        .avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: #e0e0e0; display: flex; align-items: center; justify-content: center;
+            font-size: 2em; overflow: hidden;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .info { flex: 1; }
+        .name { font-weight: bold; font-size: 1.1em; }
+        .stats { color: #666; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 Top Profils</h1>
+        <p style="text-align:center;color:white;margin-bottom:20px;">Les plus populaires cette semaine</p>
+        
+        {% for user in users %}
+        <div class="profile-card">
+            <div class="rank rank-{{ loop.index }}">#{{ loop.index }}</div>
+            <div class="avatar">
+                {% if user.photo %}
+                <img src="/static/uploads/{{ user.photo }}" alt="{{ user.username }}">
+                {% else %}👤{% endif %}
+            </div>
+            <div class="info">
+                <div class="name">{{ user.username }}, {{ user.age }}</div>
+                <div class="stats">📍 {{ user.location or 'Inconnu' }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <a href="/dashboard" style="display:block;text-align:center;color:white;margin-top:20px;">← Découvrir</a>
+    </div>
+</body>
+</html>

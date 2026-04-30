@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appel vocal - {{ other_user.username }}</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#075e54,#128c7e);height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;}
+        .avatar{width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:5em;margin-bottom:20px;animation:pulse 2s infinite;}
+        .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.4);}50%{box-shadow:0 0 0 30px rgba(255,255,255,0);}}
+        h2{font-size:1.8em;margin-bottom:5px;}
+        .status{opacity:0.8;margin-bottom:40px;}
+        .controls{display:flex;gap:30px;}
+        .btn{width:70px;height:70px;border-radius:50%;border:none;font-size:2em;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+        .btn-end{background:#f44336;color:white;width:80px;height:80px;}
+        .btn-mute{background:rgba(255,255,255,0.3);color:white;}
+        .btn-speaker{background:rgba(255,255,255,0.3);color:white;}
+        .btn:active{transform:scale(0.9);}
+        .timer{font-size:1.2em;margin-top:20px;opacity:0.8;}
+    </style>
+</head>
+<body>
+    <div class="avatar">
+        {% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}
+    </div>
+    <h2>{{ other_user.username }}</h2>
+    <p class="status" id="status">Appel vocal en cours...</p>
+    <div class="timer" id="timer">00:00</div>
+    
+    <div class="controls" style="margin-top:40px;">
+        <button class="btn btn-mute" id="muteBtn" onclick="toggleMute()">🎤</button>
+        <button class="btn btn-end" onclick="endCall()">📞</button>
+        <button class="btn btn-speaker" onclick="toggleSpeaker()">🔊</button>
+    </div>
+    
+    <script>
+        let startTime = Date.now();
+        let isMuted = false;
+        
+        // Minuteur
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const mins = Math.floor(elapsed / 60).toString().padStart(2,'0');
+            const secs = (elapsed % 60).toString().padStart(2,'0');
+            document.getElementById('timer').textContent = `${mins}:${secs}`;
+        }, 1000);
+        
+        // WebRTC audio seulement
+        async function startVoiceCall() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                document.getElementById('status').textContent = '✅ Connecté';
+                window.audioStream = stream;
+            } catch(e) {
+                document.getElementById('status').textContent = '⚠️ Micro non disponible';
+            }
+        }
+        
+        function toggleMute() {
+            if (window.audioStream) {
+                isMuted = !isMuted;
+                window.audioStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+                document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🎤';
+                document.getElementById('muteBtn').style.background = isMuted ? 'white' : 'rgba(255,255,255,0.3)';
+                document.getElementById('muteBtn').style.color = isMuted ? '#333' : 'white';
+            }
+        }
+        
+        function toggleSpeaker() {
+            // Sur mobile, le haut-parleur est géré par l'OS
+            alert('Utilisez les boutons de volume de votre téléphone');
+        }
+        
+        function endCall() {
+            if (window.audioStream) {
+                window.audioStream.getTracks().forEach(t => t.stop());
+            }
+            window.location.href = '/chat/{{ match.id }}';
+        }
+        
+        startVoiceCall();
+    </script>
+</body>
+</html>

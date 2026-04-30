@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Compatibilité - Dating App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header a { color: white; text-decoration: none; font-size: 1.5em; }
+        .header h2 { color: white; }
+        .quiz-card {
+            background: white; border-radius: 20px; padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .progress { height: 5px; background: #e0e0e0; border-radius: 5px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); transition: width 0.5s; }
+        .question { font-size: 1.3em; font-weight: bold; margin-bottom: 25px; color: #333; }
+        .option {
+            display: block; width: 100%; padding: 18px; margin: 12px 0;
+            border: 2px solid #e0e0e0; border-radius: 15px; background: white;
+            cursor: pointer; text-align: left; font-size: 1.1em;
+            transition: all 0.3s;
+        }
+        .option:hover { border-color: #667eea; background: #667eea10; transform: translateX(5px); }
+        .result { text-align: center; padding: 20px; }
+        .score { font-size: 5em; font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/features">←</a>
+            <h2>📝 Quiz</h2>
+            <div></div>
+        </div>
+
+        <div class="quiz-card">
+            <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+            <div class="question" id="question">Chargement...</div>
+            <div id="options"></div>
+            <div id="result" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentQ = 0;
+        let answers = [];
+        let questions = [];
+        
+        fetch('/api/quiz/questions')
+            .then(r => r.json())
+            .then(q => {
+                questions = q;
+                showQuestion();
+            });
+        
+        function showQuestion() {
+            if (currentQ >= questions.length) {
+                showResult();
+                return;
+            }
+            const q = questions[currentQ];
+            document.getElementById('progress-bar').style.width = ((currentQ/questions.length)*100) + '%';
+            document.getElementById('question').textContent = q.question;
+            document.getElementById('options').innerHTML = q.options.map((opt, i) => `
+                <button class="option" onclick="answer(${i})">${opt}</button>
+            `).join('');
+        }
+        
+        function answer(index) {
+            answers[currentQ] = index;
+            currentQ++;
+            showQuestion();
+        }
+        
+        function showResult() {
+            document.getElementById('question').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            const score = Math.floor(Math.random() * 40 + 60);
+            document.getElementById('result').innerHTML = `
+                <div class="score">${score}%</div>
+                <p style="color:#666;margin-top:20px;">Quiz complété !</p>
+                <p style="color:#666;">Vos réponses nous aideront à trouver des matches plus compatibles.</p>
+                <a href="/dashboard" style="display:inline-block;margin-top:20px;padding:15px 30px;background:linear-gradient(135deg, #667eea, #764ba2);color:white;text-decoration:none;border-radius:25px;">Découvrir des profils</a>
+            `;
+            fetch('/api/quiz/submit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({answers: answers})
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mur des Confessions 💬</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; color: white; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; }
+        .confession-card { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin: 15px 0; }
+        .confession-text { font-style: italic; font-size: 1.1em; }
+        .confession-time { font-size: 0.7em; color: #ccc; margin-top: 10px; }
+        .add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #ff6b6b; color: white; border: none; font-size: 2em; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 350px; width: 90%; color: #333; }
+        textarea { width: 100%; height: 120px; border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; font-size: 16px; resize: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Mur des Confessions</h1>
+        <p style="text-align:center;">Messages anonymes. Libère ton cœur !</p>
+        
+        <div id="confessions">
+            <div class="confession-card">
+                <p class="confession-text">"J'ai liké 50 profils aujourd'hui... je cherche l'amour !"</p>
+                <p class="confession-time">Il y a 5 minutes</p>
+            </div>
+            <div class="confession-card">
+                <p class="confession-text">"Je suis timide, mais cette app m'aide à m'ouvrir"</p>
+                <p class="confession-time">Il y a 15 minutes</p>
+            </div>
+            <div class="confession-card">
+                <p class="confession-text">"J'espère trouver quelqu'un qui aime les pizzas à l'ananas"</p>
+                <p class="confession-time">Il y a 30 minutes</p>
+            </div>
+        </div>
+        
+        <button class="add-btn" onclick="openModal()">+</button>
+    </div>
+    
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3>💬 Ta confession anonyme</h3>
+            <textarea placeholder="Écris ce que tu veux... c'est anonyme !"></textarea>
+            <button onclick="addConfession()" style="width:100%;padding:15px;background:#667eea;color:white;border:none;border-radius:10px;font-size:1em;cursor:pointer;margin-top:10px;">📤 Publier anonymement</button>
+            <button onclick="closeModal()" style="width:100%;padding:10px;background:transparent;border:none;color:#666;cursor:pointer;margin-top:5px;">Annuler</button>
+        </div>
+    </div>
+    
+    <a href="/dashboard" style="color:white;display:block;text-align:center;margin:20px;">← Retour</a>
+    
+    <script>
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function addConfession() {
+            const text = document.querySelector('textarea').value.trim();
+            if (text) {
+                const div = document.createElement('div');
+                div.className = 'confession-card';
+                div.innerHTML = `<p class="confession-text">"${text}"</p><p class="confession-time">À l'instant</p>`;
+                document.getElementById('confessions').prepend(div);
+                document.querySelector('textarea').value = '';
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

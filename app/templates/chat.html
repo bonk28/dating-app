@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - {{ other_user.username }}</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,sans-serif;background:#e5ddd5;height:100vh;display:flex;flex-direction:column;}
+        .header{background:#075e54;color:white;padding:8px 12px;display:flex;align-items:center;gap:10px;}
+        .header a{color:white;text-decoration:none;font-size:1.3em;}
+        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:1.2em;}
+        .avatar img{width:100%;height:100%;object-fit:cover;}
+        .info{flex:1;}.name{font-weight:600;}.status{font-size:0.7em;opacity:0.8;}
+        .header-btn{background:none;border:none;color:white;font-size:1.2em;cursor:pointer;padding:5px;text-decoration:none;}
+        
+        .messages{flex:1;overflow-y:auto;padding:10px 15px;display:flex;flex-direction:column;gap:2px;}
+        .date-sep{text-align:center;margin:10px 0;font-size:0.7em;}
+        .date-sep span{background:#e1f3fb;padding:4px 10px;border-radius:5px;}
+        .msg{max-width:75%;padding:6px 10px;border-radius:8px;position:relative;animation:in 0.2s;}
+        @keyframes in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+        .sent{background:#dcf8c6;align-self:flex-end;border-top-right-radius:0;}
+        .recv{background:#fff;align-self:flex-start;border-top-left-radius:0;box-shadow:0 1px 1px rgba(0,0,0,0.05);}
+        .time{font-size:0.6em;color:#999;text-align:right;margin-top:2px;}
+        .media{max-width:200px;border-radius:8px;cursor:pointer;}
+        
+        .input-bar{background:#f0f0f0;padding:6px 10px;display:flex;align-items:center;gap:6px;}
+        .btn{background:none;border:none;color:#54656f;font-size:1.3em;cursor:pointer;padding:5px;border-radius:50%;}
+        .btn:hover{background:rgba(0,0,0,0.1);}
+        .btn-green{background:#075e54;color:white;width:36px;height:36px;}
+        input{flex:1;padding:10px 14px;border:none;border-radius:25px;font-size:0.9em;outline:none;}
+        .send{background:none;border:none;color:#075e54;font-size:1.3em;cursor:pointer;}
+        
+        .emoji-panel{display:none;background:white;padding:8px;flex-wrap:wrap;gap:5px;border-top:1px solid #ddd;}
+        .emoji-panel.show{display:flex;}.emoji{font-size:1.4em;cursor:pointer;padding:3px;}
+        
+        /* Panel jeux */
+        #gamesPanel{display:none;position:fixed;bottom:0;left:0;right:0;background:white;z-index:200;border-radius:20px 20px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,0.3);max-height:70vh;overflow-y:auto;}
+        .game-card{display:flex;align-items:center;gap:12px;padding:15px;margin:8px 15px;background:#f8f8f8;border-radius:12px;cursor:pointer;border:2px solid transparent;}
+        .game-card:hover{border-color:#075e54;background:#e8f5e9;}
+        .game-icon{font-size:2.5em;}
+        
+        .msg-menu{display:none;position:fixed;background:white;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,0.3);z-index:50;min-width:140px;}
+        .msg-menu div{padding:12px 20px;cursor:pointer;}
+        .msg-menu .danger{color:#f44336;}
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <a href="/matches">←</a>
+        <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
+        <div class="info"><div class="name">{{ other_user.username }}</div><div class="status">En ligne</div></div>
+        <a href="/call/video/{{ match.id }}" class="header-btn">📹</a>
+        <a href="/call/voice/{{ match.id }}" class="header-btn">📞</a>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="messages" id="messages"></div>
+
+    <!-- MENU MESSAGE -->
+    <div class="msg-menu" id="msgMenu">
+        <div onclick="editMsg()">✏️ Modifier</div>
+        <div class="danger" onclick="deleteMsg()">🗑️ Supprimer</div>
+    </div>
+
+    <!-- PANEL JEUX -->
+    <div id="gamesPanel">
+        <div style="background:#075e54;color:white;padding:15px 20px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="margin:0;">🎮 Jeux avec {{ other_user.username }}</h3>
+            <button onclick="closeGames()" style="background:none;border:none;color:white;font-size:1.8em;cursor:pointer;">✕</button>
+        </div>
+        <div style="padding:10px 0 20px;">
+            <div class="game-card" onclick="startRPS()">
+                <div class="game-icon">✊</div>
+                <div style="flex:1;"><b>Pierre Feuille Ciseaux</b><br><small style="color:#666;">Choisissez, confirmez, résultat en direct</small></div>
+                <span style="font-size:1.5em;">▶</span>
+            </div>
+            <div class="game-card" onclick="startAV()">
+                <div class="game-icon">🎯</div>
+                <div style="flex:1;"><b>Action ou Vérité</b><br><small style="color:#666;">200 défis (Classique & Adulte)</small></div>
+                <span style="font-size:1.5em;">▶</span>
+            </div>
+            <div id="gameArea" style="padding:0 15px;"></div>
+        </div>
+    </div>
+
+    <!-- EMOJI -->
+    <div class="emoji-panel" id="emojiPanel">
+        {% for e in '😀😂😍🥰😘😜🤔😎🙌💕❤️🔥👍👎🎉😢😡🤗💀💯✨🌟🎵☕🍕🌹💋🙏👋👑' %}
+        <span class="emoji" onclick="ins('{{e}}')">{{e}}</span>{% endfor %}
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-bar">
+        <button class="btn" onclick="showEmoji()">😊</button>
+        <button class="btn btn-green" onclick="openGames()">🎮</button>
+        <label class="btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
+        <input id="msgInput" placeholder="Message" onkeypress="if(event.key==='Enter')sendMsg()">
+        <button class="send" onclick="sendMsg()">▶</button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const mid={{match.id}}, uid={{current_user.id}}, oid={{other_user.id}};
+        const socket=io();
+        socket.emit('join_chat',{match_id:mid});
+        let selMsg=null;
+
+        // ============ MESSAGES ============
+        function sendMsg(){
+            const v=document.getElementById('msgInput').value.trim();
+            if(!v)return;
+            fetch(`/api/messages/${mid}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v,type:'text'})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});
+        }
+        function sendMedia(f){
+            if(!f)return;
+            const t=f.type.startsWith('video')?'video':'image';
+            const fd=new FormData();fd.append('media',f);fd.append('type',t);
+            fetch(`/api/messages/media/${mid}`,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)load();});
+        }
+        function load(){
+            fetch(`/api/messages/${mid}`).then(r=>r.json()).then(msgs=>{
+                const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');
+                let ld='';
+                c.innerHTML=msgs.map(m=>{
+                    const d=new Date(m.created_at).toLocaleDateString('fr-FR'),s=d!==ld?`<div class="date-sep"><span>${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;
+                    const sent=m.sender_id===uid;let cnt=m.content;
+                    if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media" onclick="window.open('/static/uploads/${m.content}')">`;
+                    else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;
+                    else if(m.is_deleted)cnt='<i style="color:#999;">Message supprimé</i>';
+                    else cnt=m.content+(m.is_edited?' <small style="color:#999;">modifié</small>':'');
+                    return `${s}<div class="msg ${sent?'sent':'recv'}" onclick="menuMsg(event,${m.id},${m.sender_id})">${cnt}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` <span style="color:#4fc3f7;">${m.is_read?'✓✓':'✓'}</span>`:''}</div></div>`;
+                }).join('');c.scrollTop=c.scrollHeight;
+            });
+        }
+        function menuMsg(e,id,sid){e.stopPropagation();if(sid!==uid)return;selMsg=id;const m=document.getElementById('msgMenu');m.style.display='block';m.style.left=Math.min(e.clientX,innerWidth-150)+'px';m.style.top=(e.clientY-60)+'px';}
+        document.addEventListener('click',()=>document.getElementById('msgMenu').style.display='none');
+        function editMsg(){if(!selMsg)return;const t=prompt('Modifier :');if(t){fetch(`/api/messages/edit/${selMsg}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:t})}).then(r=>r.json()).then(d=>{if(d.success)load();});}}
+        function deleteMsg(){if(!selMsg)return;if(confirm('Supprimer ?')){fetch(`/api/messages/delete/${selMsg}`,{method:'POST'}).then(r=>r.json()).then(d=>{if(d.success)load();});}}
+        function showEmoji(){document.getElementById('emojiPanel').classList.toggle('show');}
+        function ins(e){document.getElementById('msgInput').value+=e;}
+
+        // ============ JEUX ============
+        function openGames(){
+            document.getElementById('gamesPanel').style.display='block';
+        }
+        function closeGames(){
+            document.getElementById('gamesPanel').style.display='none';
+            document.getElementById('gameArea').innerHTML='';
+        }
+        
+        function startRPS(){
+            document.getElementById('gameArea').innerHTML=`
+                <h4 style="text-align:center;margin:15px 0;">✊ ✋ ✌️ Pierre Feuille Ciseaux</h4>
+                <p style="text-align:center;color:#666;">Choisis ton signe :</p>
+                <div style="display:flex;justify-content:center;gap:15px;margin:15px 0;">
+                    <button onclick="playRPS('rock')" style="font-size:3em;padding:15px;border-radius:15px;border:2px solid #ddd;background:#f5f5f5;cursor:pointer;">✊</button>
+                    <button onclick="playRPS('paper')" style="font-size:3em;padding:15px;border-radius:15px;border:2px solid #ddd;background:#f5f5f5;cursor:pointer;">✋</button>
+                    <button onclick="playRPS('scissors')" style="font-size:3em;padding:15px;border-radius:15px;border:2px solid #ddd;background:#f5f5f5;cursor:pointer;">✌️</button>
+                </div>
+                <p id="rpsStatus" style="text-align:center;color:#666;"></p>
+                <div id="rpsResult" style="text-align:center;font-size:1.3em;font-weight:bold;margin:10px 0;"></div>
+            `;
+        }
+        
+        function playRPS(choice){
+            document.getElementById('rpsStatus').textContent='✅ Tu as choisi ! En attente de '+ '{{ other_user.username }}...';
+            socket.emit('rps_choice',{match_id:mid,choice:choice});
+        }
+        
+        socket.on('rps_result',(data)=>{
+            const emojis={rock:'✊',paper:'✋',scissors:'✌️'};
+            const my=data.players[uid],opp=data.players[oid];
+            let msg='';
+            if(data.winner===uid){msg='🎉 TU GAGNES !';}
+            else if(data.winner==='draw'){msg='🤝 ÉGALITÉ !';}
+            else{msg='😢 TU PERDS...';}
+            document.getElementById('rpsResult').innerHTML=`${msg}<br>Toi: ${emojis[my]} vs {{ other_user.username }}: ${emojis[opp]}`;
+            document.getElementById('rpsStatus').textContent='';
+        });
+        
+        function startAV(){
+            document.getElementById('gameArea').innerHTML=`
+                <h4 style="text-align:center;margin:15px 0;">🎯 Action ou Vérité</h4>
+                <p style="text-align:center;color:#666;">Choisis la version :</p>
+                <div style="display:flex;gap:10px;justify-content:center;margin:15px 0;">
+                    <button onclick="chooseVersion('classic')" style="padding:15px 25px;background:#4CAF50;color:white;border:none;border-radius:10px;font-size:1.1em;cursor:pointer;">🎯 Classique</button>
+                    <button onclick="chooseVersion('adult')" style="padding:15px 25px;background:#f44336;color:white;border:none;border-radius:10px;font-size:1.1em;cursor:pointer;">🔞 Adulte</button>
+                </div>
+                <div id="avChoices" style="text-align:center;"></div>
+                <div id="avResult" style="text-align:center;padding:15px;font-size:1.2em;"></div>
+            `;
+        }
+        
+        const avData = {
+            classic: {
+                actions: ["Fais 10 pompes","Imite une célébrité","Danse 30 secondes","Chante ta chanson préférée","Fais le cri d'un animal","Mime un métier","Parle avec un accent","Fais une grimace","Raconte une blague en mimant","Fais un playback","Montre ta danse la plus drôle","Fais semblant d'être un robot","Mime une pub TV","Tourne sur toi-même 10 fois","Fais un battle de regard"],
+                verites: ["Quel est ton plus grand rêve ?","Quelle est ta plus grande peur ?","Raconte ton pire date","Qui était ton premier crush ?","Quel est ton talent caché ?","Si tu gagnais au loto ?","Ton plus gros mensonge ?","Ton film préféré ?","Ton plus beau souvenir ?","Ce que tu regrettes ?","Quel métier voulais-tu faire enfant ?","Quelle est ta citation préférée ?","Qu'est-ce qui te rend heureux ?","Quel est ton pire défaut ?","La chose la plus folle que tu aies faite ?"]
+            },
+            adult: {
+                actions: ["Envoie un selfie sexy","Fais un massage virtuel","Mords tes lèvres lentement","Fais un clin d'œil","Passe ta main dans tes cheveux","Chuchote un message sensuel","Souffle un bisou","Regarde intensément 10 secondes","Fais un slow dance","Joue avec tes cheveux","Fais un regard langoureux","Mime boire un verre séduisante","Passe ta main sur ton cou","Fais un déshabillage symbolique","Prends une pose de magazine"],
+                verites: ["Ton plus gros turn-on ?","Ton fantasme le plus fou ?","Décris ton premier baiser","Ton date le plus gênant ?","Ce qui t'excite le plus ?","Ton message le plus osé ?","Ce que tu regardes en premier ?","Ton plus beau souvenir sensuel ?","Ce qui te fait fondre ?","Ton rêve le plus hot ?","Qu'est-ce que tu aimerais qu'on te fasse ?","Ton geste romantique préféré ?","Qu'est-ce qui te fait rougir ?","Ton péché mignon en amour ?","La première chose que tu regardes ?"]
+            }
+        };
+        
+        function chooseVersion(version){
+            document.getElementById('avChoices').innerHTML=`
+                <p style="margin:10px 0;">Version : <b>${version==='classic'?'🎯 Classique':'🔞 Adulte'}</b></p>
+                <button onclick="pickAV('${version}','action')" style="padding:15px 25px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:1.1em;cursor:pointer;margin:5px;">⚡ Action</button>
+                <button onclick="pickAV('${version}','verite')" style="padding:15px 25px;background:#2196F3;color:white;border:none;border-radius:10px;font-size:1.1em;cursor:pointer;margin:5px;">💬 Vérité</button>
+            `;
+        }
+        
+        function pickAV(version, type){
+            const list = avData[version][type+'s'];
+            const r = list[Math.floor(Math.random()*list.length)];
+            const emoji = type==='action'?'⚡':'💬';
+            const label = type==='action'?'ACTION':'VÉRITÉ';
+            const bg = type==='action'?'#fff3e0':'#e3f2fd';
+            const border = type==='action'?'#ff9800':'#2196F3';
+            
+            document.getElementById('avResult').innerHTML=`
+                <div style="background:${bg};padding:20px;border-radius:15px;border:2px solid ${border};">
+                    ${emoji} <b>${label}</b> (${version==='classic'?'🎯':'🔞'})<br>
+                    <span style="font-size:1.3em;">${r}</span>
+                </div>`;
+            
+            socket.emit('av_send',{match_id:mid, to_user:oid, version:version, type:type, challenge:r});
+        }
+        
+        socket.on('av_receive',(data)=>{
+            if(document.getElementById('avResult')){
+                const bg=data.type==='action'?'#fff3e0':'#e3f2fd';
+                const border=data.type==='action'?'#ff9800':'#2196F3';
+                const emoji=data.type==='action'?'⚡':'💬';
+                const label=data.type==='action'?'ACTION':'VÉRITÉ';
+                document.getElementById('avResult').innerHTML=`
+                    <div style="background:${bg};padding:20px;border-radius:15px;border:2px solid ${border};">
+                        📩 <b>${label} de {{ other_user.username }}</b> (${data.version==='classic'?'🎯':'🔞'})<br>
+                        <span style="font-size:1.3em;">${data.challenge}</span>
+                    </div>`;
+            }
+        });
+
+        setInterval(load,2000);load();
+    </script>
+</body>
+</html>

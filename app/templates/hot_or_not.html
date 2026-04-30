@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot or Not 🔥</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .timer { font-size: 5em; font-weight: bold; margin: 20px; color: #ff6b6b; }
+        .profile { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; margin: 20px; width: 250px; }
+        .profile-icon { font-size: 6em; }
+        .buttons { display: flex; gap: 20px; }
+        .btn { width: 80px; height: 80px; border-radius: 50%; border: none; font-size: 2em; cursor: pointer; }
+        .btn-hot { background: #f44336; color: white; }
+        .btn-not { background: #333; color: white; }
+        .score { font-size: 1.5em; margin: 15px; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Hot or Not</h1>
+    <p>5 secondes pour décider !</p>
+    <div class="timer" id="timer">5</div>
+    <div class="profile" id="profile">
+        <div class="profile-icon">👤</div>
+        <h2 id="profileName">Profil</h2>
+    </div>
+    <div class="buttons">
+        <button class="btn btn-not" onclick="vote('not')">👎</button>
+        <button class="btn btn-hot" onclick="vote('hot')">🔥</button>
+    </div>
+    <div class="score">Score : <span id="score">0</span></div>
+    <script>
+        let timeLeft = 5;
+        let score = 0;
+        let timer;
+        const names = ['Alex', 'Sam', 'Jordan', 'Casey', 'Riley'];
+        
+        function newRound() {
+            timeLeft = 5;
+            document.getElementById('timer').textContent = timeLeft;
+            document.getElementById('profileName').textContent = names[Math.floor(Math.random()*names.length)];
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                if (timeLeft <= 0) { clearInterval(timer); vote('timeout'); }
+            }, 1000);
+        }
+        
+        function vote(type) {
+            clearInterval(timer);
+            if (type === 'hot') { score++; document.getElementById('score').textContent = score; }
+            newRound();
+        }
+        
+        newRound();
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Letter 💌</title>
+    <style>
+        body { font-family: 'Georgia', serif; background: linear-gradient(135deg, #ff9a9e, #fad0c4); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .letter { background: #fffef0; max-width: 400px; padding: 40px; border-radius: 5px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; }
+        .letter::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid #d4a574; border-radius: 3px; pointer-events: none; }
+        h2 { text-align: center; color: #c0392b; }
+        textarea { width: 100%; height: 200px; border: none; background: transparent; font-family: 'Georgia', serif; font-size: 16px; resize: none; outline: none; line-height: 1.8; }
+        .send-btn { display: block; width: 100%; padding: 15px; margin-top: 20px; background: #c0392b; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer; }
+        .seal { text-align: center; font-size: 3em; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="letter">
+        <div class="seal">💌</div>
+        <h2>Lettre d'amour anonyme</h2>
+        <p style="text-align:center;color:#666;margin:10px 0;">Écris une lettre. Si vous matchez, elle sera révélée !</p>
+        <textarea placeholder="Cher/Chère inconnu(e)..."></textarea>
+        <button class="send-btn" onclick="sendLetter()">✉️ Envoyer anonymement</button>
+        <a href="/dashboard" style="display:block;text-align:center;margin-top:15px;color:#666;">← Retour</a>
+    </div>
+    <script>
+        function sendLetter() {
+            const letter = document.querySelector('textarea').value;
+            if (letter.trim()) {
+                alert('💌 Lettre envoyée ! Elle sera révélée si vous matchez.');
+            }
+        }
+    </script>
+</body>
+</html>

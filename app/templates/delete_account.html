@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer mon compte</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#fff5f5; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .card { background:white; border-radius:20px; padding:30px; max-width:400px; width:100%; box-shadow:0 5px 20px rgba(0,0,0,0.1); text-align:center; }
+        .warning-icon { font-size:4em; margin-bottom:15px; }
+        h2 { color:#f44336; margin-bottom:10px; }
+        p { color:#666; margin-bottom:20px; font-size:0.9em; }
+        input { width:100%; padding:15px; border:2px solid #e0e0e0; border-radius:10px; font-size:1em; margin-bottom:15px; }
+        .btn-delete { width:100%; padding:15px; background:#f44336; color:white; border:none; border-radius:10px; font-size:1.1em; font-weight:bold; cursor:pointer; }
+        .btn-cancel { display:block; margin-top:10px; color:#667eea; text-decoration:none; }
+        .danger-list { text-align:left; color:#666; font-size:0.8em; margin:15px 0; padding-left:20px; }
+        .danger-list li { margin:5px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="warning-icon">⚠️</div>
+        <h2>Supprimer mon compte</h2>
+        <p>Cette action est <strong>irréversible</strong> !</p>
+        <ul class="danger-list">
+            <li>Tous vos matches seront perdus</li>
+            <li>Tous vos messages seront effacés</li>
+            <li>Vos photos seront supprimées</li>
+            <li>Votre profil disparaîtra définitivement</li>
+        </ul>
+        <form method="POST">
+            <input type="password" name="password" placeholder="Entrez votre mot de passe pour confirmer" required>
+            <button type="submit" class="btn-delete" onclick="return confirm('Êtes-vous ABSOLUMENT sûr(e) ? Cette action est irréversible !')">🗑️ Supprimer définitivement</button>
+        </form>
+        <a href="/profile" class="btn-cancel">← Annuler, retour au profil</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Breakers - Dating App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        .header {
+            background: white; padding: 20px; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header a { color: #667eea; text-decoration: none; font-size: 1.5em; }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; }
+        .categories { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .cat-btn {
+            padding: 10px 20px; border: 2px solid #667eea;
+            border-radius: 25px; background: white; color: #667eea;
+            cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+        .cat-btn.active { background: #667eea; color: white; }
+        .icebreaker-card {
+            background: white; border-radius: 20px; padding: 40px;
+            text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .icebreaker-text { font-size: 1.5em; margin-bottom: 30px; color: #333; min-height: 80px; }
+        .btn {
+            padding: 15px 30px; border: none; border-radius: 25px;
+            font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 5px;
+            transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-refresh { background: #f5f5f5; color: #333; }
+        .btn-send { background: #667eea; color: white; }
+        .btn-copy { background: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/features">←</a>
+        <h2>🧊 Ice Breakers</h2>
+        <div></div>
+    </div>
+
+    <div class="container">
+        <div class="categories" id="categories"></div>
+        
+        <div class="icebreaker-card">
+            <div class="icebreaker-text" id="icebreaker-text">
+                Cliquez sur une catégorie
+            </div>
+            <button class="btn btn-refresh" onclick="newIcebreaker()">🔄 Un autre</button>
+            <button class="btn btn-copy" onclick="copyIcebreaker()">📋 Copier</button>
+        </div>
+    </div>
+
+    <script>
+        let currentIcebreaker = '';
+        let currentCategory = null;
+        
+        fetch('/api/icebreakers')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('categories').innerHTML = 
+                    '<button class="cat-btn active" onclick="filterCategory(null)">🎲 Tous</button>' +
+                    data.categories.map(c => 
+                        `<button class="cat-btn" onclick="filterCategory('${c}')">${c}</button>`
+                    ).join('');
+                newIcebreaker();
+            });
+        
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            newIcebreaker();
+        }
+        
+        function newIcebreaker() {
+            const url = currentCategory ? 
+                `/api/icebreakers?category=${currentCategory}` : 
+                '/api/icebreakers';
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    const ib = data.icebreaker;
+                    currentIcebreaker = typeof ib === 'string' ? ib : ib.message;
+                    document.getElementById('icebreaker-text').textContent = currentIcebreaker;
+                });
+        }
+        
+        function copyIcebreaker() {
+            navigator.clipboard.writeText(currentIcebreaker);
+            alert('✅ Copié !');
+        }
+    </script>
+</body>
+</html>
