@@ -92,7 +92,7 @@
                 
             } catch(err) {
                 console.error('Erreur:', err);
-                alert('Impossible d\'accéder à la caméra/micro. Vérifiez les permissions.');
+                document.getElementById('callStatus').textContent = 'En attente de réponse... 📞';
             }
         }
         
