@@ -5,7 +5,8 @@
     <title>📸 Stories</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#000;color:white;padding-bottom:60px}
-        .header{padding:15px;display:flex;align-items:center;gap:15px;background:#111}.header a{color:white;text-decoration:none;font-size:1.3em}
+        .header{padding:15px;display:flex;align-items:center;gap:15px;background:#111}
+        .header a{color:white;text-decoration:none;font-size:1.3em}
         .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:3px}
         .card{aspect-ratio:9/16;background:#1a1a1a;cursor:pointer;position:relative;overflow:hidden}
         .card img,.card video{width:100%;height:100%;object-fit:cover}
@@ -15,11 +16,11 @@
         .viewer{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
         .viewer img,.viewer video{flex:1;object-fit:contain;width:100%}
         .close{position:absolute;top:20px;right:20px;font-size:2em;cursor:pointer;z-index:1001}
-        .react-btns{position:absolute;bottom:100px;left:20px;display:flex;gap:10px;z-index:1001;flex-wrap:wrap}
+        .rbtns{position:absolute;bottom:100px;left:20px;display:flex;gap:10px;z-index:1001;flex-wrap:wrap}
         .rbtn{background:rgba(255,255,255,.2);padding:8px 15px;border-radius:20px;cursor:pointer;font-size:1.2em;border:none;color:white}
-        .reply-bar{position:absolute;bottom:30px;left:20px;right:20px;display:flex;gap:10px;z-index:1001}
-        .reply-bar input{flex:1;padding:12px;border-radius:25px;border:none;background:rgba(255,255,255,.2);color:white}
-        .reply-bar button{padding:12px 20px;border-radius:25px;border:none;background:#e91e63;color:white;font-weight:bold}
+        .reply{position:absolute;bottom:30px;left:20px;right:20px;display:flex;gap:10px;z-index:1001}
+        .reply input{flex:1;padding:12px;border-radius:25px;border:none;background:rgba(255,255,255,.2);color:white}
+        .reply button{padding:12px 20px;border-radius:25px;border:none;background:#e91e63;color:white;font-weight:bold}
         .panel{position:absolute;bottom:150px;left:20px;right:20px;background:rgba(0,0,0,.8);border-radius:15px;padding:15px;z-index:1001;max-height:200px;overflow-y:auto;display:none}
         .panel h4{margin-bottom:10px;color:#e91e63}
         .item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;font-size:.9em}
@@ -36,13 +37,12 @@
         <span class="close" onclick="document.getElementById('viewer').style.display='none'">✕</span>
         <div id="media" style="flex:1;display:flex;align-items:center;justify-content:center;"></div>
         <div class="panel" id="panel"><h4>❤️ Réactions</h4><div id="panelList"></div></div>
-        <div class="react-btns">
+        <div class="rbtns">
             <button class="rbtn" onclick="react('❤️')">❤️</button><button class="rbtn" onclick="react('😂')">😂</button>
             <button class="rbtn" onclick="react('🔥')">🔥</button><button class="rbtn" onclick="react('😍')">😍</button>
-            <button class="rbtn" onclick="react('👏')">👏</button><button class="rbtn" onclick="react('😮')">😮</button>
-            <button class="rbtn" onclick="showPanel()">💬 Voir réactions</button>
+            <button class="rbtn" onclick="react('👏')">👏</button><button class="rbtn" onclick="showPanel()">💬 Voir</button>
         </div>
-        <div class="reply-bar"><input type="text" id="replyInput" placeholder="Commentaire..."><button onclick="reply()">Envoyer</button></div>
+        <div class="reply"><input type="text" id="ri" placeholder="Commentaire..."><button onclick="reply()">Envoyer</button></div>
     </div>
 
     <script>
@@ -52,17 +52,15 @@
             r.onload=function(e){stories.unshift({type:f.type.startsWith('video')?'video':'image',dataUrl:e.target.result,time:new Date().toLocaleString(),reactions:[],comments:[]});localStorage.setItem('myStories',JSON.stringify(stories));render();};r.readAsDataURL(f);
         }
         function render() {
-            var g=document.getElementById('grid');
-            g.innerHTML='<div class="card add" onclick="document.getElementById(\'file\').click()"><span style="font-size:3em;">➕</span><small>Ajouter</small></div>'+
-                stories.map(function(s,i){return '<div class="card" onclick="view('+i+')">'+(s.type==='video'?'<video src="'+s.dataUrl+'"></video>':'<img src="'+s.dataUrl+'">')+'<div class="user">Moi • '+new Date(s.time).toLocaleTimeString()+'</div>'+(s.reactions.length>0?'<div class="reacts">'+s.reactions.join(' ')+' '+s.comments.length+'💬</div>':'')+'</div>';}).join('');
+            var g=document.getElementById('grid'),add='<div class="card add" onclick="document.getElementById(\'file\').click()"><span style="font-size:3em;">➕</span><small>Ajouter</small></div>';
+            g.innerHTML=add+stories.map(function(s,i){return'<div class="card" onclick="view('+i+')">'+(s.type==='video'?'<video src="'+s.dataUrl+'"></video>':'<img src="'+s.dataUrl+'">')+'<div class="user">Moi</div>'+(s.reactions.length?'<div class="reacts">'+s.reactions.join(' ')+' '+s.comments.length+'💬</div>':'')+'</div>';}).join('');
         }
-        function view(i) { cur=i; var s=stories[i]; document.getElementById('media').innerHTML=s.type==='video'?'<video src="'+s.dataUrl+'" autoplay loop controls style="max-width:100%;max-height:100%;"></video>':'<img src="'+s.dataUrl+'" style="max-width:100%;max-height:100%;">'; document.getElementById('viewer').style.display='flex';document.getElementById('panel').style.display='none'; }
-        function react(e) { stories[cur].reactions.push(e); localStorage.setItem('myStories',JSON.stringify(stories)); render(); var d=document.createElement('div');d.textContent=e;d.style.cssText='position:fixed;font-size:3em;animation:up 1s ease-out;z-index:2000;left:50%;bottom:200px;pointer-events:none;';document.body.appendChild(d);setTimeout(function(){d.remove();},1000); }
-        function reply() { var t=document.getElementById('replyInput').value.trim(); if(!t)return; stories[cur].comments.push({text:t,time:new Date().toLocaleTimeString()}); localStorage.setItem('myStories',JSON.stringify(stories)); document.getElementById('replyInput').value=''; render();alert('💬 Ajouté !'); }
-        function showPanel() { var s=stories[cur],l=document.getElementById('panelList'); var h='<p>'+s.reactions.join(' ')+' ('+s.reactions.length+')</p>'; if(s.comments.length>0){h+='<hr style="margin:10px 0;border-color:rgba(255,255,255,.2);">'+s.comments.map(function(c){return'<div class="item">💬 '+c.text+' <small style="color:#999;">'+c.time+'</small></div>';}).join('');}else{h+='<p style="color:#999;">Aucun commentaire</p>';}l.innerHTML=h;document.getElementById('panel').style.display='block'; }
-        var st=document.createElement('style');st.textContent='@keyframes up{from{opacity:1;transform:translateY(0)scale(1);}to{opacity:0;transform:translateY(-100px)scale(2);}}';document.head.appendChild(st);
+        function view(i){cur=i;var s=stories[i];document.getElementById('media').innerHTML=s.type==='video'?'<video src="'+s.dataUrl+'" autoplay loop controls style="max-width:100%;max-height:100%;"></video>':'<img src="'+s.dataUrl+'" style="max-width:100%;max-height:100%;">';document.getElementById('viewer').style.display='flex';document.getElementById('panel').style.display='none';}
+        function react(e){stories[cur].reactions.push(e);localStorage.setItem('myStories',JSON.stringify(stories));render();var d=document.createElement('div');d.textContent=e;d.style.cssText='position:fixed;font-size:3em;animation:up 1s;z-index:2000;left:50%;bottom:200px;';document.body.appendChild(d);setTimeout(function(){d.remove()},1000);}
+        function reply(){var t=document.getElementById('ri').value.trim();if(!t)return;stories[cur].comments.push({text:t,time:new Date().toLocaleTimeString()});localStorage.setItem('myStories',JSON.stringify(stories));document.getElementById('ri').value='';render();}
+        function showPanel(){var s=stories[cur],l=document.getElementById('panelList'),h='<p>'+s.reactions.join(' ')+' ('+s.reactions.length+')</p>';if(s.comments.length){h+='<hr style="margin:10px 0;border-color:rgba(255,255,255,.2)">'+s.comments.map(function(c){return'<div class="item">💬 '+c.text+'</div>';}).join('');}else{h+='<p style="color:#999;">Aucun commentaire</p>';}l.innerHTML=h;document.getElementById('panel').style.display='block';}
+        var st=document.createElement('style');st.textContent='@keyframes up{from{opacity:1;transform:translateY(0)scale(1)}to{opacity:0;transform:translateY(-100px)scale(2)}}';document.head.appendChild(st);
         render();
     </script>
-    <script src="/static/js/notif-badge.js"></script>
 </body>
 </html>

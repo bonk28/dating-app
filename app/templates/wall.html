@@ -1,123 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dating App | Mur - Dating App</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📢 Mur</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:#f0f2f5; }
-        .header { background:white; padding:15px; display:flex; align-items:center; gap:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-        .header a { text-decoration:none; color:#667eea; font-size:1.3em; }
-        .container { max-width:550px; margin:15px auto; padding:15px; }
-        .post-box { background:white; border-radius:15px; padding:15px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-        .post-box textarea { width:100%; border:none; resize:none; min-height:80px; font-family:inherit; font-size:1em; outline:none; }
-        .post-box input[type=file] { display:none; }
-        .post-actions { display:flex; gap:10px; margin-top:10px; align-items:center; }
-        .post-btn { padding:10px 25px; background:#667eea; color:white; border:none; border-radius:25px; cursor:pointer; font-weight:bold; }
-        .post-card { background:white; border-radius:15px; padding:15px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-        .post-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-        .post-avatar { width:40px; height:40px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-        .post-avatar img { width:100%; height:100%; object-fit:cover; }
-        .post-user { font-weight:600; }
-        .post-time { font-size:0.7em; color:#999; }
-        .post-content { margin:10px 0; }
-        .post-content img, .post-content video { max-width:100%; border-radius:10px; margin-top:10px; }
-        .post-footer { display:flex; gap:20px; color:#666; font-size:0.9em; }
-        .post-footer span { cursor:pointer; }
-        .delete-post { color:#f44336; cursor:pointer; float:right; }
-    body{padding-bottom:60px;}
-</style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;padding-bottom:60px}
+        .header{background:white;padding:15px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+        .header a{text-decoration:none;color:#667eea;font-size:1.3em}
+        .container{max-width:550px;margin:15px auto;padding:15px}
+        .post-box{background:white;border-radius:15px;padding:15px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+        .post-box textarea{width:100%;border:none;resize:none;min-height:80px;font-family:inherit;font-size:1em;outline:none}
+        .post-actions{display:flex;gap:10px;margin-top:10px;align-items:center}
+        .post-btn{padding:10px 25px;background:#667eea;color:white;border:none;border-radius:25px;cursor:pointer;font-weight:bold}
+        .post-card{background:white;border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+        .post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .avatar{width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center}
+        .post-user{font-weight:600}.post-time{font-size:.7em;color:#999}
+        .post-content{margin:10px 0}
+        .post-footer{display:flex;gap:20px;color:#666;font-size:.9em}
+        .post-footer span{cursor:pointer}
+        .delete{color:#f44336;cursor:pointer;float:right}
+        .comment-box{display:flex;gap:10px;margin-top:10px}
+        .comment-box input{flex:1;padding:8px;border-radius:20px;border:1px solid #ddd}
+        .comment-box button{padding:8px 15px;background:#667eea;color:white;border:none;border-radius:20px;cursor:pointer}
+        .comments{margin-top:10px;font-size:.85em;color:#666}
+        .comments div{padding:5px 0;border-bottom:1px solid #f0f0f0}
+    </style>
 </head>
 <body>
-    <div class="header">
-        <a href="/features">←</a>
-        <h2>📢 Mur</h2>
-    </div>
+    <div class="header"><a href="/features">←</a><h2>📢 Mur</h2></div>
     <div class="container">
         <div class="post-box">
-            <textarea id="postText" placeholder="Quoi de neuf ? Partage un truc drôle, une pensée..."></textarea>
+            <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
             <div class="post-actions">
-                <label style="cursor:pointer;padding:8px 15px;background:#16213e;border-radius:25px;">📷 Photo/Vidéo<input type="file" accept="image/*,video/*" id="postMedia" style="display:none;"></label>
+                <label style="cursor:pointer;padding:8px 15px;background:#f0f0f0;border-radius:25px;">📷<input type="file" accept="image/*,video/*" id="postMedia" style="display:none"></label>
                 <button class="post-btn" onclick="createPost()">Publier</button>
             </div>
         </div>
         <div id="postsContainer"></div>
     </div>
     <script>
-        let posts = JSON.parse(localStorage.getItem('wallPosts') || '[]');
-        
+        var posts = JSON.parse(localStorage.getItem('wallPosts') || '[]');
         function createPost() {
-            const text = document.getElementById('postText').value.trim();
-            const file = document.getElementById('postMedia').files[0];
-            if (!text && !file) return;
-            
-            const post = { id: Date.now(), text, time: new Date().toLocaleString(), media: null, likes: 0, liked: false };
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    post.media = { type: file.type.startsWith('video') ? 'video' : 'image', dataUrl: e.target.result };
-                    posts.unshift(post);
-                    saveAndRender();
-                };
-                reader.readAsDataURL(file);
-            } else {
-                posts.unshift(post);
-                saveAndRender();
-            }
-            document.getElementById('postText').value = '';
-            document.getElementById('postMedia').value = '';
+            var text = document.getElementById('postText').value.trim();
+            if(!text)return;
+            posts.unshift({id:Date.now(),text:text,time:new Date().toLocaleString(),likes:0,liked:false,comments:[]});
+            localStorage.setItem('wallPosts',JSON.stringify(posts));
+            document.getElementById('postText').value='';
+            render();
         }
-        
-        function saveAndRender() {
-            localStorage.setItem('wallPosts', JSON.stringify(posts));
-            renderPosts();
+        function like(id) {
+            var p = posts.find(function(x){return x.id===id});
+            if(p){p.liked=!p.liked;p.likes+=p.liked?1:-1;localStorage.setItem('wallPosts',JSON.stringify(posts));render();}
         }
-        
-        function deletePost(id) {
-            posts = posts.filter(p => p.id !== id);
-            saveAndRender();
+        function comment(id) {
+            var input = document.getElementById('comment-'+id);
+            var text = input.value.trim();
+            if(!text)return;
+            var p = posts.find(function(x){return x.id===id});
+            if(p){p.comments.push({text:text,time:new Date().toLocaleTimeString()});localStorage.setItem('wallPosts',JSON.stringify(posts));input.value='';render();}
         }
-        
-        function likePost(id) {
-            const post = posts.find(p => p.id === id);
-            if (post) {
-                post.liked = !post.liked;
-                post.likes += post.liked ? 1 : -1;
-                saveAndRender();
-            }
+        function delPost(id){posts=posts.filter(function(x){return x.id!==id});localStorage.setItem('wallPosts',JSON.stringify(posts));render();}
+        function render() {
+            var c = document.getElementById('postsContainer');
+            if(posts.length===0){c.innerHTML='<p style="text-align:center;color:#999;padding:40px;">Aucune publication</p>';return;}
+            c.innerHTML = posts.map(function(p){
+                return '<div class="post-card"><div class="post-header"><div class="avatar">👤</div><div><div class="post-user">Moi</div><div class="post-time">'+p.time+'</div></div><span class="delete" onclick="delPost('+p.id+')">🗑️</span></div><div class="post-content">'+p.text+'</div><div class="post-footer"><span onclick="like('+p.id+')">'+(p.liked?'❤️':'🤍')+' '+p.likes+'</span><span>💬 '+p.comments.length+'</span></div><div class="comments">'+p.comments.map(function(c){return'<div>💬 '+c.text+' <small>'+c.time+'</small></div>';}).join('')+'</div><div class="comment-box"><input id="comment-'+p.id+'" placeholder="Commenter..."><button onclick="comment('+p.id+')">➤</button></div></div>';
+            }).join('');
         }
-        
-        function renderPosts() {
-            const c = document.getElementById('postsContainer');
-            if (posts.length === 0) {
-                c.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Aucune publication. Sois le premier !</p>';
-                return;
-            }
-            c.innerHTML = posts.map(p => `
-                <div class="post-card">
-                    <div class="post-header">
-                        <div class="post-avatar">👤</div>
-                        <div>
-                            <div class="post-user">Moi</div>
-                            <div class="post-time">${p.time}</div>
-                        </div>
-                        <span class="delete-post" onclick="deletePost(${p.id})">🗑️</span>
-                    </div>
-                    ${p.text ? `<div class="post-content">${p.text}</div>` : ''}
-                    ${p.media ? `<div class="post-content">${p.media.type === 'video' ? `<video src="${p.media.dataUrl}" controls style="max-width:100%;border-radius:10px;"></video>` : `<img src="${p.media.dataUrl}" style="max-width:100%;border-radius:10px;">`}</div>` : ''}
-                    <div class="post-footer">
-                        <span onclick="likePost(${p.id})">${p.liked ? '❤️' : '🤍'} ${p.likes} J'aime</span>
-                        <span>💬 Commenter</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        renderPosts();
+        render();
     </script>
-    {% include 'music_float.html' %}
-<script src="/static/js/notif-badge.js"></script>
 </body>
 </html>
