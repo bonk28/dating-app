@@ -3,66 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dating App | Stories</title>
+    <title>📸 Stories</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:#000; color:white; }
-        .header { padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
-        .header a { color:white; text-decoration:none; }
-        .stories-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; padding:0; }
-        .story-card { aspect-ratio:9/16; background:#1a1a1a; cursor:pointer; position:relative; overflow:hidden; }
-        .story-card img, .story-card video { width:100%; height:100%; object-fit:cover; }
-        .story-add { display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed #333; }
-        .story-add span { font-size:3em; }
-        .story-user { position:absolute; bottom:10px; left:10px; font-weight:bold; font-size:0.9em; text-shadow:0 2px 4px rgba(0,0,0,0.8); }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#000;color:white;padding-bottom:60px;}
+        .header{padding:15px;display:flex;align-items:center;gap:15px;background:#111;}
+        .header a{color:white;text-decoration:none;font-size:1.3em;}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:3px;}
+        .story-card{aspect-ratio:9/16;background:#1a1a1a;cursor:pointer;position:relative;overflow:hidden;}
+        .story-card img,.story-card video{width:100%;height:100%;object-fit:cover;}
+        .story-add{display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #333;}
+        .story-user{position:absolute;bottom:10px;left:10px;font-weight:bold;font-size:0.8em;text-shadow:0 2px 4px rgba(0,0,0,0.8);}
+        .story-reactions{position:absolute;bottom:35px;left:10px;font-size:0.8em;display:flex;gap:3px;flex-wrap:wrap;}
         
-        .viewer { position:fixed; top:0; left:0; right:0; bottom:0; background:#000; z-index:1000; display:none; }
-        .viewer img, .viewer video { width:100%; height:100%; object-fit:contain; }
-        .viewer-close { position:absolute; top:20px; right:20px; font-size:2em; cursor:pointer; z-index:1001; color:white; }
-        .viewer-reply { position:absolute; bottom:30px; left:20px; right:20px; display:flex; gap:10px; }
-        .viewer-reply input { flex:1; padding:12px; border-radius:25px; border:none; background:rgba(255,255,255,0.2); color:white; }
-        .viewer-reply button { padding:12px 20px; border-radius:25px; border:none; background:#e91e63; color:white; font-weight:bold; }
+        .viewer{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column;}
+        .viewer img,.viewer video{flex:1;object-fit:contain;width:100%;}
+        .viewer-close{position:absolute;top:20px;right:20px;font-size:2em;cursor:pointer;z-index:1001;color:white;}
+        .viewer-reactions{position:absolute;bottom:100px;left:20px;display:flex;gap:10px;flex-wrap:wrap;z-index:1001;}
+        .reaction-btn{background:rgba(255,255,255,0.2);padding:8px 15px;border-radius:20px;cursor:pointer;font-size:1.2em;border:none;color:white;}
+        .viewer-reply{position:absolute;bottom:30px;left:20px;right:20px;display:flex;gap:10px;z-index:1001;}
+        .viewer-reply input{flex:1;padding:12px;border-radius:25px;border:none;background:rgba(255,255,255,0.2);color:white;}
+        .viewer-reply button{padding:12px 20px;border-radius:25px;border:none;background:#e91e63;color:white;font-weight:bold;}
         
-        .reactions { position:absolute; bottom:80px; left:20px; display:flex; gap:10px; flex-wrap:wrap; }
-        .reaction { background:rgba(255,255,255,0.2); padding:8px 12px; border-radius:20px; cursor:pointer; font-size:1.2em; }
-        .reaction:hover { background:rgba(255,255,255,0.4); }
-    body{padding-bottom:60px;}
-</style>
+        .reactions-panel{position:absolute;bottom:150px;left:20px;right:20px;background:rgba(0,0,0,0.8);border-radius:15px;padding:15px;z-index:1001;max-height:200px;overflow-y:auto;display:none;}
+        .reactions-panel h4{margin-bottom:10px;color:#e91e63;}
+        .reaction-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;font-size:0.9em;}
+    </style>
 </head>
 <body>
     <div class="header">
         <a href="/features">←</a>
-        <h3>📸 Stories</h3>
-        <span></span>
+        <h2>📸 Stories</h2>
     </div>
-    <div class="stories-grid" id="storiesGrid">
+    
+    <div class="grid" id="storiesGrid">
         <div class="story-card story-add" onclick="document.getElementById('storyFile').click()">
-            <span>➕</span>
+            <span style="font-size:3em;">➕</span>
             <small>Ajouter</small>
         </div>
     </div>
     <input type="file" id="storyFile" accept="image/*,video/*" style="display:none" onchange="addStory(this.files[0])">
     
+    <!-- VIEWER -->
     <div class="viewer" id="viewer">
         <span class="viewer-close" onclick="closeViewer()">✕</span>
-        <div id="viewerMedia"></div>
-        <div class="reactions" id="reactions">
-            <span class="reaction" onclick="sendReaction('❤️')">❤️</span>
-            <span class="reaction" onclick="sendReaction('😂')">😂</span>
-            <span class="reaction" onclick="sendReaction('🔥')">🔥</span>
-            <span class="reaction" onclick="sendReaction('😍')">😍</span>
-            <span class="reaction" onclick="sendReaction('👏')">👏</span>
-            <span class="reaction" onclick="sendReaction('💯')">💯</span>
+        <div id="viewerMedia" style="flex:1;display:flex;align-items:center;justify-content:center;"></div>
+        
+        <!-- Panneau réactions -->
+        <div class="reactions-panel" id="reactionsPanel">
+            <h4>❤️ Réactions</h4>
+            <div id="reactionsList"></div>
         </div>
+        
+        <!-- Emojis réaction -->
+        <div class="viewer-reactions">
+            <button class="reaction-btn" onclick="sendReaction('❤️')">❤️</button>
+            <button class="reaction-btn" onclick="sendReaction('😂')">😂</button>
+            <button class="reaction-btn" onclick="sendReaction('🔥')">🔥</button>
+            <button class="reaction-btn" onclick="sendReaction('😍')">😍</button>
+            <button class="reaction-btn" onclick="sendReaction('👏')">👏</button>
+            <button class="reaction-btn" onclick="sendReaction('😮')">😮</button>
+            <button class="reaction-btn" onclick="showReactions()">💬 Voir réactions</button>
+        </div>
+        
+        <!-- Commentaire -->
         <div class="viewer-reply">
-            <input type="text" id="replyInput" placeholder="Réagir à cette story...">
+            <input type="text" id="replyInput" placeholder="Ajouter un commentaire...">
             <button onclick="sendReply()">Envoyer</button>
         </div>
     </div>
 
     <script>
         let stories = JSON.parse(localStorage.getItem('myStories') || '[]');
-        let currentStoryIndex = 0;
+        let currentIndex = 0;
         
         function addStory(file) {
             if (!file) return;
@@ -72,9 +85,9 @@
                     type: file.type.startsWith('video') ? 'video' : 'image',
                     dataUrl: e.target.result,
                     user: 'Moi',
-                    time: new Date().toLocaleTimeString(),
-                    replies: [],
-                    reactions: []
+                    time: new Date().toLocaleString(),
+                    reactions: [],
+                    comments: []
                 });
                 localStorage.setItem('myStories', JSON.stringify(stories));
                 renderStories();
@@ -86,26 +99,26 @@
             const grid = document.getElementById('storiesGrid');
             grid.innerHTML = `
                 <div class="story-card story-add" onclick="document.getElementById('storyFile').click()">
-                    <span>➕</span><small>Ajouter</small>
+                    <span style="font-size:3em;">➕</span><small>Ajouter</small>
                 </div>
             ` + stories.map((s, i) => `
                 <div class="story-card" onclick="viewStory(${i})">
                     ${s.type === 'video' ? `<video src="${s.dataUrl}"></video>` : `<img src="${s.dataUrl}">`}
-                    <div class="story-user">Moi • ${s.time}</div>
+                    <div class="story-user">Moi • ${new Date(s.time).toLocaleTimeString()}</div>
+                    ${s.reactions.length > 0 ? `<div class="story-reactions">${s.reactions.join(' ')} ${s.comments.length}💬</div>` : ''}
                 </div>
             `).join('');
         }
         
         function viewStory(index) {
-            currentStoryIndex = index;
+            currentIndex = index;
             const story = stories[index];
-            const viewer = document.getElementById('viewer');
-            const media = document.getElementById('viewerMedia');
-            
-            media.innerHTML = story.type === 'video' 
-                ? `<video src="${story.dataUrl}" autoplay loop controls></video>`
-                : `<img src="${story.dataUrl}">`;
-            viewer.style.display = 'block';
+            document.getElementById('viewerMedia').innerHTML = story.type === 'video' 
+                ? `<video src="${story.dataUrl}" autoplay loop controls style="max-width:100%;max-height:100%;"></video>`
+                : `<img src="${story.dataUrl}" style="max-width:100%;max-height:100%;">`;
+            document.getElementById('viewer').style.display = 'flex';
+            document.getElementById('reactionsPanel').style.display = 'none';
+            updateReactions();
         }
         
         function closeViewer() {
@@ -113,33 +126,53 @@
         }
         
         function sendReaction(emoji) {
-            stories[currentStoryIndex].reactions.push(emoji);
+            stories[currentIndex].reactions.push(emoji);
             localStorage.setItem('myStories', JSON.stringify(stories));
-            // Animation de l'emoji qui flotte
+            updateReactions();
+            // Animation
             const el = document.createElement('div');
             el.textContent = emoji;
-            el.style.cssText = 'position:fixed;font-size:2em;animation:floatUp 2s ease-out;z-index:2000;left:50%;bottom:150px;';
+            el.style.cssText = 'position:fixed;font-size:3em;animation:floatUp 1s ease-out;z-index:2000;left:50%;bottom:200px;pointer-events:none;';
             document.body.appendChild(el);
-            setTimeout(() => el.remove(), 2000);
+            setTimeout(() => el.remove(), 1000);
         }
         
         function sendReply() {
             const input = document.getElementById('replyInput');
             const text = input.value.trim();
             if (!text) return;
-            stories[currentStoryIndex].replies.push({ text, time: new Date().toLocaleTimeString() });
+            stories[currentIndex].comments.push({ text, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myStories', JSON.stringify(stories));
             input.value = '';
-            alert('💬 Réponse envoyée : ' + text);
+            updateReactions();
+            alert('💬 Commentaire ajouté !');
         }
         
-        // Animation CSS
+        function showReactions() {
+            const panel = document.getElementById('reactionsPanel');
+            const list = document.getElementById('reactionsList');
+            const story = stories[currentIndex];
+            
+            let html = `<p>${story.reactions.join(' ')} (${story.reactions.length} réactions)</p>`;
+            if (story.comments.length > 0) {
+                html += '<hr style="margin:10px 0;border-color:rgba(255,255,255,0.2);">';
+                html += story.comments.map(c => `<div class="reaction-item">💬 ${c.text} <small style="color:#999;">${c.time}</small></div>`).join('');
+            } else {
+                html += '<p style="color:#999;">Aucun commentaire</p>';
+            }
+            list.innerHTML = html;
+            panel.style.display = 'block';
+        }
+        
+        function updateReactions() {
+            renderStories();
+        }
+        
         const style = document.createElement('style');
-        style.textContent = '@keyframes floatUp { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-200px) scale(2); } }';
+        style.textContent = '@keyframes floatUp{from{opacity:1;transform:translateY(0)scale(1);}to{opacity:0;transform:translateY(-100px)scale(2);}}';
         document.head.appendChild(style);
         
         renderStories();
     </script>
-<script src="/static/js/notif-badge.js"></script>
 </body>
 </html>

@@ -40,7 +40,7 @@ def register():
             db.session.add(user)
             db.session.commit()
             print(f"✅ Utilisateur créé : {username}")
-            login_user(user)
+            login_user(user, remember=True)
             flash('Bienvenue ' + username + ' !', 'success')
             return redirect(url_for('main.dashboard'))
         except Exception as e:
@@ -62,7 +62,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
-            login_user(user)
+            login_user(user, remember=True)
             print(f"✅ Connexion : {username}")
             return redirect(url_for('main.dashboard'))
         
