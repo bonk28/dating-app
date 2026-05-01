@@ -2,73 +2,169 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📢 Mur</title>
+    <title>📢 Fil d'actualité</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;padding-bottom:60px}
-        .header{background:white;padding:15px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-        .header a{text-decoration:none;color:#667eea;font-size:1.3em}
-        .container{max-width:550px;margin:15px auto;padding:15px}
-        .post-box{background:white;border-radius:15px;padding:15px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-        .post-box textarea{width:100%;border:none;resize:none;min-height:80px;font-family:inherit;font-size:1em;outline:none}
-        .post-actions{display:flex;gap:10px;margin-top:10px;align-items:center}
-        .post-btn{padding:10px 25px;background:#667eea;color:white;border:none;border-radius:25px;cursor:pointer;font-weight:bold}
-        .post-card{background:white;border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-        .post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-        .avatar{width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center}
-        .post-user{font-weight:600}.post-time{font-size:.7em;color:#999}
-        .post-content{margin:10px 0}
-        .post-footer{display:flex;gap:20px;color:#666;font-size:.9em}
-        .post-footer span{cursor:pointer}
-        .delete{color:#f44336;cursor:pointer;float:right}
-        .comment-box{display:flex;gap:10px;margin-top:10px}
-        .comment-box input{flex:1;padding:8px;border-radius:20px;border:1px solid #ddd}
-        .comment-box button{padding:8px 15px;background:#667eea;color:white;border:none;border-radius:20px;cursor:pointer}
-        .comments{margin-top:10px;font-size:.85em;color:#666}
-        .comments div{padding:5px 0;border-bottom:1px solid #f0f0f0}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,sans-serif;background:#f0f2f5;padding-bottom:70px}
+        .header{background:white;padding:12px 20px;display:flex;align-items:center;gap:15px;box-shadow:0 1px 3px rgba(0,0,0,.1);position:sticky;top:0;z-index:100}
+        .header a{text-decoration:none;color:#667eea;font-size:1.2em}
+        .header h2{font-size:1.3em;color:#333}
+        .container{max-width:600px;margin:15px auto;padding:0 15px}
+        
+        .create-post{background:white;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+        .create-post .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .create-post .avatar{width:42px;height:42px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:1.3em}
+        .create-post input{flex:1;padding:12px 18px;border:none;background:#f0f2f5;border-radius:25px;font-size:.95em;outline:none;cursor:pointer}
+        .create-post .bottom{display:flex;justify-content:space-around;border-top:1px solid #e0e0e0;padding-top:10px;margin-top:10px}
+        .create-post .action{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.9em;color:#666;background:none;border:none}
+        .create-post .action:hover{background:#f0f2f5}
+        
+        .post{background:white;border-radius:12px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden}
+        .post-header{display:flex;align-items:center;gap:10px;padding:15px 15px 10px}
+        .post-avatar{width:42px;height:42px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:1.3em}
+        .post-info{flex:1}.post-name{font-weight:600;font-size:.95em}.post-time{font-size:.75em;color:#999}
+        .post-menu{color:#999;cursor:pointer;font-size:1.3em}
+        .post-text{padding:0 15px 15px;font-size:.95em;line-height:1.5}
+        .post-stats{display:flex;justify-content:space-between;padding:8px 15px;color:#999;font-size:.8em;border-top:1px solid #f0f0f0}
+        .post-actions{display:flex;justify-content:space-around;padding:5px 0;border-top:1px solid #f0f0f0}
+        .post-btn{display:flex;align-items:center;gap:8px;padding:10px 30px;cursor:pointer;font-size:.9em;color:#666;background:none;border:none;border-radius:5px;font-weight:500}
+        .post-btn:hover{background:#f0f2f5}
+        .post-btn.liked{color:#e91e63}
+        
+        .comments-section{padding:0 15px 15px;background:#f8f9fa;border-top:1px solid #e0e0e0}
+        .comment{display:flex;gap:8px;padding:8px 0;align-items:flex-start}
+        .comment-avatar{width:32px;height:32px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:.8em;flex-shrink:0}
+        .comment-bubble{background:white;padding:8px 12px;border-radius:18px;font-size:.9em;max-width:80%}
+        .comment-name{font-weight:600;font-size:.8em}.comment-text{font-size:.9em}.comment-time{font-size:.7em;color:#999}
+        .add-comment{display:flex;gap:8px;padding:8px 0;align-items:center}
+        .add-comment input{flex:1;padding:10px 15px;border:none;background:white;border-radius:25px;font-size:.9em;outline:none}
+        .add-comment button{background:none;border:none;color:#667eea;font-weight:bold;cursor:pointer}
     </style>
 </head>
 <body>
-    <div class="header"><a href="/features">←</a><h2>📢 Mur</h2></div>
+    <div class="header"><a href="/features">←</a><h2>📢 Fil d'actualité</h2></div>
     <div class="container">
-        <div class="post-box">
-            <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
-            <div class="post-actions">
-                <label style="cursor:pointer;padding:8px 15px;background:#f0f0f0;border-radius:25px;">📷<input type="file" accept="image/*,video/*" id="postMedia" style="display:none"></label>
-                <button class="post-btn" onclick="createPost()">Publier</button>
+        <div class="create-post">
+            <div class="top">
+                <div class="avatar">👤</div>
+                <input type="text" id="postInput" placeholder="Quoi de neuf ?" onfocus="showPostForm()">
+            </div>
+            <div id="postForm" style="display:none;">
+                <textarea id="postText" style="width:100%;min-height:100px;border:none;padding:10px;font-family:inherit;font-size:.95em;resize:vertical;outline:none;" placeholder="Écris quelque chose..."></textarea>
+                <div class="bottom">
+                    <label class="action">📷 Photo<input type="file" accept="image/*" id="postMedia" style="display:none"></label>
+                    <button class="action" onclick="createPost()" style="background:#667eea;color:white;font-weight:bold;">Publier</button>
+                </div>
             </div>
         </div>
         <div id="postsContainer"></div>
     </div>
+
     <script>
-        var posts = JSON.parse(localStorage.getItem('wallPosts') || '[]');
+        var posts = JSON.parse(localStorage.getItem('fbPosts') || '[]');
+        
+        function showPostForm() {
+            document.getElementById('postForm').style.display = 'block';
+        }
+        
         function createPost() {
             var text = document.getElementById('postText').value.trim();
-            if(!text)return;
-            posts.unshift({id:Date.now(),text:text,time:new Date().toLocaleString(),likes:0,liked:false,comments:[]});
-            localStorage.setItem('wallPosts',JSON.stringify(posts));
-            document.getElementById('postText').value='';
+            if (!text) return;
+            
+            var post = {
+                id: Date.now(),
+                text: text,
+                time: new Date().toLocaleString(),
+                likes: 0,
+                liked: false,
+                comments: []
+            };
+            
+            // Ajouter photo si sélectionnée
+            var file = document.getElementById('postMedia').files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    post.image = e.target.result;
+                    posts.unshift(post);
+                    saveAndRender();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                posts.unshift(post);
+                saveAndRender();
+            }
+            
+            document.getElementById('postText').value = '';
+            document.getElementById('postMedia').value = '';
+            document.getElementById('postForm').style.display = 'none';
+        }
+        
+        function saveAndRender() {
+            localStorage.setItem('fbPosts', JSON.stringify(posts));
             render();
         }
-        function like(id) {
-            var p = posts.find(function(x){return x.id===id});
-            if(p){p.liked=!p.liked;p.likes+=p.liked?1:-1;localStorage.setItem('wallPosts',JSON.stringify(posts));render();}
+        
+        function likePost(id) {
+            var p = posts.find(function(x) { return x.id === id; });
+            if (p) { p.liked = !p.liked; p.likes += p.liked ? 1 : -1; saveAndRender(); }
         }
-        function comment(id) {
-            var input = document.getElementById('comment-'+id);
+        
+        function addComment(id) {
+            var input = document.getElementById('comment-input-' + id);
             var text = input.value.trim();
-            if(!text)return;
-            var p = posts.find(function(x){return x.id===id});
-            if(p){p.comments.push({text:text,time:new Date().toLocaleTimeString()});localStorage.setItem('wallPosts',JSON.stringify(posts));input.value='';render();}
+            if (!text) return;
+            var p = posts.find(function(x) { return x.id === id; });
+            if (p) {
+                p.comments.push({ text: text, time: new Date().toLocaleTimeString() });
+                saveAndRender();
+                
+                // Notification à l'auteur du post
+                if (typeof addNotif !== 'undefined') {
+                    addNotif('💬', 'Nouveau commentaire', text);
+                }
+            }
         }
-        function delPost(id){posts=posts.filter(function(x){return x.id!==id});localStorage.setItem('wallPosts',JSON.stringify(posts));render();}
+        
+        function deletePost(id) {
+            if (confirm('Supprimer cette publication ?')) {
+                posts = posts.filter(function(x) { return x.id !== id; });
+                saveAndRender();
+            }
+        }
+        
         function render() {
             var c = document.getElementById('postsContainer');
-            if(posts.length===0){c.innerHTML='<p style="text-align:center;color:#999;padding:40px;">Aucune publication</p>';return;}
-            c.innerHTML = posts.map(function(p){
-                return '<div class="post-card"><div class="post-header"><div class="avatar">👤</div><div><div class="post-user">Moi</div><div class="post-time">'+p.time+'</div></div><span class="delete" onclick="delPost('+p.id+')">🗑️</span></div><div class="post-content">'+p.text+'</div><div class="post-footer"><span onclick="like('+p.id+')">'+(p.liked?'❤️':'🤍')+' '+p.likes+'</span><span>💬 '+p.comments.length+'</span></div><div class="comments">'+p.comments.map(function(c){return'<div>💬 '+c.text+' <small>'+c.time+'</small></div>';}).join('')+'</div><div class="comment-box"><input id="comment-'+p.id+'" placeholder="Commenter..."><button onclick="comment('+p.id+')">➤</button></div></div>';
+            if (posts.length === 0) {
+                c.innerHTML = '<div style="text-align:center;color:#999;padding:50px;">Aucune publication. Sois le premier !</div>';
+                return;
+            }
+            c.innerHTML = posts.map(function(p) {
+                return '<div class="post">' +
+                    '<div class="post-header">' +
+                        '<div class="post-avatar">👤</div>' +
+                        '<div class="post-info"><div class="post-name">Moi</div><div class="post-time">' + p.time + '</div></div>' +
+                        '<span class="post-menu" onclick="deletePost(' + p.id + ')">🗑️</span>' +
+                    '</div>' +
+                    '<div class="post-text">' + p.text + '</div>' +
+                    (p.image ? '<div style="padding:0 15px;"><img src="' + p.image + '" style="width:100%;border-radius:8px;"></div>' : '') +
+                    '<div class="post-stats"><span>' + (p.likes > 0 ? '❤️ ' + p.likes : '') + '</span><span>' + p.comments.length + ' commentaires</span></div>' +
+                    '<div class="post-actions">' +
+                        '<button class="post-btn' + (p.liked ? ' liked' : '') + '" onclick="likePost(' + p.id + ')">' + (p.liked ? '❤️' : '🤍') + ' J\'aime</button>' +
+                        '<button class="post-btn">💬 Commenter</button>' +
+                    '</div>' +
+                    '<div class="comments-section">' +
+                        p.comments.map(function(c) {
+                            return '<div class="comment"><div class="comment-avatar">👤</div><div class="comment-bubble"><div class="comment-name">Toi</div><div class="comment-text">' + c.text + '</div><div class="comment-time">' + c.time + '</div></div></div>';
+                        }).join('') +
+                        '<div class="add-comment"><input id="comment-input-' + p.id + '" placeholder="Écrire un commentaire..."><button onclick="addComment(' + p.id + ')">Publier</button></div>' +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
+        
         render();
     </script>
+    <script src="/static/js/notif-badge.js"></script>
 </body>
 </html>

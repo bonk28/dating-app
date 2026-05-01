@@ -7,60 +7,150 @@
         *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#000;color:white;padding-bottom:60px}
         .header{padding:15px;display:flex;align-items:center;gap:15px;background:#111}
         .header a{color:white;text-decoration:none;font-size:1.3em}
-        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:3px}
-        .card{aspect-ratio:9/16;background:#1a1a1a;cursor:pointer;position:relative;overflow:hidden}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;padding:2px}
+        .card{aspect-ratio:9/16;background:#1a1a1a;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s}
+        .card:active{transform:scale(.95)}
         .card img,.card video{width:100%;height:100%;object-fit:cover}
-        .add{display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #333}
-        .user{position:absolute;bottom:10px;left:10px;font-weight:bold;font-size:.8em;text-shadow:0 2px 4px rgba(0,0,0,.8)}
-        .reacts{position:absolute;bottom:35px;left:10px;font-size:.8em}
-        .viewer{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
-        .viewer img,.viewer video{flex:1;object-fit:contain;width:100%}
-        .close{position:absolute;top:20px;right:20px;font-size:2em;cursor:pointer;z-index:1001}
-        .rbtns{position:absolute;bottom:100px;left:20px;display:flex;gap:10px;z-index:1001;flex-wrap:wrap}
-        .rbtn{background:rgba(255,255,255,.2);padding:8px 15px;border-radius:20px;cursor:pointer;font-size:1.2em;border:none;color:white}
-        .reply{position:absolute;bottom:30px;left:20px;right:20px;display:flex;gap:10px;z-index:1001}
-        .reply input{flex:1;padding:12px;border-radius:25px;border:none;background:rgba(255,255,255,.2);color:white}
-        .reply button{padding:12px 20px;border-radius:25px;border:none;background:#e91e63;color:white;font-weight:bold}
-        .panel{position:absolute;bottom:150px;left:20px;right:20px;background:rgba(0,0,0,.8);border-radius:15px;padding:15px;z-index:1001;max-height:200px;overflow-y:auto;display:none}
-        .panel h4{margin-bottom:10px;color:#e91e63}
-        .item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;font-size:.9em}
+        .add{display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #333;background:#111}
+        .add span{font-size:3em}.add small{color:#888;margin-top:8px}
+        .info{position:absolute;bottom:0;left:0;right:0;padding:15px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+        .username{font-weight:600;font-size:.9em}.meta{font-size:.7em;color:#ccc}
+        
+        .viewer{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;flex-direction:column}
+        .viewer-header{position:absolute;top:0;left:0;right:0;padding:20px;display:flex;align-items:center;gap:12px;background:linear-gradient(rgba(0,0,0,.7),transparent);z-index:10}
+        .viewer-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+        .viewer-name{font-weight:600;font-size:.9em}.viewer-time{font-size:.7em;color:#ccc}
+        .viewer-close{position:absolute;top:20px;right:20px;font-size:2em;cursor:pointer;z-index:11}
+        .viewer-media{flex:1;display:flex;align-items:center;justify-content:center}
+        .viewer-media img,.viewer-media video{max-width:100%;max-height:100%;object-fit:contain}
+        
+        .viewer-bottom{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+        .reactions-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+        .reaction-btn{background:rgba(255,255,255,.15);padding:10px 18px;border-radius:25px;cursor:pointer;font-size:1.3em;border:none;color:white;transition:all .2s}
+        .reaction-btn:active{transform:scale(.9);background:rgba(255,255,255,.3)}
+        .reply-bar{display:flex;gap:10px}
+        .reply-bar input{flex:1;padding:14px 18px;border-radius:30px;border:none;background:rgba(255,255,255,.15);color:white;font-size:.95em;outline:none}
+        .reply-bar input::placeholder{color:#aaa}
+        .reply-bar button{padding:14px 25px;border-radius:30px;border:none;background:#e91e63;color:white;font-weight:bold;cursor:pointer;font-size:.95em}
+        
+        .comments-panel{position:absolute;bottom:140px;left:20px;right:20px;background:rgba(0,0,0,.85);border-radius:20px;padding:20px;z-index:10;max-height:250px;overflow-y:auto;display:none;backdrop-filter:blur(10px)}
+        .comments-panel h4{margin-bottom:15px;font-size:1.1em}
+        .comment-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;gap:10px;align-items:flex-start}
+        .comment-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.7em;flex-shrink:0}
+        .comment-bubble{flex:1}.comment-name{font-weight:600;font-size:.8em}.comment-text{font-size:.85em;margin-top:2px}.comment-time{font-size:.7em;color:#999;margin-top:3px}
+        .floating-emoji{position:fixed;font-size:3em;animation:floatUp 1.5s ease-out forwards;pointer-events:none;z-index:3000}
+        @keyframes floatUp{0%{opacity:1;transform:translateY(0)scale(1)}100%{opacity:0;transform:translateY(-200px)scale(2.5)}}
     </style>
 </head>
 <body>
     <div class="header"><a href="/features">←</a><h2>📸 Stories</h2></div>
     <div class="grid" id="grid">
-        <div class="card add" onclick="document.getElementById('file').click()"><span style="font-size:3em;">➕</span><small>Ajouter</small></div>
+        <div class="card add" onclick="document.getElementById('file').click()"><span>➕</span><small>Ajouter une story</small></div>
     </div>
     <input type="file" id="file" accept="image/*,video/*" style="display:none" onchange="addStory(this.files[0])">
     
     <div class="viewer" id="viewer">
-        <span class="close" onclick="document.getElementById('viewer').style.display='none'">✕</span>
-        <div id="media" style="flex:1;display:flex;align-items:center;justify-content:center;"></div>
-        <div class="panel" id="panel"><h4>❤️ Réactions</h4><div id="panelList"></div></div>
-        <div class="rbtns">
-            <button class="rbtn" onclick="react('❤️')">❤️</button><button class="rbtn" onclick="react('😂')">😂</button>
-            <button class="rbtn" onclick="react('🔥')">🔥</button><button class="rbtn" onclick="react('😍')">😍</button>
-            <button class="rbtn" onclick="react('👏')">👏</button><button class="rbtn" onclick="showPanel()">💬 Voir</button>
+        <div class="viewer-header">
+            <div class="viewer-avatar">👤</div>
+            <div><div class="viewer-name">Moi</div><div class="viewer-time" id="viewerTime"></div></div>
         </div>
-        <div class="reply"><input type="text" id="ri" placeholder="Commentaire..."><button onclick="reply()">Envoyer</button></div>
+        <span class="viewer-close" onclick="closeViewer()">✕</span>
+        <div class="viewer-media" id="media"></div>
+        
+        <div class="comments-panel" id="panel"><h4>💬 Réactions & Commentaires</h4><div id="panelList"></div></div>
+        
+        <div class="viewer-bottom">
+            <div class="reactions-bar">
+                <button class="reaction-btn" onclick="react('❤️')">❤️</button>
+                <button class="reaction-btn" onclick="react('😂')">😂</button>
+                <button class="reaction-btn" onclick="react('🔥')">🔥</button>
+                <button class="reaction-btn" onclick="react('😍')">😍</button>
+                <button class="reaction-btn" onclick="react('👏')">👏</button>
+                <button class="reaction-btn" onclick="react('😮')">😮</button>
+                <button class="reaction-btn" onclick="react('💯')">💯</button>
+                <button class="reaction-btn" onclick="showPanel()" style="font-size:.9em;">💬</button>
+            </div>
+            <div class="reply-bar">
+                <input type="text" id="ri" placeholder="Répondre à cette story...">
+                <button onclick="reply()">Envoyer</button>
+            </div>
+        </div>
     </div>
 
     <script>
         var stories = JSON.parse(localStorage.getItem('myStories') || '[]'), cur = 0;
+        
         function addStory(f) {
-            if(!f)return;var r=new FileReader();
-            r.onload=function(e){stories.unshift({type:f.type.startsWith('video')?'video':'image',dataUrl:e.target.result,time:new Date().toLocaleString(),reactions:[],comments:[]});localStorage.setItem('myStories',JSON.stringify(stories));render();};r.readAsDataURL(f);
+            if(!f)return;
+            var r=new FileReader();
+            r.onload=function(e){
+                stories.unshift({type:f.type.startsWith('video')?'video':'image',dataUrl:e.target.result,time:new Date().toLocaleString(),reactions:[],comments:[]});
+                localStorage.setItem('myStories',JSON.stringify(stories));
+                render();
+                // Notification pour les autres utilisateurs
+                if(typeof addNotif !== 'undefined') addNotif('📸', 'Nouvelle story !', 'Quelqu\'un a publié une story');
+            };
+            r.readAsDataURL(f);
         }
+        
         function render() {
-            var g=document.getElementById('grid'),add='<div class="card add" onclick="document.getElementById(\'file\').click()"><span style="font-size:3em;">➕</span><small>Ajouter</small></div>';
-            g.innerHTML=add+stories.map(function(s,i){return'<div class="card" onclick="view('+i+')">'+(s.type==='video'?'<video src="'+s.dataUrl+'"></video>':'<img src="'+s.dataUrl+'">')+'<div class="user">Moi</div>'+(s.reactions.length?'<div class="reacts">'+s.reactions.join(' ')+' '+s.comments.length+'💬</div>':'')+'</div>';}).join('');
+            var g=document.getElementById('grid');
+            g.innerHTML='<div class="card add" onclick="document.getElementById(\'file\').click()"><span>➕</span><small>Ajouter une story</small></div>'+
+                stories.map(function(s,i){
+                    return'<div class="card" onclick="view('+i+')">'+(s.type==='video'?'<video src="'+s.dataUrl+'"></video>':'<img src="'+s.dataUrl+'">')+
+                    '<div class="info"><div class="username">Moi</div><div class="meta">'+new Date(s.time).toLocaleTimeString()+' • '+s.reactions.length+' réactions • '+s.comments.length+' 💬</div></div></div>';
+                }).join('');
         }
-        function view(i){cur=i;var s=stories[i];document.getElementById('media').innerHTML=s.type==='video'?'<video src="'+s.dataUrl+'" autoplay loop controls style="max-width:100%;max-height:100%;"></video>':'<img src="'+s.dataUrl+'" style="max-width:100%;max-height:100%;">';document.getElementById('viewer').style.display='flex';document.getElementById('panel').style.display='none';}
-        function react(e){stories[cur].reactions.push(e);localStorage.setItem('myStories',JSON.stringify(stories));render();var d=document.createElement('div');d.textContent=e;d.style.cssText='position:fixed;font-size:3em;animation:up 1s;z-index:2000;left:50%;bottom:200px;';document.body.appendChild(d);setTimeout(function(){d.remove()},1000);}
-        function reply(){var t=document.getElementById('ri').value.trim();if(!t)return;stories[cur].comments.push({text:t,time:new Date().toLocaleTimeString()});localStorage.setItem('myStories',JSON.stringify(stories));document.getElementById('ri').value='';render();}
-        function showPanel(){var s=stories[cur],l=document.getElementById('panelList'),h='<p>'+s.reactions.join(' ')+' ('+s.reactions.length+')</p>';if(s.comments.length){h+='<hr style="margin:10px 0;border-color:rgba(255,255,255,.2)">'+s.comments.map(function(c){return'<div class="item">💬 '+c.text+'</div>';}).join('');}else{h+='<p style="color:#999;">Aucun commentaire</p>';}l.innerHTML=h;document.getElementById('panel').style.display='block';}
-        var st=document.createElement('style');st.textContent='@keyframes up{from{opacity:1;transform:translateY(0)scale(1)}to{opacity:0;transform:translateY(-100px)scale(2)}}';document.head.appendChild(st);
+        
+        function view(i){
+            cur=i;var s=stories[i];
+            document.getElementById('media').innerHTML=s.type==='video'?'<video src="'+s.dataUrl+'" autoplay loop controls style="max-width:100%;max-height:100%;"></video>':'<img src="'+s.dataUrl+'" style="max-width:100%;max-height:100%;">';
+            document.getElementById('viewerTime').textContent=s.time;
+            document.getElementById('viewer').style.display='flex';
+            document.getElementById('panel').style.display='none';
+            document.getElementById('ri').value='';
+        }
+        
+        function closeViewer(){document.getElementById('viewer').style.display='none';}
+        
+        function react(e){
+            stories[cur].reactions.push(e);
+            localStorage.setItem('myStories',JSON.stringify(stories));
+            render();
+            // Animation flottante
+            var d=document.createElement('div');d.textContent=e;d.className='floating-emoji';
+            d.style.left=Math.random()*60+20+'%';d.style.bottom='200px';d.style.animation='floatUp 2s ease-out forwards';
+            document.body.appendChild(d);setTimeout(function(){d.remove();},2000);
+        }
+        
+        function reply(){
+            var t=document.getElementById('ri').value.trim();
+            if(!t)return;
+            stories[cur].comments.push({text:t,time:new Date().toLocaleTimeString()});
+            localStorage.setItem('myStories',JSON.stringify(stories));
+            document.getElementById('ri').value='';
+            render();
+            
+            // ENVOYER UN MESSAGE PRIVÉ (simulation)
+            if(typeof addNotif !== 'undefined') {
+                addNotif('💬', 'Nouveau commentaire sur ta story', t);
+            }
+            alert('💬 Ton commentaire a été envoyé en message privé à l\'auteur de la story !');
+        }
+        
+        function showPanel(){
+            var s=stories[cur],l=document.getElementById('panelList');
+            var h='<p style="margin-bottom:10px;">'+s.reactions.join(' ')+' <small>('+s.reactions.length+')</small></p>';
+            if(s.comments.length>0){
+                h+='<hr style="border-color:rgba(255,255,255,.2);margin:10px 0;">';
+                h+=s.comments.map(function(c){return'<div class="comment-item"><div class="comment-avatar">👤</div><div class="comment-bubble"><div class="comment-name">Toi</div><div class="comment-text">'+c.text+'</div><div class="comment-time">'+c.time+'</div></div></div>';}).join('');
+            }else{h+='<p style="color:#999;text-align:center;padding:15px;">Aucun commentaire</p>';}
+            l.innerHTML=h;
+            document.getElementById('panel').style.display='block';
+        }
+        
         render();
     </script>
+    <script src="/static/js/notif-badge.js"></script>
 </body>
 </html>
