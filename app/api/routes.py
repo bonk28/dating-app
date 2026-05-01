@@ -137,3 +137,14 @@ def send_voice_message(match_id):
         db.session.commit()
         return jsonify({'success': True})
     return jsonify({'error': 'Fichier invalide'}), 400
+
+@bp.route('/update-location', methods=['POST'])
+@login_required
+def update_location():
+    data = request.get_json()
+    if data.get('latitude') and data.get('longitude'):
+        current_user.latitude = data['latitude']
+        current_user.longitude = data['longitude']
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'error': 'Coordonnées manquantes'}), 400

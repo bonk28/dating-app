@@ -62,7 +62,13 @@
     <div class="input-bar">
         <button class="btn game" onclick="openGamePanel()">🎮</button>
         <label class="btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
-        <input id="msgInput" placeholder="Message" onkeypress="if(event.key==='Enter')sendMsg()">
+        <div style="display:flex;gap:4px;padding:4px 0;flex-wrap:wrap;" id="formatBar">
+                    <button class="btn" onclick="formatText('bold')" title="Gras" style="font-weight:bold;font-size:1em;">B</button>
+                    <button class="btn" onclick="formatText('italic')" title="Italique" style="font-style:italic;font-size:1em;">I</button>
+                    <button class="btn" onclick="formatText('big')" title="Grand" style="font-size:1.2em;">A+</button>
+                    <button class="btn" onclick="formatText('small')" title="Petit" style="font-size:.8em;">A-</button>
+                </div>
+                <input id="msgInput" placeholder="Message" onkeypress="if(event.key==='Enter')sendMsg()" style="flex:1;">
         <button class="btn" onclick="sendMsg()" style="color:#c8963e;font-size:1.5em;">➤</button>
     </div>
 
@@ -96,7 +102,21 @@
         const socket=io();socket.emit('join_chat',{match_id:mid});
         
         // MESSAGES
-        function sendMsg(){const v=document.getElementById('msgInput').value.trim();if(!v)return;fetch('/api/messages/'+mid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});}
+        function formatText(type){
+        const input=document.getElementById('msgInput');
+        const start=input.selectionStart,end=input.selectionEnd;
+        const text=input.value.substring(start,end);
+        let formatted='';
+        switch(type){
+            case 'bold': formatted='<b>'+text+'</b>';break;
+            case 'italic': formatted='<i>'+text+'</i>';break;
+            case 'big': formatted='<big>'+text+'</big>';break;
+            case 'small': formatted='<small>'+text+'</small>';break;
+        }
+        input.value=input.value.substring(0,start)+formatted+input.value.substring(end);
+        input.focus();
+    }
+    function sendMsg(){const v=document.getElementById('msgInput').value.trim();if(!v)return;fetch('/api/messages/'+mid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});}
         function sendMedia(f){if(!f)return;const t=f.type.startsWith('video')?'video':'image';const fd=new FormData();fd.append('media',f);fd.append('type',t);fetch('/api/messages/media/'+mid,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)load();});}
         function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div style="text-align:center;margin:8px 0"><span style="background:rgba(0,0,0,.08);padding:3px 10px;border-radius:8px;font-size:.7em">${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="color:#999;">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="color:#999;">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` <span style="color:#4fc3f7;">${m.is_read?'✓✓':'✓'}</span>`:''}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
         
