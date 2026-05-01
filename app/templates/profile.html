@@ -37,13 +37,14 @@
         .stat-value{font-size:1.5em;font-weight:bold;color:#667eea;}
         .stat-label{font-size:0.8em;color:#666;}
     body { padding-bottom: 60px; }
+body{padding-bottom:60px;}
 </style>
 </head>
 <body>
-    <div class="nav">
-        <a href="/dashboard">🏠 Découvrir</a>
-        <a href="/matches">💕 Matches</a>
-        
+        <div class="nav" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:white;padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);z-index:100;">
+        <a href="/dashboard">🏠</a>
+        <a href="/matches">💕</a>
+        <a href="/wall">📢</a>
         <a href="/features">➕</a>
         <a href="/profile">👤</a>
     </div>
@@ -163,7 +164,8 @@
                 <small style="color:#666;">Photo 4 (premium)</small>
                 </div>
                 <button type="submit" class="btn btn-primary">💾 Sauvegarder</button>
-            </form>
+            <a href="/stories" style="display:block;text-align:center;padding:12px;background:#e91e63;color:white;text-decoration:none;border-radius:10px;margin:10px 0;">📸 Mes Stories</a>
+</form>
             
             <a href="/delete-account" class="btn btn-danger" style="display:block;text-align:center;margin-top:10px;">🗑️ Supprimer mon compte</a>
         </div>

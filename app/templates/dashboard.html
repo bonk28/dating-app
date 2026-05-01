@@ -1,91 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Découvrir - Dating App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dating App | Découvrir - Dating App</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/static/css/swipe.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,sans-serif;background:#050510;color:white;overflow:hidden;height:100vh}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        .nav {
+            background: white; padding: 15px;
+            display: flex; justify-content: space-around;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed; bottom: 0; left: 0; right: 0; bottom: 0; z-index: 100;
+        }
+        .nav a { text-decoration: none; color: #667eea; font-weight: bold; font-size: 0.9em; }
+        .cards-container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        .card {
+            background: white; border-radius: 15px; overflow: hidden;
+            margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative; cursor: grab; user-select: none;
+        }
+        .card:active { cursor: grabbing; }
+        .card-image {
+            width: 100%; height: 350px; background: #e0e0e0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5em; position: relative; overflow: hidden;
+        }
+        .card-image img { width: 100%; height: 100%; object-fit: cover; }
+        .compatibility-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white; padding: 8px 15px; border-radius: 25px;
+            font-weight: bold; font-size: 0.9em;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10;
+        }
+        .distance-badge {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(0,0,0,0.7); color: white;
+            padding: 8px 15px; border-radius: 25px; font-size: 0.9em; z-index: 10;
+        }
+        .card-body { padding: 20px; }
+        .card-body h3 { margin-bottom: 10px; color: #333; }
+        .card-body p { color: #666; margin-bottom: 5px; }
+        .interests { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+        .interest-tag {
+            background: #667eea20; color: #667eea;
+            padding: 5px 10px; border-radius: 20px; font-size: 0.8em;
+        }
+        .actions { display: flex; gap: 10px; padding: 15px; justify-content: center; }
+        .btn {
+            padding: 15px 25px; border: none; border-radius: 50%;
+            font-size: 1.5em; cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .btn:active { transform: scale(0.9); }
+        .btn-pass { background: white; color: #f44336; }
+        .btn-super { background: white; color: #2196F3; }
+        .btn-like { background: white; color: #4CAF50; }
+        .no-more { text-align: center; padding: 50px 20px; color: #999; }
         
-        .header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;position:relative;z-index:10}
-        .header h2{background:linear-gradient(135deg,#ff2d78,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.5em}
-        .header-btn{color:white;text-decoration:none;font-size:1.3em}
+        .like-badge, .nope-badge, .super-like-badge {
+            position: absolute; top: 40%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            padding: 15px 30px; border-radius: 10px;
+            font-size: 2em; font-weight: bold; border: 4px solid white;
+            display: none; z-index: 20;
+        }
+        .like-badge { background: #4CAF50; color: white; box-shadow: 0 5px 20px rgba(76,175,80,0.5); }
+        .nope-badge { background: #f44336; color: white; box-shadow: 0 5px 20px rgba(244,67,54,0.5); }
+        .super-like-badge { background: #2196F3; color: white; box-shadow: 0 5px 20px rgba(33,150,243,0.5); }
         
-        .cards-container{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
-        .card-stack{position:relative;width:300px;height:420px}
+        #user-stats { 
+            text-align: center; padding: 10px; background: white;
+            margin: 10px; border-radius: 10px; font-size: 0.9em; color: #666;
+        }
+        #install-btn {
+            display: none; margin: 10px auto; padding: 10px 20px;
+            background: #667eea; color: white; border: none;
+            border-radius: 25px; cursor: pointer; font-size: 1em;
+        }
         
-        .card{position:absolute;width:100%;height:100%;border-radius:20px;overflow:hidden;background:#0d0d20;border:1px solid rgba(255,255,255,.1);transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:grab}
-        .card:active{cursor:grabbing}
-        .card img{width:100%;height:60%;object-fit:cover}
-        .card-body{padding:20px}
-        .card-name{font-size:1.3em;font-weight:700;background:linear-gradient(135deg,#fff,#ccc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .card-info{font-size:.8em;opacity:.5;margin:5px 0}
-        .card-bio{font-size:.85em;opacity:.7;margin-top:10px}
-        .card-badges{display:flex;gap:8px;margin:10px 0}
-        .badge{padding:4px 12px;border-radius:20px;font-size:.7em;font-weight:bold;background:rgba(255,255,255,.1)}
-        .badge-compat{background:rgba(0,200,83,.2);color:#00c853}
-        .badge-dist{background:rgba(0,229,255,.2);color:#00e5ff}
-        
-        .actions{display:flex;justify-content:center;gap:25px;padding:20px}
-        .act-btn{width:65px;height:65px;border-radius:50%;border:none;font-size:2em;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;background:#0d0d20;border:1px solid rgba(255,255,255,.1)}
-        .act-btn:hover{transform:scale(1.1)}
-        .act-pass:hover{background:rgba(255,23,68,.2);border-color:#ff1744;color:#ff1744}
-        .act-super:hover{background:rgba(0,229,255,.2);border-color:#00e5ff;color:#00e5ff}
-        .act-like:hover{background:rgba(0,200,83,.2);border-color:#00c853;color:#00c853}
-        
-        .nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:12px;background:rgba(13,13,32,.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.05);z-index:100}
-        .nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:1.2em;transition:all .3s;padding:8px}
-        .nav a.active{color:#ff2d78}
-    </style>
+        .match-notification {
+            position: fixed; bottom: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8); display: flex;
+            align-items: center; justify-content: center; z-index: 9999;
+        }
+        .match-content {
+            background: white; padding: 30px; border-radius: 20px;
+            text-align: center; max-width: 350px;
+        }
+        .match-content h1 { margin-bottom: 10px; }
+        .match-content p { color: #666; margin-bottom: 20px; }
+        .match-content button, .match-content a {
+            display: block; padding: 12px; margin: 10px 0;
+            border-radius: 25px; text-decoration: none; font-weight: bold;
+        }
+        .match-content button {
+            background: #667eea; color: white; border: none;
+            width: 100%; cursor: pointer;
+        }
+        .match-content a {
+            background: #4CAF50; color: white;
+        }
+    body{padding-bottom:60px;}
+</style>
 </head>
 <body>
-    <div class="header">
-        <span class="header-btn">🔔</span>
-        <h2>💎 Découvrir</h2>
-        <a href="/profile" class="header-btn">👤</a>
-    </div>
-    
-    <div class="cards-container" id="cardsContainer">
-        <div class="card-stack" id="cardStack">
-            {% if matches %}
-            {% for match in matches %}
-            <div class="card" style="z-index:{{ loop.revindex }};transform:scale({{ 1 - loop.index0 * 0.03 }})translateY({{ loop.index0 * 5 }}px);" data-id="{{ match.id }}">
-                {% if match.photo %}<img src="/static/uploads/{{ match.photo }}" alt="{{ match.username }}">{% else %}<div style="height:60%;background:linear-gradient(135deg,#ff2d78,#00e5ff);display:flex;align-items:center;justify-content:center;font-size:5em;">👤</div>{% endif %}
-                <div class="card-body">
-                    <div class="card-name">{{ match.username }}, {{ match.age }}</div>
-                    <div class="card-info">📍 {{ match.location or 'Inconnu' }}</div>
-                    <div class="card-badges">
-                        {% if match.compatibility %}<span class="badge badge-compat">{{ match.compatibility }}%</span>{% endif %}
-                        {% if match.distance %}<span class="badge badge-dist">📍 {{ match.distance }}km</span>{% endif %}
-                    </div>
-                    <div class="card-bio">{{ match.bio[:80] or 'Pas de bio' }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div style="text-align:center;padding:50px;color:rgba(255,255,255,.3);">
-                <p style="font-size:4em;">🔍</p><p>Plus de profils ! Reviens plus tard.</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="actions">
-        <button class="act-btn act-pass" onclick="swipe('pass')">👎</button>
-        <button class="act-btn act-super" onclick="swipe('super_like')">⭐</button>
-        <button class="act-btn act-like" onclick="swipe('like')">❤️</button>
-    </div>
-    
-    <div class="nav">
-        <a href="/dashboard" class="active">🏠</a>
+        <div class="nav" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:white;padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);z-index:100;">
+        <a href="/dashboard">🏠</a>
         <a href="/matches">💕</a>
         <a href="/wall">📢</a>
         <a href="/features">➕</a>
         <a href="/profile">👤</a>
     </div>
 
-    <script>
-        function swipe(dir){const card=document.querySelector('.card:first-child');if(!card)return;const id=card.dataset.id;card.style.transition='all .4s';card.style.transform='translateX('+(dir==='like'?'150%':dir==='pass'?'-150%':'0')+') translateY('+(dir==='super_like'?'-150%':'0')+') rotate('+(dir==='like'?'20deg':dir==='pass'?'-20deg':'0')+')';card.style.opacity='0';fetch('/api/swipe/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({direction:dir})}).then(r=>r.json()).then(d=>{if(d.is_match)alert('🎉 MATCH!');});setTimeout(()=>{card.remove();if(!document.querySelector('.card'))location.reload();},400);}
-    </script>
+    <div id="user-stats">Chargement des stats...</div>
+    <button id="install-btn">📱 Installer l'application</button>
+
+    <div class="cards-container">
+        {% if matches %}
+            {% for match in matches %}
+            <div class="card" data-user-id="{{ match.id }}">
+                {% if match.compatibility is defined %}
+                <div class="compatibility-badge">{{ match.compatibility }}% compatible</div>
+                {% endif %}
+                {% if match.distance is defined and match.distance %}
+                <div class="distance-badge">📍 {{ match.distance }} km</div>
+                {% endif %}
+                
+                <div class="like-badge">LIKE</div>
+                <div class="nope-badge">NOPE</div>
+                <div class="super-like-badge">⭐ SUPER</div>
+                
+                <div class="card-image">
+                    {% if match.photo %}
+                    <img src="/static/uploads/{{ match.photo }}" alt="{{ match.username }}">
+                    {% else %}
+                    <div>📷</div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body">
+                    <h3>{{ match.username }}, {{ match.age }}</h3>
+                    {% if match.location %}<p>📍 {{ match.location }}</p>{% endif %}
+                    {% if match.bio %}<p>{{ match.bio[:100] }}</p>{% endif %}
+                    
+                    {% if match.interests %}
+                    <div class="interests">
+                        {% set interests_list = match.interests.split(',') %}
+                        {% for interest in interests_list[:5] %}
+                        <span class="interest-tag">{{ interest.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="actions">
+                    <button onclick="swipeUser('{{ match.id }}', 'pass')" class="btn btn-pass">👎</button>
+                    <button onclick="swipeUser('{{ match.id }}', 'super_like')" class="btn btn-super">⭐</button>
+                    <button onclick="swipeUser('{{ match.id }}', 'like')" class="btn btn-like">💚</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-more">
+                <p style="font-size:4em;">🔍</p>
+                <h2>Plus de profils</h2>
+                <p>Élargissez vos critères de recherche ou revenez plus tard !</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="/static/js/app.js"></script>
+<script src="/static/js/global-player.js"></script>
+{% include 'music_float.html' %}
+<script src="/static/js/notif-badge.js"></script>
 </body>
 </html>
