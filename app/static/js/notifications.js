@@ -23,3 +23,14 @@ setInterval(() => {
 }, 10000);
 
 requestNotif();
+
+// Vérifier nouvelles stories
+let lastStoryCount = 0;
+setInterval(() => {
+  fetch('/api/stories').then(r => r.json()).then(stories => {
+    if (stories.length > lastStoryCount && lastStoryCount > 0) {
+      notify('📸 Nouvelle story !', 'Quelqu'un a publié une story');
+    }
+    lastStoryCount = stories.length;
+  });
+}, 15000);

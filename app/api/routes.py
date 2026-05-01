@@ -358,3 +358,13 @@ def delete_message(message_id):
     msg.content = 'Message supprimé'
     db.session.commit()
     return jsonify({'success': True})
+
+@bp.route('/unlike/<int:user_id>', methods=['POST'])
+@login_required
+def unlike_user(user_id):
+    like = Like.query.filter_by(liker_id=current_user.id, liked_id=user_id).first()
+    if like:
+        db.session.delete(like)
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'error': 'Pas de like trouvé'}), 404
