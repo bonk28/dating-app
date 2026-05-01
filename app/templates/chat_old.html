@@ -6,8 +6,8 @@
     <title>Dating App | Chat - {{ other_user.username }}</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:#e5ddd5; height:100vh; display:flex; flex-direction:column; }
-        .chat-header { background:#075e54; color:white; padding:8px 12px; display:flex; align-items:center; gap:10px; }
+        body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:#0f0f1a; height:100vh; display:flex; flex-direction:column; }
+        .chat-header { background:#1a1a2e; color:white; padding:8px 12px; display:flex; align-items:center; gap:10px; }
         .back-btn { color:white; text-decoration:none; font-size:1.2em; }
         .chat-avatar { width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; overflow:hidden; }
         .chat-avatar img { width:100%; height:100%; object-fit:cover; }
@@ -19,17 +19,17 @@
         .date-sep { text-align:center; margin:10px 0; } .date-sep span { background:#e1f3fb; padding:4px 10px; border-radius:5px; font-size:0.7em; }
         .message { max-width:75%; padding:6px 10px; border-radius:8px; position:relative; animation:fadeIn 0.2s; cursor:pointer; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-        .msg-sent { background:#dcf8c6; align-self:flex-end; border-top-right-radius:0; }
+        .msg-sent { background:#2d3436; align-self:flex-end; border-top-right-radius:0; }
         .msg-recv { background:#fff; align-self:flex-start; border-top-left-radius:0; }
         .msg-time { font-size:0.6em; color:#999; text-align:right; margin-top:2px; }
         .msg-menu { display:none; position:fixed; background:white; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.3); z-index:60; min-width:140px; }
         .msg-menu div { padding:12px 20px; cursor:pointer; }
         .msg-menu .danger { color:#f44336; }
         
-        .input-area { background:#f0f0f0; padding:6px 10px; display:flex; align-items:center; gap:6px; }
+        .input-area { background:#16213e; padding:6px 10px; display:flex; align-items:center; gap:6px; }
         .input-btn { background:none; border:none; color:#54656f; font-size:1.3em; cursor:pointer; padding:5px; }
         .msg-input { flex:1; padding:10px; border:none; border-radius:25px; font-size:0.9em; outline:none; }
-        .send-btn { background:none; border:none; color:#075e54; font-size:1.4em; cursor:pointer; }
+        .send-btn { background:none; border:none; color:#1a1a2e; font-size:1.4em; cursor:pointer; }
         
         .emoji-panel { display:none; background:white; padding:8px; flex-wrap:wrap; gap:5px; }
         .emoji-panel.show { display:flex; }
@@ -59,7 +59,7 @@
             background:#f5f5f5; transition:all 0.3s;
         }
         .rps-choice:hover { background:#e0e0e0; }
-        .rps-choice.selected { border-color:#075e54; background:#c8e6c9; }
+        .rps-choice.selected { border-color:#1a1a2e; background:#c8e6c9; }
         .rps-choice.confirmed { border-color:#4CAF50; background:#a5d6a7; cursor:not-allowed; }
         .av-card {
             padding:20px; border-radius:15px; margin:10px 0;
@@ -117,7 +117,7 @@
     
     <!-- ========== PANEL JEUX ========== -->
     <div id="gamesPanel">
-        <div style="background:#075e54;color:white;padding:15px 20px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1;">
+        <div style="background:#1a1a2e;color:white;padding:15px 20px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1;">
             <h3 style="margin:0;">🎮 Jeux</h3>
             <button onclick="closeGames()" style="background:none;border:none;color:white;font-size:1.8em;cursor:pointer;">✕</button>
         </div>
@@ -126,12 +126,12 @@
                 <div onclick="showGame('rps')" style="display:flex;align-items:center;gap:15px;padding:18px;background:#f8f8f8;border-radius:15px;margin-bottom:10px;cursor:pointer;">
                     <span style="font-size:2.5em;">✊✋✌️</span>
                     <div style="flex:1;"><b>Pierre Feuille Ciseaux</b><br><small style="color:#666;">Choisissez, confirmez, résultat !</small></div>
-                    <span style="font-size:2em;color:#075e54;">▶</span>
+                    <span style="font-size:2em;color:#1a1a2e;">▶</span>
                 </div>
                 <div onclick="showGame('av')" style="display:flex;align-items:center;gap:15px;padding:18px;background:#f8f8f8;border-radius:15px;margin-bottom:10px;cursor:pointer;">
                     <span style="font-size:2.5em;">🎯💬</span>
                     <div style="flex:1;"><b>Action ou Vérité</b><br><small style="color:#666;">Classique & Adulte • 200 défis</small></div>
-                    <span style="font-size:2em;color:#075e54;">▶</span>
+                    <span style="font-size:2em;color:#1a1a2e;">▶</span>
                 </div>
             </div>
             <div id="gameContent"></div>
@@ -144,7 +144,7 @@
 
     <div class="input-area">
         <button class="input-btn" onclick="showEmojis()">😊</button>
-        <button class="input-btn" onclick="openGames()" style="background:#075e54;color:white;border-radius:50%;width:38px;height:38px;font-size:1em;" title="Jeux">🎮</button>
+        <button class="input-btn" onclick="openGames()" style="background:#1a1a2e;color:white;border-radius:50%;width:38px;height:38px;font-size:1em;" title="Jeux">🎮</button>
         
         <label class="input-btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
         <input class="msg-input" id="msgInput" placeholder="Message" onkeypress="if(event.key==='Enter')sendMsg()">
@@ -268,7 +268,7 @@
                 <button class="rps-choice" onclick="chooseRPS('paper', this)">✋</button>
                 <button class="rps-choice" onclick="chooseRPS('scissors', this)">✌️</button>
             </div>
-            <button id="rpsConfirm" class="game-btn" style="background:#075e54;color:white;display:block;margin:0 auto;opacity:0.5;" disabled onclick="confirmRPS()">
+            <button id="rpsConfirm" class="game-btn" style="background:#1a1a2e;color:white;display:block;margin:0 auto;opacity:0.5;" disabled onclick="confirmRPS()">
                 ✅ Confirmer mon choix
             </button>
             <p id="rpsStatus" class="game-status">En attente de ton choix...</p>
@@ -382,7 +382,7 @@
                 <p style="font-size:1.3em;margin:10px 0;">${random}</p>
                 <small style="color:#666;">${type==='action'?'Fais-le maintenant !':'Réponds honnêtement !'}</small>
             </div>
-            <button class="game-btn" style="background:#075e54;color:white;display:block;margin:10px auto;" onclick="sendAVChallenge('${version}','${type}','${random.replace(/'/g, "\'")}')">📤 Envoyer ce défi à {{ other_user.username }}</button>
+            <button class="game-btn" style="background:#1a1a2e;color:white;display:block;margin:10px auto;" onclick="sendAVChallenge('${version}','${type}','${random.replace(/'/g, "\'")}')">📤 Envoyer ce défi à {{ other_user.username }}</button>
         `;
     }
     

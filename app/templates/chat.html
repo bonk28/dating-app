@@ -6,8 +6,8 @@
     <title>Dating App | Chat - {{ other_user.username }}</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:-apple-system,sans-serif;background:#e5ddd5;height:100vh;display:flex;flex-direction:column;}
-        .header{background:#075e54;color:white;padding:8px 12px;display:flex;align-items:center;gap:10px;}
+        body{font-family:-apple-system,sans-serif;background:#0f0f1a;height:100vh;display:flex;flex-direction:column;}
+        .header{background:#1a1a2e;color:white;padding:8px 12px;display:flex;align-items:center;gap:10px;}
         .header a{color:white;text-decoration:none;font-size:1.3em;}
         .avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:1.2em;}
         .avatar img{width:100%;height:100%;object-fit:cover;}
@@ -19,17 +19,17 @@
         .date-sep span{background:#e1f3fb;padding:4px 10px;border-radius:5px;}
         .msg{max-width:75%;padding:6px 10px;border-radius:8px;position:relative;animation:in 0.2s;}
         @keyframes in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-        .sent{background:#dcf8c6;align-self:flex-end;border-top-right-radius:0;}
+        .sent{background:#2d3436;align-self:flex-end;border-top-right-radius:0;}
         .recv{background:#fff;align-self:flex-start;border-top-left-radius:0;box-shadow:0 1px 1px rgba(0,0,0,0.05);}
         .time{font-size:0.6em;color:#999;text-align:right;margin-top:2px;}
         .media{max-width:200px;border-radius:8px;cursor:pointer;}
         
-        .input-bar{background:#f0f0f0;padding:6px 10px;display:flex;align-items:center;gap:6px;}
+        .input-bar{background:#16213e;padding:6px 10px;display:flex;align-items:center;gap:6px;}
         .btn{background:none;border:none;color:#54656f;font-size:1.3em;cursor:pointer;padding:5px;border-radius:50%;}
         .btn:hover{background:rgba(0,0,0,0.1);}
-        .btn-green{background:#075e54;color:white;width:36px;height:36px;}
+        .btn-green{background:#1a1a2e;color:white;width:36px;height:36px;}
         input{flex:1;padding:10px 14px;border:none;border-radius:25px;font-size:0.9em;outline:none;}
-        .send{background:none;border:none;color:#075e54;font-size:1.3em;cursor:pointer;}
+        .send{background:none;border:none;color:#1a1a2e;font-size:1.3em;cursor:pointer;}
         
         .emoji-panel{display:none;background:white;padding:8px;flex-wrap:wrap;gap:5px;border-top:1px solid #ddd;}
         .emoji-panel.show{display:flex;}.emoji{font-size:1.4em;cursor:pointer;padding:3px;}
@@ -37,13 +37,15 @@
         /* Panel jeux */
         #gamesPanel{display:none;position:fixed;bottom:0;left:0;right:0;background:white;z-index:200;border-radius:20px 20px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,0.3);max-height:70vh;overflow-y:auto;}
         .game-card{display:flex;align-items:center;gap:12px;padding:15px;margin:8px 15px;background:#f8f8f8;border-radius:12px;cursor:pointer;border:2px solid transparent;}
-        .game-card:hover{border-color:#075e54;background:#e8f5e9;}
+        .game-card:hover{border-color:#1a1a2e;background:#e8f5e9;}
         .game-icon{font-size:2.5em;}
         
         .msg-menu{display:none;position:fixed;background:white;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,0.3);z-index:50;min-width:140px;}
         .msg-menu div{padding:12px 20px;cursor:pointer;}
         .msg-menu .danger{color:#f44336;}
     </style>
+<script src="/static/js/notifications.js"></script>
+<script src="/static/js/games.js"></script>
 </head>
 <body>
     <!-- HEADER -->
@@ -66,7 +68,7 @@
 
     <!-- PANEL JEUX -->
     <div id="gamesPanel">
-        <div style="background:#075e54;color:white;padding:15px 20px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;">
+        <div style="background:#1a1a2e;color:white;padding:15px 20px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;">
             <h3 style="margin:0;">🎮 Jeux avec {{ other_user.username }}</h3>
             <button onclick="closeGames()" style="background:none;border:none;color:white;font-size:1.8em;cursor:pointer;">✕</button>
         </div>
