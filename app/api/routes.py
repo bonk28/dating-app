@@ -19,14 +19,64 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     
     return R * c
 
+
 @bp.route('/swipe/<int:user_id>', methods=['POST'])
 @login_required
 def swipe(user_id):
     data = request.get_json()
     direction = data.get('direction', 'like')
     
+    # Si "unlike", supprimer le like existant
+    if direction == 'unlike':
+        like = Like.query.filter_by(liker_id=current_user.id, liked_id=user_id).first()
+        if like:
+            db.session.delete(like)
+            db.session.commit()
+            return jsonify({'success': True, 'removed': True})
+        return jsonify({'success': False, 'error': 'Pas de like à supprimer'})
+    
     if direction not in ['like', 'pass', 'super_like']:
         return jsonify({'success': False, 'error': 'Direction invalide'}), 400
+    
+    like = Like.query.filter_by(liker_id=current_user.id, liked_id=user_id).first()
+    
+    if like:
+        like.direction = direction
+    else:
+        like = Like(liker_id=current_user.id, liked_id=user_id, direction=direction)
+        db.session.add(like)
+    
+    is_match = False
+    match_id = None
+    compatibility = 0
+    
+    if direction in ['like', 'super_like']:
+        reciprocal = Like.query.filter_by(
+            liker_id=user_id, liked_id=current_user.id
+        ).filter(Like.direction.in_(['like', 'super_like'])).first()
+        
+        if reciprocal:
+            other_user = User.query.get(user_id)
+            compatibility = current_user.get_compatibility(other_user)
+            match = Match(
+                user1_id=min(current_user.id, user_id),
+                user2_id=max(current_user.id, user_id),
+                compatibility=compatibility
+            )
+            db.session.add(match)
+            db.session.flush()
+            match_id = match.id
+            is_match = True
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'is_match': is_match,
+        'match_id': match_id,
+        'compatibility': compatibility
+    })
+, 400
     
     like = Like.query.filter_by(
         liker_id=current_user.id,
