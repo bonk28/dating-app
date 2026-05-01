@@ -77,6 +77,60 @@
                     <textarea name="bio" placeholder="Parle de toi...">{{ user.bio or '' }}</textarea>
                 </div>
                 <div class="form-group">
+                    <label>♈ Signe astrologique</label>
+                    <select name="signe">
+                        <option value="">Choisir</option>
+                        <option value="belier">Bélier</option><option value="taureau">Taureau</option>
+                        <option value="gemeaux">Gémeaux</option><option value="cancer">Cancer</option>
+                        <option value="lion">Lion</option><option value="vierge">Vierge</option>
+                        <option value="balance">Balance</option><option value="scorpion">Scorpion</option>
+                        <option value="sagittaire">Sagittaire</option><option value="capricorne">Capricorne</option>
+                        <option value="verseau">Verseau</option><option value="poissons">Poissons</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🐾 Animal préféré</label>
+                    <input type="text" name="animal" value="{{ user.animal or '' }}" placeholder="Ex: Chat, Chien, Dauphin...">
+                </div>
+                <div class="form-group">
+                    <label>✈️ J'aime voyager ?</label>
+                    <select name="voyage">
+                        <option value="">Choisir</option>
+                        <option value="oui">Oui ✈️</option>
+                        <option value="non">Pas vraiment</option>
+                        <option value="parfois">Parfois</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🌍 Pays préféré</label>
+                    <input type="text" name="pays" value="{{ user.pays or '' }}" placeholder="Ex: France, Japon, Brésil...">
+                </div>
+                <div class="form-group">
+                    <label>📺 Série préférée</label>
+                    <input type="text" name="serie" value="{{ user.serie or '' }}" placeholder="Ex: Breaking Bad, Friends...">
+                </div>
+                <div class="form-group">
+                    <label>🎵 Genre musical préféré</label>
+                    <input type="text" name="musique" value="{{ user.musique or '' }}" placeholder="Ex: Rap, RnB, Pop, Rock...">
+                </div>
+                <div class="form-group">
+                    <label>🍽️ Plat préféré</label>
+                    <input type="text" name="plat" value="{{ user.plat or '' }}" placeholder="Ex: Pizza, Sushi, Attiéké...">
+                </div>
+                <div class="form-group">
+                    <label>🎨 Loisir / Passion</label>
+                    <input type="text" name="loisir" value="{{ user.loisir or '' }}" placeholder="Ex: Sport, Lecture, Cuisine...">
+                </div>
+                <div class="form-group">
+                    <label>💼 Profession / Occupation</label>
+                    <input type="text" name="profession" value="{{ user.profession or '' }}" placeholder="Ex: Étudiant, Ingénieur, Commerçant...">
+                </div>
+                <div class="form-group">
+                    <label>🌟 Citation qui te définit</label>
+                    <input type="text" name="citation" value="{{ user.citation or '' }}" placeholder="Ex: La vie est belle...">
+                </div>
+
+                <div class="form-group">
                     <label>Intérêts (séparés par des virgules)</label>
                     <input type="text" name="interests" value="{{ user.interests or '' }}" placeholder="Ex: voyage, musique, sport">
                 </div>

@@ -116,6 +116,49 @@
         </div>
         {% endif %}
 
+        {% if user.signe %}
+        <div class="info-card">
+            <h3>♈ Signe astrologique</h3>
+            <p>{{ user.signe }}</p>
+        </div>
+        {% endif %}
+        {% if user.animal %}
+        <div class="info-card">
+            <h3>🐾 Animal préféré</h3>
+            <p>{{ user.animal }}</p>
+        </div>
+        {% endif %}
+        {% if user.pays %}
+        <div class="info-card">
+            <h3>🌍 Pays préféré</h3>
+            <p>{{ user.pays }}</p>
+        </div>
+        {% endif %}
+        {% if user.serie %}
+        <div class="info-card">
+            <h3>📺 Série préférée</h3>
+            <p>{{ user.serie }}</p>
+        </div>
+        {% endif %}
+        {% if user.musique %}
+        <div class="info-card">
+            <h3>🎵 Genre musical</h3>
+            <p>{{ user.musique }}</p>
+        </div>
+        {% endif %}
+        {% if user.profession %}
+        <div class="info-card">
+            <h3>💼 Profession</h3>
+            <p>{{ user.profession }}</p>
+        </div>
+        {% endif %}
+        {% if user.citation %}
+        <div class="info-card">
+            <h3>🌟 Citation</h3>
+            <p style="font-style:italic;">"{{ user.citation }}"</p>
+        </div>
+        {% endif %}
+
         {% if user.interests %}
         <div class="info-card">
             <h3>🎯 Centres d'intérêt</h3>

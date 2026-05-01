@@ -45,6 +45,16 @@ def profile():
         current_user.interests = request.form.get('interests')
         current_user.location = request.form.get('location')
         current_user.looking_for = request.form.get('looking_for')
+        current_user.signe = request.form.get('signe')
+        current_user.animal = request.form.get('animal')
+        current_user.voyage = request.form.get('voyage')
+        current_user.pays = request.form.get('pays')
+        current_user.serie = request.form.get('serie')
+        current_user.musique = request.form.get('musique')
+        current_user.plat = request.form.get('plat')
+        current_user.loisir = request.form.get('loisir')
+        current_user.profession = request.form.get('profession')
+        current_user.citation = request.form.get('citation')
         current_user.max_distance = request.form.get('max_distance', 50, type=int)
         if 'photo' in request.files:
             file = request.files['photo']
