@@ -1,0 +1,10 @@
+.online-dot {
+    width: 8px; height: 8px; background: #00c853;
+    border-radius: 50%; display: inline-block;
+    animation: onlinePulse 2s infinite;
+    box-shadow: 0 0 10px #00c853;
+}
+@keyframes onlinePulse {
+    0%, 100% { box-shadow: 0 0 5px #00c853; }
+    50% { box-shadow: 0 0 15px #00c853, 0 0 30px rgba(0,200,83,.5); }
+}

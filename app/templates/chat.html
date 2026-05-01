@@ -120,7 +120,7 @@
         <a href="/matches" class="back">←</a>
         <a href="/profile/{{ other_user.id }}" style="display:flex;align-items:center;gap:12px;flex:1;text-decoration:none;color:inherit">
             <div class="avatar"><div class="avatar-inner">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div></div>
-            <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">💎 Premium Match</div></div>
+            <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">💎 Premium Match <span class="online-dot"></span></div></div>
         </a>
         <button onclick="callUser('video')" class="hbtn">📹</button>
         <button onclick="callUser('voice')" class="hbtn call-btn">📞</button>
