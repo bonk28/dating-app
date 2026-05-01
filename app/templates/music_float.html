@@ -24,6 +24,55 @@
     .music-track .name{font-weight:600;font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .music-track .artist{font-size:.7em;opacity:.6}
     .music-track .play-btn{color:#1DB954;font-size:1.5em}
+
+    .nav {
+        position:fixed !important;
+        bottom:0 !important;
+        left:0 !important;
+        right:0 !important;
+        display:flex !important;
+        justify-content:space-around !important;
+        align-items:center !important;
+        padding:8px 10px 22px !important;
+        background:rgba(10,10,20,.98) !important;
+        backdrop-filter:blur(30px) !important;
+        -webkit-backdrop-filter:blur(30px) !important;
+        border-top:1px solid rgba(255,255,255,.08) !important;
+        z-index:100 !important;
+    }
+    .nav-item {
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:center !important;
+        gap:3px !important;
+        text-decoration:none !important;
+        color:rgba(255,255,255,.4) !important;
+        font-size:.6em !important;
+        font-weight:500 !important;
+        transition:all .3s !important;
+        padding:6px 12px !important;
+        border-radius:12px !important;
+        letter-spacing:.3px !important;
+    }
+    .nav-item.active {
+        color:#ff2d78 !important;
+    }
+    .nav-item.active .nav-icon {
+        transform:scale(1.2) !important;
+        filter:drop-shadow(0 0 8px rgba(255,45,120,.6)) !important;
+    }
+    .nav-icon {
+        font-size:1.5em !important;
+        transition:all .3s !important;
+        display:block !important;
+    }
+    .nav-label {
+        font-weight:500 !important;
+        letter-spacing:.5px !important;
+        font-size:.7em !important;
+    }
+
+body{padding-bottom:85px;}
 </style>
 
 <!-- MINI PLAYER -->
