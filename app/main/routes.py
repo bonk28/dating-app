@@ -88,23 +88,7 @@ def chat(match_id):
     today_date = date.today().strftime('%d/%m/%Y')
     return render_template('chat.html', match=match, other_user=other_user, messages=messages_list, today_date=today_date)
 
-@bp.route('/search', methods=['GET', 'POST'])
-@login_required
-def search():
-    users = []
-    if request.method == 'POST':
-        min_age = request.form.get('min_age', 18, type=int)
-        max_age = request.form.get('max_age', 100, type=int)
-        gender = request.form.get('gender', '')
-        location = request.form.get('location', '')
-        interests = request.form.get('interests', '')
-        query = User.query.filter(User.id != current_user.id, User.is_active == True)
-        if gender: query = query.filter(User.gender == gender)
-        if min_age and max_age: query = query.filter(User.age.between(min_age, max_age))
-        if location: query = query.filter(User.location.contains(location))
-        if interests: query = query.filter(User.interests.contains(interests))
-        users = query.limit(50).all()
-    return render_template('search.html', users=users)
+
 
 @bp.route('/profile/<int:user_id>')
 @login_required
