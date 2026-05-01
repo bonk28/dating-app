@@ -16,7 +16,7 @@
             background: white; padding: 15px;
             display: flex; justify-content: space-around;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky; top: 0; z-index: 100;
+            position: fixed; bottom: 0; left: 0; right: 0; bottom: 0; z-index: 100;
         }
         .nav a { text-decoration: none; color: #667eea; font-weight: bold; font-size: 0.9em; }
         .cards-container { padding: 15px; max-width: 500px; margin: 0 auto; }
@@ -86,7 +86,7 @@
         }
         
         .match-notification {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed; bottom: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8); display: flex;
             align-items: center; justify-content: center; z-index: 9999;
         }
@@ -107,7 +107,8 @@
         .match-content a {
             background: #4CAF50; color: white;
         }
-    </style>
+    body{padding-bottom:60px;}
+</style>
 </head>
 <body>
     <div class="nav">
