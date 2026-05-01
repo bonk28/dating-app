@@ -134,6 +134,36 @@
         }, 2000);
     }
     
+    // APPELS
+    function startCall(type) {
+        socket.emit('start_call', {to_user: oid, type: type});
+    }
+    
+    socket.on('incoming_call', function(data) {
+        if (confirm(data.from + ' vous appelle ! Décrocher ?')) {
+            socket.emit('accept_call', {call_id: data.call_id});
+            window.location.href = '/call/' + data.type + '/' + mid;
+        } else {
+            socket.emit('reject_call', {call_id: data.call_id});
+        }
+    });
+    
+    socket.on('call_ringing', function() {
+        alert('📞 Appel en cours...');
+    });
+    
+    socket.on('call_accepted', function(data) {
+        window.location.href = '/call/' + data.type + '/' + mid;
+    });
+    
+    socket.on('call_rejected', function() {
+        alert('❌ Appel refusé');
+    });
+    
+    socket.on('call_ended', function() {
+        alert('📞 Appel terminé');
+    });
+    
     function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
         function closeGamePanel(){document.getElementById('gamePanel').style.display='none';document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';}
         

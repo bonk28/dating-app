@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appel - {{ other_user.username }}</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:sans-serif;background:#1a1a2e;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center}
+        .avatar{width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:3em;margin-bottom:20px;animation:pulse 2s infinite}
+        .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.4)}50%{box-shadow:0 0 0 30px rgba(255,255,255,0)}}
+        h2{font-size:1.5em;margin:10px 0}
+        .status{opacity:.7}.timer{font-size:1.5em;margin:20px 0}
+        .btn{width:70px;height:70px;border-radius:50%;border:none;font-size:2em;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#f44336;color:white}
+        .btn:active{transform:scale(.9)}
+    </style>
+</head>
+<body>
+    <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
+    <h2>{{ other_user.username }}</h2>
+    <p class="status" id="status">{{ 'Appel vidéo' if call_type == 'video' else 'Appel vocal' }} en cours...</p>
+    <div class="timer" id="timer">00:00</div>
+    <button class="btn" onclick="endCall()">📞</button>
+
+    <script>
+        let startTime = Date.now();
+        setInterval(function() {
+            let e = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = 
+                Math.floor(e/60).toString().padStart(2,'0') + ':' + (e%60).toString().padStart(2,'0');
+        }, 1000);
+        
+        function endCall() {
+            window.location.href = '/chat/{{ match.id }}';
+        }
+        
+        // Essayer d'accéder au micro/caméra
+        {% if call_type == 'video' %}
+        navigator.mediaDevices.getUserMedia({video:true, audio:true})
+            .then(function(stream) {
+                document.getElementById('status').textContent = '✅ Connecté';
+            })
+            .catch(function() {
+                document.getElementById('status').textContent = '⚠️ Caméra/Micro non disponible';
+            });
+        {% else %}
+        navigator.mediaDevices.getUserMedia({audio:true})
+            .then(function(stream) {
+                document.getElementById('status').textContent = '✅ Connecté';
+            })
+            .catch(function() {
+                document.getElementById('status').textContent = '⚠️ Micro non disponible';
+            });
+        {% endif %}
+    </script>
+</body>
+</html>
