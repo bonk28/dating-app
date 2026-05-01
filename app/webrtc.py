@@ -182,3 +182,20 @@ def handle_rps_choice(data):
         emit('rps_round_result', {'opponent_choice': c1, 'winner': winner}, room=f'user_{p2}')
         
         rps_games[match_id]['choices'] = {}
+
+# ============ ACTION OU VÉRITÉ ============
+@socketio.on('av_invite')
+def handle_av_invite(data):
+    emit('av_invite_received', {'version': data['version']}, room=f'user_{data["to_user"]}')
+
+@socketio.on('av_accept')
+def handle_av_accept(data):
+    emit('av_accepted', {'version': data['version']}, room=f'user_{data["to_user"]}')
+
+@socketio.on('av_decline')
+def handle_av_decline(data):
+    emit('av_declined', {}, room=f'user_{data["to_user"]}')
+
+@socketio.on('av_send')
+def handle_av_send(data):
+    emit('av_receive', {'type': data['type'], 'challenge': data['challenge']}, room=f'user_{data["to_user"]}')

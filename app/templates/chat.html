@@ -80,6 +80,12 @@
                     <span style="font-size:1.5em;color:#ccc;margin-left:auto;">›</span>
                 </div>
             </div>
+                <div onclick="inviteAV()" style="display:flex;align-items:center;gap:15px;padding:18px;background:#f8f8f8;border-radius:12px;cursor:pointer;">
+                    <span style="font-size:2.5em;">🎯</span>
+                    <div><b>Action ou Vérité</b><br><small style="color:#888;">Invitation + 100 défis</small></div>
+                    <span style="font-size:1.5em;color:#ccc;margin-left:auto;">›</span>
+                </div>
+            </div>
             <div id="gameContent"></div>
         </div>
     </div>
@@ -223,6 +229,102 @@
                     <button class="btn-action btn-primary" onclick="document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';">🔄 Rejouer</button>
                 </div>`;
         }
+        
+        
+        // ============ ACTION OU VÉRITÉ ============
+        const avActions=["Fais 10 pompes","Imite une célébrité","Danse 30 secondes","Chante ta chanson préférée","Fais le cri dun animal","Mime un métier","Parle avec un accent étranger","Fais une grimace et prends un selfie","Raconte une blague en mimant","Fais un playback","Tourne sur toi-même 10 fois","Fais le poirier","Marche comme un robot","Fais un battle de regard","Chuchote un secret","Invente une chanson","Fais un discours","Mime une pub","Montre ton talent caché","Fais un massage de tes épaules","Imite le rire dun bébé","Parle en verlan","Fais une chorégraphie TikTok","Dessine avec les yeux fermés","Raconte une histoire avec 3 objets","Fais 30s de gainage","Mime ton animal préféré","Fais un compliment à chaque partie de ton corps","Chante en yaourt","Fais semblant dêtre présentateur météo","Danse sans musique","Fais un selfie avec la tête en bas","Imite 3 personnes différentes","Raconte un souvenir denfance","Fais un battle d applaudissements","Montre ta meilleure impression","Fais le cri de 5 animaux","Parle comme un bébé","Mime une scène de film","Fais un exercice de respiration","Danse la macarena","Fais un compliment à lautre joueur","Raconte une histoire drôle","Mime une rencontre amoureuse","Fais un selfie le plus drôle possible","Parle en rimes","Imite un professeur","Fais semblant d avoir un Oscar","Montre ton meilleur pas de danse","Raconte une anecdote gênante"];
+        
+        const avVerites=["Quel est ton plus grand rêve?","Quelle est ta plus grande peur?","Raconte ton pire rendez-vous","Qui était ton premier crush?","Quel est ton talent caché?","Si tu gagnais au loto?","Ton plus gros mensonge?","Ton film préféré?","Ton plus beau souvenir?","Ce que tu regrettes le plus?","Quel métier voulais-tu faire enfant?","Quelle est ta citation préférée?","Qu est-ce qui te rend heureux?","Quel est ton pire défaut?","La chose la plus folle que tu aies faite?","Quel est ton livre préféré?","Quelle qualité admires-tu chez les autres?","Ton endroit préféré dans le monde?","Le meilleur conseil qu on tait donné?","Si tu pouvais dîner avec une célébrité?","Quel est le plus beau compliment reçu?","Quelle est ta phobie?","Qu est-ce qui t énerve le plus?","Quel est ton guilty pleasure?","La dernière fois que tu as pleuré?","Quel est le pire conseil reçu?","Ce que tu changerais chez toi?","Le plus gros risque que tu aies pris?","Ce dont tu es le plus fier?","Qu est-ce qu on devrait retenir de toi?","Quel est ton pire souvenir décole?","Ce que tu n oses jamais dire en public?","Quelle est ta chanson honteuse préférée?","Quel est ton talent le plus inutile?","L habitude la plus bizarre que tu aies?","Le truc le plus enfantin que tu fais encore?","Quelle est ta plus grande fierté?","Quelle est la chose que tu regrettes de ne pas avoir faite?","Le plus beau geste qu on ait fait pour toi?","Qu est-ce qui te fait pleurer facilement?","Quel est le pire mensonge que tu aies raconté?","Quelle est ta série préférée?","Quel est ton plat préféré?","Quelle est ton application préférée?","Qu est-ce que tu fais pour te détendre?","Quelle est ta destination de rêve?","Quel est ton animal préféré et pourquoi?","Qu est-ce qui te motive le matin?","Quelle est la personne qui t inspire le plus?","Quel est ton souvenir le plus drôle?"];
+        
+        let avGameActive=false;
+        
+        function inviteAV(){
+            document.getElementById('gameMenu').style.display='none';
+            document.getElementById('gameContent').innerHTML=`
+                <h4 style="text-align:center;">🎯 Action ou Vérité</h4>
+                <p style="text-align:center;color:#666;">100 actions + 100 vérités</p>
+                <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
+                    <button class="btn-action" style="background:#ff9800;color:white" onclick="sendAVInvite('classic')">🎯 Classique</button>
+                    <button class="btn-action" style="background:#f44336;color:white" onclick="sendAVInvite('adult')">🔞 Adulte</button>
+                </div>
+            `;
+        }
+        
+        function sendAVInvite(version){
+            socket.emit('av_invite',{match_id:mid,to_user:oid,version:version});
+            document.getElementById('gameContent').innerHTML=`<div class="invite-box"><p>📤 Invitation envoyée !</p><p style="color:#888;">En attente...</p></div>`;
+        }
+        
+        socket.on('av_invite_received',(d)=>{
+            document.getElementById('gamePanel').style.display='block';
+            document.getElementById('gameMenu').style.display='none';
+            document.getElementById('gameContent').innerHTML=`
+                <div class="invite-box">
+                    <p style="font-size:1.3em;">🎯 {{ other_user.username }} vous invite à Action ou Vérité ${d.version==='adult'?'🔞':''}!</p>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+                        <button class="btn-action btn-success" onclick="acceptAV('${d.version}')">✅ Accepter</button>
+                        <button class="btn-action btn-danger" onclick="declineAV()">❌ Refuser</button>
+                    </div>
+                </div>`;
+        });
+        
+        function acceptAV(version){
+            avGameActive=true;
+            socket.emit('av_accept',{match_id:mid,to_user:oid,version:version});
+            showAVPanel(version);
+        }
+        
+        function declineAV(){socket.emit('av_decline',{match_id:mid,to_user:oid});closeGamePanel();}
+        
+        socket.on('av_accepted',(d)=>{avGameActive=true;showAVPanel(d.version);});
+        socket.on('av_declined',()=>{document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#f44336;">❌ Refusé</p>';});
+        
+        function showAVPanel(version){
+            document.getElementById('gameContent').innerHTML=`
+                <h4 style="text-align:center;">🎯 Action ou Vérité ${version==='adult'?'🔞':''}</h4>
+                <p style="text-align:center;color:#666;">Choisis ou lance une action/vérité aléatoire</p>
+                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0;">
+                    <button class="btn-action" style="background:#ff9800;color:white" onclick="pickAV('${version}','action')">⚡ Action aléatoire</button>
+                    <button class="btn-action" style="background:#2196F3;color:white" onclick="pickAV('${version}','verite')">💬 Vérité aléatoire</button>
+                </div>
+                <div id="avResult" style="text-align:center;padding:20px;margin-top:15px;"></div>
+            `;
+        }
+        
+        function pickAV(version,type){
+            const list=type==='action'?avActions:avVerites;
+            const random=list[Math.floor(Math.random()*list.length)];
+            const emoji=type==='action'?'⚡':'💬';
+            const label=type==='action'?'ACTION':'VÉRITÉ';
+            const bg=type==='action'?'#fff3e0':'#e3f2fd';
+            const border=type==='action'?'#ff9800':'#2196F3';
+            
+            document.getElementById('avResult').innerHTML=`
+                <div style="background:${bg};padding:25px;border-radius:15px;border:2px solid ${border};animation:pop .5s;">
+                    <span style="font-size:2.5em;">${emoji}</span>
+                    <h3 style="color:${border};">${label}</h3>
+                    <p style="font-size:1.3em;margin:10px 0;">${random}</p>
+                </div>
+                <button class="btn-action btn-primary" onclick="pickAV('${version}','${type}')" style="margin-top:10px;">🔄 Relancer</button>`;
+            
+            socket.emit('av_send',{match_id:mid,to_user:oid,type:type,challenge:random});
+        }
+        
+        socket.on('av_receive',(d)=>{
+            const bg=d.type==='action'?'#fff3e0':'#e3f2fd';
+            const border=d.type==='action'?'#ff9800':'#2196F3';
+            const emoji=d.type==='action'?'⚡':'💬';
+            const label=d.type==='action'?'ACTION':'VÉRITÉ';
+            
+            document.getElementById('avResult').innerHTML=`
+                <div style="background:${bg};padding:25px;border-radius:15px;border:2px solid ${border};animation:pop .5s;">
+                    <span style="font-size:2.5em;">${emoji}</span>
+                    <h3 style="color:${border};">📩 ${label} reçu !</h3>
+                    <p style="font-size:1.3em;margin:10px 0;">${d.challenge}</p>
+                </div>`;
+        });
+        
+        function newAVChallenge(version){pickAV(version,'action');}
         
         setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
     </script>
