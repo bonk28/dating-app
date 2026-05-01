@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Appel - {{ other_user.username }}</title>
+    <style>
+        :root{--accent:#ff2d78}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,sans-serif;background:#000;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+        
+        #remoteVideo{width:100%;height:100%;object-fit:cover;background:#0a0a14}
+        #localVideo{position:fixed;bottom:120px;right:20px;width:130px;height:180px;border-radius:15px;object-fit:cover;border:3px solid rgba(255,255,255,.3);z-index:10;background:#1a1a1a}
+        .audio-only #localVideo{display:none}
+        .audio-only #remoteVideo{background:linear-gradient(135deg,#1a1a2e,#0a0a14)}
+        
+        .caller-info{position:fixed;top:40px;left:50%;transform:translateX(-50%);color:white;text-align:center;z-index:10}
+        .caller-avatar{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:2.5em;overflow:hidden}
+        .caller-avatar img{width:100%;height:100%;object-fit:cover}
+        .caller-name{font-size:1.3em;font-weight:bold}
+        .caller-status{font-size:.8em;opacity:.7;margin-top:5px}
+        
+        .controls{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:20px;z-index:20}
+        .ctrl-btn{width:60px;height:60px;border-radius:50%;border:none;font-size:1.4em;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center}
+        .ctrl-btn:active{transform:scale(.9)}
+        .btn-end{background:#ff1744;color:white;width:70px;height:70px}
+        .btn-mute{background:rgba(255,255,255,.2);color:white}
+        .btn-mute.active{background:white;color:#333}
+        .btn-video{background:rgba(255,255,255,.2);color:white}
+        .btn-video.off{background:white;color:#333}
+        .btn-switch{background:rgba(255,255,255,.2);color:white}
+        
+        .timer{position:fixed;top:130px;left:50%;transform:translateX(-50%);color:white;font-size:1.1em;z-index:10}
+        
+        .connecting{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:white;text-align:center;z-index:5}
+        .connecting .pulse{width:60px;height:60px;border-radius:50%;border:3px solid white;animation:connPulse 1.5s infinite;margin:0 auto 20px}
+        @keyframes connPulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
+    </style>
+</head>
+<body class="{{ 'audio-only' if call_type == 'audio' else '' }}">
+    
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay playsinline muted></video>
+    
+    <div class="caller-info">
+        <div class="caller-avatar">
+            {% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}
+        </div>
+        <div class="caller-name">{{ other_user.username }}</div>
+        <div class="caller-status" id="status">Connexion...</div>
+    </div>
+    
+    <div class="timer" id="timer">00:00</div>
+    
+    <div class="connecting" id="connecting">
+        <div class="pulse"></div>
+        <p>Établissement de la connexion...</p>
+    </div>
+    
+    <div class="controls">
+        <button class="ctrl-btn btn-mute" id="muteBtn" onclick="toggleMute()">🎤</button>
+        {% if call_type == 'video' %}
+        <button class="ctrl-btn btn-video" id="videoBtn" onclick="toggleVideo()">📹</button>
+        {% endif %}
+        <button class="ctrl-btn btn-end" onclick="endCall()">📞</button>
+        <button class="ctrl-btn btn-switch" onclick="switchCamera()">🔄</button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const room = '{{ room }}';
+        const uid = {{ current_user.id }};
+        const callType = '{{ call_type }}';
+        let localStream, pc, isMuted = false, isVideoOff = false;
+        let startTime = Date.now();
+        let timerInterval;
+        
+        // Configuration WebRTC
+        const rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        };
+        
+        // Rejoindre la room
+        socket.emit('join_room', { room: room });
+        
+        async function startCall() {
+            try {
+                // Demander média
+                const constraints = callType === 'video' 
+                    ? { video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: true }
+                    : { audio: true, video: false };
+                
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                if (callType === 'video') {
+                    document.getElementById('localVideo').srcObject = localStream;
+                }
+                
+                document.getElementById('status').textContent = 'Connecté ✅';
+                document.getElementById('connecting').style.display = 'none';
+                
+                // Créer PeerConnection
+                pc = new RTCPeerConnection(rtcConfig);
+                
+                // Ajouter les tracks locaux
+                localStream.getTracks().forEach(track => {
+                    pc.addTrack(track, localStream);
+                });
+                
+                // Recevoir le flux distant
+                pc.ontrack = function(event) {
+                    if (event.streams[0]) {
+                        document.getElementById('remoteVideo').srcObject = event.streams[0];
+                        document.getElementById('status').textContent = 'En appel 📞';
+                        document.getElementById('connecting').style.display = 'none';
+                    }
+                };
+                
+                // Gérer les candidats ICE
+                pc.onicecandidate = function(event) {
+                    if (event.candidate) {
+                        socket.emit('ice_candidate', {
+                            room: room,
+                            candidate: event.candidate
+                        });
+                    }
+                };
+                
+                // Gérer le changement de connexion
+                pc.onconnectionstatechange = function() {
+                    if (pc.connectionState === 'connected') {
+                        document.getElementById('status').textContent = 'En appel 📞';
+                    } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                        document.getElementById('status').textContent = 'Connexion perdue';
+                    }
+                };
+                
+                // Créer l'offre
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                socket.emit('call_offer', { room: room, offer: offer });
+                
+                // Démarrer le timer
+                startTimer();
+                
+            } catch(e) {
+                document.getElementById('status').textContent = 'Erreur: ' + e.message;
+                document.getElementById('connecting').style.display = 'none';
+                alert('Impossible d\'accéder à la caméra/micro. Vérifiez les permissions.');
+            }
+        }
+        
+        // Réception de l'offre
+        socket.on('call_offer', async function(data) {
+            if (!pc) {
+                pc = new RTCPeerConnection(rtcConfig);
+                
+                pc.ontrack = function(event) {
+                    document.getElementById('remoteVideo').srcObject = event.streams[0];
+                };
+                
+                pc.onicecandidate = function(event) {
+                    if (event.candidate) {
+                        socket.emit('ice_candidate', {
+                            room: room,
+                            candidate: event.candidate
+                        });
+                    }
+                };
+                
+                localStream.getTracks().forEach(track => {
+                    pc.addTrack(track, localStream);
+                });
+                
+                await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                socket.emit('call_answer', { room: room, answer: answer });
+            }
+        });
+        
+        // Réception de la réponse
+        socket.on('call_answer', async function(data) {
+            if (pc) {
+                await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+            }
+        });
+        
+        // Réception des candidats ICE
+        socket.on('ice_candidate', async function(data) {
+            if (pc && data.candidate) {
+                try {
+                    await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                } catch(e) {
+                    console.log('ICE candidate error:', e);
+                }
+            }
+        });
+        
+        // Fin d'appel
+        socket.on('call_ended', function() {
+            endCall();
+        });
+        
+        socket.on('user_joined', function(data) {
+            document.getElementById('status').textContent = data.username + ' a rejoint';
+        });
+        
+        socket.on('user_left', function(data) {
+            document.getElementById('status').textContent = 'Appel terminé';
+            setTimeout(endCall, 2000);
+        });
+        
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                var elapsed = Math.floor((Date.now() - startTime) / 1000);
+                var min = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                var sec = (elapsed % 60).toString().padStart(2, '0');
+                document.getElementById('timer').textContent = min + ':' + sec;
+            }, 1000);
+        }
+        
+        function toggleMute() {
+            if (localStream) {
+                isMuted = !isMuted;
+                localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+                document.getElementById('muteBtn').classList.toggle('active', isMuted);
+                document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🎤';
+            }
+        }
+        
+        function toggleVideo() {
+            if (localStream && callType === 'video') {
+                isVideoOff = !isVideoOff;
+                localStream.getVideoTracks().forEach(t => t.enabled = !isVideoOff);
+                document.getElementById('videoBtn').classList.toggle('off', isVideoOff);
+                document.getElementById('videoBtn').textContent = isVideoOff ? '📷❌' : '📹';
+            }
+        }
+        
+        function switchCamera() {
+            if (localStream && callType === 'video') {
+                var currentFacing = localStream.getVideoTracks()[0].getSettings().facingMode;
+                var newFacing = currentFacing === 'user' ? 'environment' : 'user';
+                
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: newFacing } })
+                    .then(function(newStream) {
+                        var oldTrack = localStream.getVideoTracks()[0];
+                        var newTrack = newStream.getVideoTracks()[0];
+                        
+                        var sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                        if (sender) sender.replaceTrack(newTrack);
+                        
+                        localStream.removeTrack(oldTrack);
+                        oldTrack.stop();
+                        localStream.addTrack(newTrack);
+                        document.getElementById('localVideo').srcObject = localStream;
+                    });
+            }
+        }
+        
+        function endCall() {
+            if (pc) {
+                pc.close();
+                pc = null;
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(t => t.stop());
+                localStream = null;
+            }
+            if (timerInterval) clearInterval(timerInterval);
+            socket.emit('call_end', { room: room });
+            socket.emit('leave_room', { room: room });
+            window.location.href = '/chat/{{ match.id }}';
+        }
+        
+        // Démarrer l'appel
+        startCall();
+    </script>
+</body>
+</html>
