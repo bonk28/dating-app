@@ -4,96 +4,92 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - {{ other_user.username }}</title>
     <style>
+        :root{
+            --bg:#0a0a14;
+            --surface:#12121f;
+            --accent:#ff2d55;
+            --accent2:#ff6b81;
+            --sent:linear-gradient(135deg,#ff2d55,#ff6b81);
+            --recv:#1e1e30;
+            --text:#e8e8f0;
+            --gold:#ffd700;
+        }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,sans-serif;background:#efeae2;height:100vh;display:flex;flex-direction:column}
-        body::before{content:"💕 Dating App";position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:4em;opacity:.04;pointer-events:none;z-index:0;white-space:nowrap}
-        .header{background:#c8963e;color:white;padding:8px 12px;display:flex;align-items:center;gap:10px;position:relative;z-index:2}
-        .back{color:white;text-decoration:none;font-size:1.2em}
-        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+        
+        .header{background:var(--surface);padding:10px 15px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+        .back{color:var(--accent);text-decoration:none;font-size:1.2em}
+        .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:1.1em}
         .avatar img{width:100%;height:100%;object-fit:cover}
-        .info{flex:1}.name{font-weight:600;font-size:.95em}.sub{font-size:.7em;opacity:.8}
-        .hbtn{color:white;text-decoration:none;font-size:1.1em;padding:6px}
+        .info{flex:1}.name{font-weight:600;font-size:.95em}.sub{font-size:.7em;opacity:.5}
+        .hbtn{color:var(--text);text-decoration:none;font-size:1.1em;padding:8px;border-radius:50%;transition:all .2s}
+        .hbtn:hover{background:rgba(255,255,255,.1)}
         
-        .messages{flex:1;overflow-y:auto;padding:10px 15px;display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}
-        .msg{max-width:72%;padding:7px 10px 5px;border-radius:8px;font-size:.9em;line-height:1.4;position:relative;z-index:1}
-        .sent{background:#d9c8a8;align-self:flex-end;border-top-right-radius:2px}
-        .recv{background:white;align-self:flex-start;border-top-left-radius:2px;box-shadow:0 1px 1px rgba(0,0,0,.05)}
-        .time{font-size:.6em;color:#999;text-align:right;margin-top:2px}
-        .media{max-width:200px;border-radius:6px;cursor:pointer}
+        .messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:6px}
+        .msg{max-width:70%;padding:10px 14px;border-radius:18px;font-size:.9em;line-height:1.4;animation:msgIn .3s ease}
+        @keyframes msgIn{from{opacity:0;transform:translateY(12px) scale(.95)}}
+        .sent{background:var(--sent);align-self:flex-end;border-bottom-right-radius:4px;color:white}
+        .recv{background:var(--recv);align-self:flex-start;border-bottom-left-radius:4px}
+        .time{font-size:.6em;opacity:.5;text-align:right;margin-top:3px}
+        .check{color:#4fc3f7}
+        .media{max-width:200px;border-radius:12px;cursor:pointer}
         
-        .input-bar{background:#f0ebe1;padding:6px 10px;display:flex;align-items:center;gap:6px;position:relative;z-index:2}
-        .btn{background:none;border:none;color:#8b7355;font-size:1.3em;cursor:pointer;padding:6px;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
-        .btn.game{background:#c8963e;color:white}
-        input{flex:1;padding:10px 14px;border:none;border-radius:25px;font-size:.9em;outline:none;background:white}
+        .input-bar{background:var(--surface);padding:8px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.05)}
+        .btn{background:none;border:none;color:var(--text);font-size:1.2em;cursor:pointer;padding:8px;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .btn:hover{background:rgba(255,255,255,.08)}
+        .btn.accent{background:var(--accent);color:white}
+        .btn.accent:hover{background:var(--accent2)}
+        input{flex:1;padding:12px 16px;border:none;border-radius:25px;background:rgba(255,255,255,.05);color:var(--text);font-size:.9em;outline:none}
+        input::placeholder{color:rgba(255,255,255,.3)}
         
-        /* Panel de jeu */
-        .game-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:white;z-index:200;border-radius:20px 20px 0 0;max-height:70vh;overflow-y:auto;box-shadow:0 -5px 30px rgba(0,0,0,.2)}
-        .game-header{background:#c8963e;color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0}
-        .game-body{padding:20px}
-        .rps-btn{font-size:3.5em;padding:20px;border-radius:20px;background:#f5f5f5;border:3px solid transparent;cursor:pointer;transition:all .2s}
-        .rps-btn:hover{background:#fff8e1}
-        .rps-btn.selected{border-color:#c8963e;background:#fff8e1;transform:scale(1.1)}
-        .rps-btn:disabled{opacity:.4;cursor:not-allowed}
-        .btn-action{padding:12px 25px;border:none;border-radius:25px;font-weight:bold;cursor:pointer;font-size:.95em;margin:5px}
-        .btn-primary{background:#c8963e;color:white}
+        .game-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);z-index:200;border-radius:20px 20px 0 0;max-height:65vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
+        .gp-header{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0}
+        .game-card{display:flex;align-items:center;gap:15px;padding:18px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:all .2s}
+        .game-card:hover{background:rgba(255,255,255,.03)}
+        .game-card:active{background:rgba(255,255,255,.06)}
+        .game-icon{font-size:2.5em}
+        .game-arrow{color:rgba(255,255,255,.3);font-size:1.5em}
+        .btn-action{padding:12px 25px;border:none;border-radius:25px;font-weight:bold;cursor:pointer;margin:5px;font-size:.9em;transition:all .2s}
+        .btn-action:active{transform:scale(.95)}
+        .btn-primary{background:var(--accent);color:white}
         .btn-success{background:#4CAF50;color:white}
         .btn-danger{background:#f44336;color:white}
-        .result{text-align:center;padding:20px;font-size:1.3em;animation:pop .5s}
+        .invite-box{text-align:center;padding:30px;font-size:1.1em}
+        .rps-btn{font-size:3.5em;padding:20px;border-radius:20px;background:rgba(255,255,255,.03);border:2px solid transparent;cursor:pointer;transition:all .2s}
+        .rps-btn:hover{background:rgba(255,255,255,.08)}
+        .rps-btn.selected{border-color:var(--accent);background:rgba(255,45,85,.15)}
+        .rps-btn:disabled{opacity:.3;cursor:not-allowed}
+        .result{text-align:center;padding:20px;font-size:1.2em;animation:pop .5s}
         @keyframes pop{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
-        .scoreboard{display:flex;justify-content:center;gap:30px;font-size:1.2em;margin:15px 0}
-        .score{text-align:center}.score-val{font-size:2em;font-weight:bold;color:#c8963e}
-        .invite-box{text-align:center;padding:30px;font-size:1.2em}
-        .timer{font-size:1.5em;font-weight:bold;text-align:center;color:#c8963e;margin:10px 0}
     </style>
 </head>
 <body>
     <div class="header">
         <a href="/matches" class="back">←</a>
-        <a href="/profile/{{ other_user.id }}" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;color:white">
+        <a href="/profile/{{ other_user.id }}" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;color:inherit">
             <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
             <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">Dating App</div></div>
         </a>
-        <button onclick="startCall('video')" class="hbtn" style="border:none;cursor:pointer;">📹</button>
-        <button onclick="startCall('voice')" class="hbtn" style="border:none;cursor:pointer;">📞</button>
+        <button onclick="callUser('video')" class="hbtn">📹</button>
+        <button onclick="callUser('voice')" class="hbtn">📞</button>
     </div>
 
     <div class="messages" id="messages"></div>
 
     <div class="input-bar">
-        <button class="btn game" onclick="openGamePanel()">🎮</button>
+        <button class="btn accent" onclick="openGamePanel()">🎮</button>
         <label class="btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
-        <div style="display:flex;gap:4px;padding:4px 0;flex-wrap:wrap;" id="formatBar">
-                    <button class="btn" onclick="formatText('bold')" title="Gras" style="font-weight:bold;font-size:1em;">B</button>
-                    <button class="btn" onclick="formatText('italic')" title="Italique" style="font-style:italic;font-size:1em;">I</button>
-                    <button class="btn" onclick="formatText('big')" title="Grand" style="font-size:1.2em;">A+</button>
-                    <button class="btn" onclick="formatText('small')" title="Petit" style="font-size:.8em;">A-</button>
-                </div>
-                <input id="msgInput" placeholder="Message" onkeypress="if(event.key==='Enter')sendMsg()" style="flex:1;">
-        <button class="btn" onclick="sendMsg()" style="color:#c8963e;font-size:1.5em;">➤</button>
+        <input id="msgInput" placeholder="Écris un message..." onkeypress="if(event.key==='Enter')sendMsg()">
+        <button class="btn" onclick="sendMsg()" style="font-size:1.4em;">➤</button>
     </div>
 
-    <!-- PANEL DE JEU -->
     <div class="game-panel" id="gamePanel">
-        <div class="game-header">
-            <h3>🎮 Jeux</h3>
-            <button onclick="closeGamePanel()" style="background:none;border:none;color:white;font-size:1.5em;cursor:pointer;">✕</button>
+        <div class="gp-header"><h3>🎮 Jeux</h3><button onclick="closeGamePanel()" style="background:none;border:none;color:white;font-size:1.5em;cursor:pointer;">✕</button></div>
+        <div id="gameMenu">
+            <div class="game-card" onclick="inviteRPS()"><div class="game-icon">✊</div><div><b>Pierre Feuille Ciseaux</b><br><small style="opacity:.5">Invitation + manches + gage</small></div><span class="game-arrow">›</span></div>
+            <div class="game-card" onclick="inviteAV()"><div class="game-icon">🎯</div><div><b>Action ou Vérité</b><br><small style="opacity:.5">Classique & Adulte</small></div><span class="game-arrow">›</span></div>
         </div>
-        <div class="game-body">
-            <div id="gameMenu">
-                <div onclick="inviteRPS()" style="display:flex;align-items:center;gap:15px;padding:18px;background:#f8f8f8;border-radius:12px;cursor:pointer;margin-bottom:10px;">
-                    <span style="font-size:2.5em;">✊</span>
-                    <div><b>Pierre Feuille Ciseaux</b><br><small style="color:#888;">Invitation + manches + gage</small></div>
-                    <span style="font-size:1.5em;color:#ccc;margin-left:auto;">›</span>
-                </div>
-            </div>
-                <div onclick="inviteAV()" style="display:flex;align-items:center;gap:15px;padding:18px;background:#f8f8f8;border-radius:12px;cursor:pointer;">
-                    <span style="font-size:2.5em;">🎯</span>
-                    <div><b>Action ou Vérité</b><br><small style="color:#888;">Invitation + 100 défis</small></div>
-                    <span style="font-size:1.5em;color:#ccc;margin-left:auto;">›</span>
-                </div>
-            </div>
-            <div id="gameContent"></div>
-        </div>
+        <div id="gameContent" style="padding:15px;"></div>
     </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -101,310 +97,44 @@
         const mid={{match.id}},uid={{current_user.id}},oid={{other_user.id}};
         const socket=io();socket.emit('join_chat',{match_id:mid});
         
-        // MESSAGES
-        function formatText(type){
-        const input=document.getElementById('msgInput');
-        const start=input.selectionStart,end=input.selectionEnd;
-        const text=input.value.substring(start,end);
-        let formatted='';
-        switch(type){
-            case 'bold': formatted='<b>'+text+'</b>';break;
-            case 'italic': formatted='<i>'+text+'</i>';break;
-            case 'big': formatted='<big>'+text+'</big>';break;
-            case 'small': formatted='<small>'+text+'</small>';break;
-        }
-        input.value=input.value.substring(0,start)+formatted+input.value.substring(end);
-        input.focus();
-    }
-    function sendMsg(){const v=document.getElementById('msgInput').value.trim();if(!v)return;fetch('/api/messages/'+mid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});}
+        function sendMsg(){const v=document.getElementById('msgInput').value.trim();if(!v)return;fetch('/api/messages/'+mid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});}
         function sendMedia(f){if(!f)return;const t=f.type.startsWith('video')?'video':'image';const fd=new FormData();fd.append('media',f);fd.append('type',t);fetch('/api/messages/media/'+mid,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)load();});}
-        function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div style="text-align:center;margin:8px 0"><span style="background:rgba(0,0,0,.08);padding:3px 10px;border-radius:8px;font-size:.7em">${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="color:#999;">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="color:#999;">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` <span style="color:#4fc3f7;">${m.is_read?'✓✓':'✓'}</span>`:''}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
+        function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div style="text-align:center;margin:8px 0"><span style="background:rgba(255,255,255,.06);padding:3px 12px;border-radius:10px;font-size:.7em;opacity:.5">${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="opacity:.3">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="opacity:.4">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` <span class="check">${m.is_read?'✓✓':'✓'}</span>`:''}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
         
-        function startCall(type) {
-        socket.emit('call_user', {
-            match_id: mid,
-            to_user: oid,
-            from_user: '{{ current_user.username }}',
-            type: type
-        });
-        alert('📞 Appel en cours... En attente de la réponse');
-        // Rediriger vers la page d'appel après 2 secondes
-        setTimeout(function() {
-            window.location.href = '/call/' + type + '/' + mid;
-        }, 2000);
-    }
-    
-    // APPELS
-    function startCall(type) {
-        socket.emit('start_call', {to_user: oid, type: type});
-    }
-    
-    socket.on('incoming_call', function(data) {
-        if (confirm(data.from + ' vous appelle ! Décrocher ?')) {
-            socket.emit('accept_call', {call_id: data.call_id});
-            window.location.href = '/call/' + data.type + '/' + mid;
-        } else {
-            socket.emit('reject_call', {call_id: data.call_id});
-        }
-    });
-    
-    socket.on('call_ringing', function() {
-        alert('📞 Appel en cours...');
-    });
-    
-    socket.on('call_accepted', function(data) {
-        window.location.href = '/call/' + data.type + '/' + mid;
-    });
-    
-    socket.on('call_rejected', function() {
-        alert('❌ Appel refusé');
-    });
-    
-    socket.on('call_ended', function() {
-        alert('📞 Appel terminé');
-    });
-    
-    function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
+        function callUser(type){if(confirm('Appeler {{ other_user.username }} en '+(type==='video'?'vidéo':'vocal')+' ?')){socket.emit('call_invite',{to_user:oid,type:type,from_user:'{{ current_user.username }}'});window.location.href='/call/'+type+'/'+mid;}}
+        socket.on('call_invite',function(data){if(confirm(data.from_user+' vous appelle en '+(data.type==='video'?'vidéo 📹':'vocal 📞')+' ! Rejoindre ?')){window.location.href='/call/'+data.type+'/'+mid;}});
+        
+        function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
         function closeGamePanel(){document.getElementById('gamePanel').style.display='none';document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';}
         
-        // ============ PIERRE FEUILLE CISEAUX ============
-        let rpsManches=3,rpsMyScore=0,rpsOppScore=0,rpsCurrentManche=0,rpsMyChoice=null,rpsOppChoice=null,rpsGameActive=false,rpsImHost=false,rpsGage='';
+        // RPS
+        let rpsManches=3,rpsMyScore=0,rpsOppScore=0,rpsCurrent=0,rpsMyChoice=null,rpsGage='';
         
-        function inviteRPS(){
-            document.getElementById('gameMenu').style.display='none';
-            document.getElementById('gameContent').innerHTML=`
-                <h4 style="text-align:center;">✊ Pierre ✋ Feuille ✌️ Ciseaux</h4>
-                <p style="text-align:center;color:#666;">Configuration de la partie</p>
-                <div style="margin:15px 0;">
-                    <label>Nombre de manches :</label>
-                    <select id="rpsManches" style="padding:10px;border-radius:8px;border:2px solid #c8963e;font-size:1em;margin-left:10px;">
-                        <option value="3">3 manches</option>
-                        <option value="5">5 manches</option>
-                        <option value="7">7 manches</option>
-                    </select>
-                </div>
-                <div style="margin:15px 0;">
-                    <label>Gage pour le perdant :</label>
-                    <input id="rpsGage" placeholder="Ex: chanter, danser, avouer..." style="width:100%;padding:10px;border-radius:8px;border:2px solid #ddd;margin-top:5px;">
-                </div>
-                <button class="btn-action btn-primary" onclick="sendRPSInvite()" style="display:block;width:100%;">📤 Envoyer l'invitation</button>
-            `;
-        }
+        function inviteRPS(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">✊ Pierre ✋ Feuille ✌️ Ciseaux</h4><div style="margin:15px 0;"><label>Manches :</label><select id="rpsManches" style="padding:8px;border-radius:8px;background:rgba(255,255,255,.05);color:white;border:1px solid rgba(255,255,255,.2);margin-left:10px;"><option value="3">3</option><option value="5">5</option><option value="7">7</option></select></div><div style="margin:15px 0;"><label>Gage perdant :</label><input id="rpsGage" placeholder="Ex: chanter, danser..." style="width:100%;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);color:white;border:1px solid rgba(255,255,255,.2);margin-top:5px;"></div><button class="btn-action btn-primary" onclick="sendRPSInvite()" style="display:block;width:100%;">📤 Envoyer</button>`;}
+        function sendRPSInvite(){rpsManches=parseInt(document.getElementById('rpsManches').value);rpsGage=document.getElementById('rpsGage').value.trim()||'Gage surprise';socket.emit('rps_invite',{match_id:mid,to_user:oid,manches:rpsManches,gage:rpsGage});document.getElementById('gameContent').innerHTML='<div class="invite-box">📤 Invitation envoyée...</div>';}
+        socket.on('rps_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div class="invite-box"><p style="font-size:1.2em;">🎮 Défi de {{ other_user.username }}!</p><p>Manches: <b>${d.manches}</b> | Gage: <b>${d.gage}</b></p><div style="margin-top:20px;"><button class="btn-action btn-success" onclick="acceptRPS(${d.manches},'${d.gage.replace(/'/g,"\\'")}')">✅ Accepter</button><button class="btn-action btn-danger" onclick="declineRPS()">❌ Refuser</button></div></div>`;});
+        function acceptRPS(m,g){rpsManches=m;rpsGage=g;rpsMyScore=0;rpsOppScore=0;rpsCurrent=0;socket.emit('rps_accept',{match_id:mid,to_user:oid,manches:m,gage:g});startRPSRound();}
+        function declineRPS(){socket.emit('rps_decline',{match_id:mid,to_user:oid});closeGamePanel();}
+        socket.on('rps_accepted',(d)=>{rpsManches=d.manches;rpsGage=d.gage;rpsMyScore=0;rpsOppScore=0;rpsCurrent=0;document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#4CAF50;">✅ Accepté!</p>';setTimeout(startRPSRound,1000);});
+        function startRPSRound(){rpsCurrent++;rpsMyChoice=null;if(rpsCurrent>rpsManches){endRPS();return;}document.getElementById('gameContent').innerHTML=`<div style="text-align:center;margin-bottom:15px;"><span>Moi: <b>${rpsMyScore}</b></span> | <span>Manche ${rpsCurrent}/${rpsManches}</span> | <span>{{ other_user.username }}: <b>${rpsOppScore}</b></span></div><div style="display:flex;justify-content:center;gap:15px;margin:15px 0;"><button class="rps-btn" onclick="chooseRPS('rock')">✊</button><button class="rps-btn" onclick="chooseRPS('paper')">✋</button><button class="rps-btn" onclick="chooseRPS('scissors')">✌️</button></div><p id="rpsStatus" style="text-align:center;opacity:.5;"></p><div id="rpsResult"></div>`;}
+        function chooseRPS(c){if(rpsMyChoice)return;rpsMyChoice=c;document.querySelectorAll('.rps-btn').forEach(b=>{b.disabled=true;b.classList.remove('selected');});event.target.classList.add('selected');document.getElementById('rpsStatus').textContent='✅ En attente...';socket.emit('rps_round_choice',{match_id:mid,choice:c});}
+        socket.on('rps_round_result',(d)=>{rpsOppChoice=d.opponent_choice;const e={rock:'✊',paper:'✋',scissors:'✌️'};let r='';if(d.winner===uid){rpsMyScore++;r='🎉 Gagné!';}else if(d.winner==='draw'){r='🤝 Égalité';}else{rpsOppScore++;r='😢 Perdu...';}document.getElementById('rpsResult').innerHTML=`<div class="result">Toi:${e[rpsMyChoice]} vs Lui:${e[rpsOppChoice]}<br><b>${r}</b><br><button class="btn-action btn-primary" onclick="startRPSRound()">▶ Suite</button></div>`;});
+        function endRPS(){const w=rpsMyScore>rpsOppScore;document.getElementById('gameContent').innerHTML=`<div class="result"><h3>🏆 ${w?'VICTOIRE!':'Défaite...'}</h3><p>${rpsMyScore} - ${rpsOppScore}</p><p>${w?'🎉 '+rpsGage:'😢 '+rpsGage}</p><button class="btn-action btn-primary" onclick="document.getElementById(\'gameContent\').innerHTML=\'\';document.getElementById(\'gameMenu\').style.display=\'block\';">🔄 Rejouer</button></div>`;}
         
-        function sendRPSInvite(){
-            const manches=parseInt(document.getElementById('rpsManches').value);
-            const gage=document.getElementById('rpsGage').value.trim()||'Faire un gage surprise';
-            socket.emit('rps_invite',{match_id:mid,to_user:oid,manches:manches,gage:gage});
-            document.getElementById('gameContent').innerHTML=`<div class="invite-box"><p>📤 Invitation envoyée !</p><p style="color:#888;">En attente de la réponse...</p></div>`;
-        }
-        
-        socket.on('rps_invite_received',(d)=>{
-            document.getElementById('gamePanel').style.display='block';
-            document.getElementById('gameMenu').style.display='none';
-            document.getElementById('gameContent').innerHTML=`
-                <div class="invite-box">
-                    <p style="font-size:1.3em;">🎮 {{ other_user.username }} vous défie !</p>
-                    <p>Manches : <b>${d.manches}</b></p>
-                    <p>Gage du perdant : <b>${d.gage}</b></p>
-                    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
-                        <button class="btn-action btn-success" onclick="acceptRPS(${d.manches},'${d.gage.replace(/'/g,"\\'")}')">✅ Accepter</button>
-                        <button class="btn-action btn-danger" onclick="declineRPS()">❌ Refuser</button>
-                    </div>
-                </div>`;
-        });
-        
-        function acceptRPS(manches,gage){
-            rpsManches=manches;rpsGage=gage;rpsMyScore=0;rpsOppScore=0;rpsCurrentManche=0;rpsGameActive=true;rpsImHost=false;
-            socket.emit('rps_accept',{match_id:mid,to_user:oid,manches:manches,gage:gage});
-            startRPSRound();
-        }
-        
-        function declineRPS(){
-            socket.emit('rps_decline',{match_id:mid,to_user:oid});
-            document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#f44336;">❌ Invitation refusée</p>';
-        }
-        
-        socket.on('rps_accepted',(d)=>{
-            rpsManches=d.manches;rpsGage=d.gage;rpsMyScore=0;rpsOppScore=0;rpsCurrentManche=0;rpsGameActive=true;rpsImHost=true;
-            document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#4CAF50;padding:20px;">✅ Invitation acceptée !</p>';
-            setTimeout(startRPSRound,1000);
-        });
-        
-        socket.on('rps_declined',()=>{
-            document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#f44336;padding:20px;">❌ Invitation refusée</p>';
-        });
-        
-        function startRPSRound(){
-            rpsCurrentManche++;rpsMyChoice=null;rpsOppChoice=null;
-            if(rpsCurrentManche>rpsManches){endRPSGame();return;}
-            document.getElementById('gameContent').innerHTML=`
-                <div class="scoreboard">
-                    <div class="score"><div>Moi</div><div class="score-val">${rpsMyScore}</div></div>
-                    <div class="score"><div style="font-size:.5em;">Manche ${rpsCurrentManche}/${rpsManches}</div></div>
-                    <div class="score"><div>{{ other_user.username }}</div><div class="score-val">${rpsOppScore}</div></div>
-                </div>
-                <p style="text-align:center;font-weight:bold;color:#c8963e;">Manche ${rpsCurrentManche} - Choisis !</p>
-                <div style="display:flex;justify-content:center;gap:15px;margin:20px 0;">
-                    <button class="rps-btn" onclick="chooseRPS('rock')">✊</button>
-                    <button class="rps-btn" onclick="chooseRPS('paper')">✋</button>
-                    <button class="rps-btn" onclick="chooseRPS('scissors')">✌️</button>
-                </div>
-                <p id="rpsRoundStatus" style="text-align:center;color:#666;"></p>
-                <div id="rpsRoundResult"></div>
-            `;
-        }
-        
-        function chooseRPS(choice){
-            if(rpsMyChoice)return;
-            rpsMyChoice=choice;
-            document.querySelectorAll('.rps-btn').forEach(b=>{b.disabled=true;b.classList.remove('selected');});
-            event.target.classList.add('selected');
-            document.getElementById('rpsRoundStatus').textContent='✅ Choix fait ! En attente...';
-            socket.emit('rps_round_choice',{match_id:mid,choice:choice});
-        }
-        
-        socket.on('rps_round_result',(d)=>{
-            rpsOppChoice=d.opponent_choice;
-            const emojis={rock:'✊',paper:'✋',scissors:'✌️'};
-            let result='';
-            if(d.winner===uid){rpsMyScore++;result='🎉 Tu gagnes cette manche !';}
-            else if(d.winner==='draw'){result='🤝 Égalité !';}
-            else{rpsOppScore++;result='😢 Tu perds cette manche...';}
-            
-            document.getElementById('rpsRoundResult').innerHTML=`
-                <div class="result">
-                    <p>Toi: ${emojis[rpsMyChoice]} | Lui: ${emojis[rpsOppChoice]}</p>
-                    <p style="font-size:1.2em;color:${rpsMyScore>rpsOppScore?'#4CAF50':'#f44336'}">${result}</p>
-                    <button class="btn-action btn-primary" onclick="startRPSRound()">Manche suivante ▶</button>
-                </div>`;
-        });
-        
-        function endRPSGame(){
-            rpsGameActive=false;
-            const iWin=rpsMyScore>rpsOppScore;
-            document.getElementById('gameContent').innerHTML=`
-                <div class="result" style="text-align:center;padding:30px;">
-                    <h2>🏆 ${iWin?'TU AS GAGNÉ !':'Tu as perdu...'}</h2>
-                    <div class="scoreboard">
-                        <div class="score"><div>Moi</div><div class="score-val">${rpsMyScore}</div></div>
-                        <div class="score"><div>{{ other_user.username }}</div><div class="score-val">${rpsOppScore}</div></div>
-                    </div>
-                    <p style="font-size:1.2em;margin:15px 0;">${iWin?`🎉 Félicitations ! ${rpsGage}`:`😢 ${rpsGage}`}</p>
-                    <button class="btn-action btn-primary" onclick="document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';">🔄 Rejouer</button>
-                </div>`;
-        }
-        
-        
-        // ============ ACTION OU VÉRITÉ ============
-        const avActions=["Fais 10 pompes","Imite une célébrité","Danse 30 secondes","Chante ta chanson préférée","Fais le cri dun animal","Mime un métier","Parle avec un accent étranger","Fais une grimace et prends un selfie","Raconte une blague en mimant","Fais un playback","Tourne sur toi-même 10 fois","Fais le poirier","Marche comme un robot","Fais un battle de regard","Chuchote un secret","Invente une chanson","Fais un discours","Mime une pub","Montre ton talent caché","Fais un massage de tes épaules","Imite le rire dun bébé","Parle en verlan","Fais une chorégraphie TikTok","Dessine avec les yeux fermés","Raconte une histoire avec 3 objets","Fais 30s de gainage","Mime ton animal préféré","Fais un compliment à chaque partie de ton corps","Chante en yaourt","Fais semblant dêtre présentateur météo","Danse sans musique","Fais un selfie avec la tête en bas","Imite 3 personnes différentes","Raconte un souvenir denfance","Fais un battle d applaudissements","Montre ta meilleure impression","Fais le cri de 5 animaux","Parle comme un bébé","Mime une scène de film","Fais un exercice de respiration","Danse la macarena","Fais un compliment à lautre joueur","Raconte une histoire drôle","Mime une rencontre amoureuse","Fais un selfie le plus drôle possible","Parle en rimes","Imite un professeur","Fais semblant d avoir un Oscar","Montre ton meilleur pas de danse","Raconte une anecdote gênante"];
-        
-        const avVerites=["Quel est ton plus grand rêve?","Quelle est ta plus grande peur?","Raconte ton pire rendez-vous","Qui était ton premier crush?","Quel est ton talent caché?","Si tu gagnais au loto?","Ton plus gros mensonge?","Ton film préféré?","Ton plus beau souvenir?","Ce que tu regrettes le plus?","Quel métier voulais-tu faire enfant?","Quelle est ta citation préférée?","Qu est-ce qui te rend heureux?","Quel est ton pire défaut?","La chose la plus folle que tu aies faite?","Quel est ton livre préféré?","Quelle qualité admires-tu chez les autres?","Ton endroit préféré dans le monde?","Le meilleur conseil qu on tait donné?","Si tu pouvais dîner avec une célébrité?","Quel est le plus beau compliment reçu?","Quelle est ta phobie?","Qu est-ce qui t énerve le plus?","Quel est ton guilty pleasure?","La dernière fois que tu as pleuré?","Quel est le pire conseil reçu?","Ce que tu changerais chez toi?","Le plus gros risque que tu aies pris?","Ce dont tu es le plus fier?","Qu est-ce qu on devrait retenir de toi?","Quel est ton pire souvenir décole?","Ce que tu n oses jamais dire en public?","Quelle est ta chanson honteuse préférée?","Quel est ton talent le plus inutile?","L habitude la plus bizarre que tu aies?","Le truc le plus enfantin que tu fais encore?","Quelle est ta plus grande fierté?","Quelle est la chose que tu regrettes de ne pas avoir faite?","Le plus beau geste qu on ait fait pour toi?","Qu est-ce qui te fait pleurer facilement?","Quel est le pire mensonge que tu aies raconté?","Quelle est ta série préférée?","Quel est ton plat préféré?","Quelle est ton application préférée?","Qu est-ce que tu fais pour te détendre?","Quelle est ta destination de rêve?","Quel est ton animal préféré et pourquoi?","Qu est-ce qui te motive le matin?","Quelle est la personne qui t inspire le plus?","Quel est ton souvenir le plus drôle?"];
-        
-        let avGameActive=false;
-        
-        function inviteAV(){
-            document.getElementById('gameMenu').style.display='none';
-            document.getElementById('gameContent').innerHTML=`
-                <h4 style="text-align:center;">🎯 Action ou Vérité</h4>
-                <p style="text-align:center;color:#666;">100 actions + 100 vérités</p>
-                <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
-                    <button class="btn-action" style="background:#ff9800;color:white" onclick="sendAVInvite('classic')">🎯 Classique</button>
-                    <button class="btn-action" style="background:#f44336;color:white" onclick="sendAVInvite('adult')">🔞 Adulte</button>
-                </div>
-            `;
-        }
-        
-        function sendAVInvite(version){
-            socket.emit('av_invite',{match_id:mid,to_user:oid,version:version});
-            document.getElementById('gameContent').innerHTML=`<div class="invite-box"><p>📤 Invitation envoyée !</p><p style="color:#888;">En attente...</p></div>`;
-        }
-        
-        socket.on('av_invite_received',(d)=>{
-            document.getElementById('gamePanel').style.display='block';
-            document.getElementById('gameMenu').style.display='none';
-            document.getElementById('gameContent').innerHTML=`
-                <div class="invite-box">
-                    <p style="font-size:1.3em;">🎯 {{ other_user.username }} vous invite à Action ou Vérité ${d.version==='adult'?'🔞':''}!</p>
-                    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
-                        <button class="btn-action btn-success" onclick="acceptAV('${d.version}')">✅ Accepter</button>
-                        <button class="btn-action btn-danger" onclick="declineAV()">❌ Refuser</button>
-                    </div>
-                </div>`;
-        });
-        
-        function acceptAV(version){
-            avGameActive=true;
-            socket.emit('av_accept',{match_id:mid,to_user:oid,version:version});
-            showAVPanel(version);
-        }
-        
+        // AV
+        const avActions=["Fais 10 pompes","Imite célébrité","Danse 30s","Chante","Cri animal","Mime métier","Accent étranger","Grimace selfie","Blague mimée","Playback","Tourne 10x","Marche robot","Battle regard","Chuchote secret","Invente chanson","Discours Oscar","Mime pub","Talent caché","Massage épaules","Bébé rire","Verlan","Danse TikTok","Yeux fermés dessin","Histoire 3 objets","Gainage 30s","Animal préféré","Compliment corps","Yaourt chanson","Présentateur météo","Danse sans musique"];
+        const avVerites=["Ton rêve?","Ta peur?","Pire date?","Premier crush?","Talent caché?","Au loto?","Plus gros mensonge?","Film préféré?","Plus beau souvenir?","Regret?","Métier enfant?","Citation préférée?","Ce qui te rend heureux?","Pire défaut?","Chose folle faite?","Livre préféré?","Qualité admirée?","Endroit préféré?","Meilleur conseil?","Dîner célébrité?","Plus beau compliment?","Phobie?","Ce qui t'énerve?","Guilty pleasure?","Dernière fois pleuré?","Pire conseil?","Changerais chez toi?","Plus gros risque?","Plus fier?","On retient quoi de toi?"];
+        function inviteAV(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">🎯 Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;margin:20px 0;"><button class="btn-action btn-success" onclick="sendAVInvite('classic')">🎯 Classique</button><button class="btn-action btn-danger" onclick="sendAVInvite('adult')">🔞 Adulte</button></div>`;}
+        function sendAVInvite(v){socket.emit('av_invite',{match_id:mid,to_user:oid,version:v});document.getElementById('gameContent').innerHTML='<div class="invite-box">📤 Invitation envoyée...</div>';}
+        socket.on('av_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div class="invite-box"><p style="font-size:1.2em;">🎯 {{ other_user.username }} vous invite!</p><div style="margin-top:20px;"><button class="btn-action btn-success" onclick="acceptAV('${d.version}')">✅ Accepter</button><button class="btn-action btn-danger" onclick="declineAV()">❌ Refuser</button></div></div>`;});
+        function acceptAV(v){socket.emit('av_accept',{match_id:mid,to_user:oid,version:v});showAVPanel(v);}
         function declineAV(){socket.emit('av_decline',{match_id:mid,to_user:oid});closeGamePanel();}
+        socket.on('av_accepted',(d)=>{showAVPanel(d.version);});
+        function showAVPanel(v){document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">🎯 ${v==='adult'?'🔞 ':''}Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0;"><button class="btn-action btn-primary" onclick="pickAV('${v}','action')">⚡ Action</button><button class="btn-action btn-primary" onclick="pickAV('${v}','verite')">💬 Vérité</button></div><div id="avResult" style="text-align:center;padding:15px;"></div>`;}
+        function pickAV(v,t){const l=t==='action'?avActions:avVerites;const r=l[Math.floor(Math.random()*l.length)];const bg=t==='action'?'rgba(255,152,0,.15)':'rgba(33,150,243,.15)';const border=t==='action'?'#ff9800':'#2196F3';document.getElementById('avResult').innerHTML=`<div style="background:${bg};padding:25px;border-radius:15px;border:1px solid ${border};animation:pop .5s;"><span style="font-size:2em;">${t==='action'?'⚡':'💬'}</span><h3>${t==='action'?'ACTION':'VÉRITÉ'}</h3><p style="font-size:1.2em;margin:10px 0;">${r}</p></div><button class="btn-action btn-primary" onclick="pickAV('${v}','${t}')" style="margin-top:10px;">🔄 Relancer</button>`;socket.emit('av_send',{match_id:mid,to_user:oid,type:t,challenge:r});}
+        socket.on('av_receive',(d)=>{document.getElementById('avResult').innerHTML=`<div style="background:rgba(255,255,255,.05);padding:25px;border-radius:15px;animation:pop .5s;"><span style="font-size:2em;">📩</span><h3>${d.type==='action'?'ACTION':'VÉRITÉ'} reçu</h3><p style="font-size:1.2em;margin:10px 0;">${d.challenge}</p></div>`;});
         
-        socket.on('av_accepted',(d)=>{avGameActive=true;showAVPanel(d.version);});
-        socket.on('av_declined',()=>{document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#f44336;">❌ Refusé</p>';});
-        
-        function showAVPanel(version){
-            document.getElementById('gameContent').innerHTML=`
-                <h4 style="text-align:center;">🎯 Action ou Vérité ${version==='adult'?'🔞':''}</h4>
-                <p style="text-align:center;color:#666;">Choisis ou lance une action/vérité aléatoire</p>
-                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0;">
-                    <button class="btn-action" style="background:#ff9800;color:white" onclick="pickAV('${version}','action')">⚡ Action aléatoire</button>
-                    <button class="btn-action" style="background:#2196F3;color:white" onclick="pickAV('${version}','verite')">💬 Vérité aléatoire</button>
-                </div>
-                <div id="avResult" style="text-align:center;padding:20px;margin-top:15px;"></div>
-            `;
-        }
-        
-        function pickAV(version,type){
-            const list=type==='action'?avActions:avVerites;
-            const random=list[Math.floor(Math.random()*list.length)];
-            const emoji=type==='action'?'⚡':'💬';
-            const label=type==='action'?'ACTION':'VÉRITÉ';
-            const bg=type==='action'?'#fff3e0':'#e3f2fd';
-            const border=type==='action'?'#ff9800':'#2196F3';
-            
-            document.getElementById('avResult').innerHTML=`
-                <div style="background:${bg};padding:25px;border-radius:15px;border:2px solid ${border};animation:pop .5s;">
-                    <span style="font-size:2.5em;">${emoji}</span>
-                    <h3 style="color:${border};">${label}</h3>
-                    <p style="font-size:1.3em;margin:10px 0;">${random}</p>
-                </div>
-                <button class="btn-action btn-primary" onclick="pickAV('${version}','${type}')" style="margin-top:10px;">🔄 Relancer</button>`;
-            
-            socket.emit('av_send',{match_id:mid,to_user:oid,type:type,challenge:random});
-        }
-        
-        socket.on('av_receive',(d)=>{
-            const bg=d.type==='action'?'#fff3e0':'#e3f2fd';
-            const border=d.type==='action'?'#ff9800':'#2196F3';
-            const emoji=d.type==='action'?'⚡':'💬';
-            const label=d.type==='action'?'ACTION':'VÉRITÉ';
-            
-            document.getElementById('avResult').innerHTML=`
-                <div style="background:${bg};padding:25px;border-radius:15px;border:2px solid ${border};animation:pop .5s;">
-                    <span style="font-size:2.5em;">${emoji}</span>
-                    <h3 style="color:${border};">📩 ${label} reçu !</h3>
-                    <p style="font-size:1.3em;margin:10px 0;">${d.challenge}</p>
-                </div>`;
-        });
-        
-        function newAVChallenge(version){pickAV(version,'action');}
-        
-        // Écouter les appels entrants
-        socket.on('incoming_call', function(data) {
-            if (confirm(data.from + ' vous appelle en ' + (data.type==='video'?'vidéo 📹':'vocal 📞') + ' ! Décrocher ?')) {
-                window.location.href = '/call/' + data.type + '/' + mid;
-            } else {
-                socket.emit('call_rejected', {match_id: mid, to: data.from_id});
-            }
-        });
-        
-        socket.on('call_rejected', function() {
-            alert('❌ Appel refusé');
-        });
-        
-        setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
+        setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;},500);
     </script>
-<script src="/static/js/unified-badge.js"></script>
 </body>
 </html>
