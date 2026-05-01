@@ -53,8 +53,8 @@
             <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
             <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">Dating App</div></div>
         </a>
-        <a href="/call/video/{{ match.id }}" class="hbtn">📹</a>
-        <a href="/call/voice/{{ match.id }}" class="hbtn">📞</a>
+        <button onclick="startCall('video')" class="hbtn" style="border:none;cursor:pointer;">📹</button>
+        <button onclick="startCall('voice')" class="hbtn" style="border:none;cursor:pointer;">📞</button>
     </div>
 
     <div class="messages" id="messages"></div>
@@ -120,7 +120,21 @@
         function sendMedia(f){if(!f)return;const t=f.type.startsWith('video')?'video':'image';const fd=new FormData();fd.append('media',f);fd.append('type',t);fetch('/api/messages/media/'+mid,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)load();});}
         function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div style="text-align:center;margin:8px 0"><span style="background:rgba(0,0,0,.08);padding:3px 10px;border-radius:8px;font-size:.7em">${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="color:#999;">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="color:#999;">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` <span style="color:#4fc3f7;">${m.is_read?'✓✓':'✓'}</span>`:''}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
         
-        function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
+        function startCall(type) {
+        socket.emit('call_user', {
+            match_id: mid,
+            to_user: oid,
+            from_user: '{{ current_user.username }}',
+            type: type
+        });
+        alert('📞 Appel en cours... En attente de la réponse');
+        // Rediriger vers la page d'appel après 2 secondes
+        setTimeout(function() {
+            window.location.href = '/call/' + type + '/' + mid;
+        }, 2000);
+    }
+    
+    function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
         function closeGamePanel(){document.getElementById('gamePanel').style.display='none';document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';}
         
         // ============ PIERRE FEUILLE CISEAUX ============
@@ -345,6 +359,19 @@
         });
         
         function newAVChallenge(version){pickAV(version,'action');}
+        
+        // Écouter les appels entrants
+        socket.on('incoming_call', function(data) {
+            if (confirm(data.from + ' vous appelle en ' + (data.type==='video'?'vidéo 📹':'vocal 📞') + ' ! Décrocher ?')) {
+                window.location.href = '/call/' + data.type + '/' + mid;
+            } else {
+                socket.emit('call_rejected', {match_id: mid, to: data.from_id});
+            }
+        });
+        
+        socket.on('call_rejected', function() {
+            alert('❌ Appel refusé');
+        });
         
         setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
     </script>
