@@ -122,7 +122,17 @@
                     <div class="match-name">{{ item.user.username }}</div>
                     <div class="match-last-msg">
                         {% if item.last_message %}
-                            {{ item.last_message.content[:50] }}
+                            {% if item.last_message.message_type == 'image' %}
+                                📷 Photo
+                            {% elif item.last_message.message_type == 'video' %}
+                                🎬 Vidéo
+                            {% elif item.last_message.message_type == 'voice' %}
+                                🎤 Message vocal
+                            {% elif item.last_message.is_deleted %}
+                                Message supprimé
+                            {% else %}
+                                {{ item.last_message.content[:50] }}
+                            {% endif %}
                         {% else %}
                             Dites bonjour ! 👋
                         {% endif %}
