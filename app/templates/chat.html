@@ -109,7 +109,15 @@
         /* MODAL MUSIQUE */
         .music-modal{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,#1a1a30,#000);z-index:300;border-radius:25px 25px 0 0;max-height:60vh;overflow-y:auto;box-shadow:0 -20px 50px rgba(0,0,0,.8);padding:20px}
         .music-modal.show{display:block}
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body>
     <!-- PARTICULES -->
@@ -205,5 +213,6 @@
         
         setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
     </script>
+{% include 'music_float.html' %}
 </body>
 </html>

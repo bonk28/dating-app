@@ -41,7 +41,15 @@
         .stat{text-align:center}.stat-val{font-size:2em;font-weight:900;color:#ffd700}.stat-lbl{font-size:.7em;opacity:.5;text-transform:uppercase}
         
         .footer{position:fixed;bottom:20px;color:rgba(255,255,255,.3);font-size:.7em}
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body>
     <div class="bg-anim"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
@@ -60,5 +68,6 @@
         <a href="/login" class="btn btn-outline">👤 SE CONNECTER</a>
     </div>
     <div class="footer">© 2026 Kevin Bonkoungou & Jules Ilboudo</div>
+{% include 'music_float.html' %}
 </body>
 </html>

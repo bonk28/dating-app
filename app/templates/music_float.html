@@ -1,128 +1,161 @@
-<!-- BOUTON MUSIQUE DÉPLAÇABLE -->
-<div id="musicFloatBtn" style="position:fixed;bottom:80px;right:20px;width:55px;height:55px;border-radius:50%;background:#1DB954;color:white;border:none;font-size:1.5em;cursor:grab;z-index:9998;box-shadow:0 5px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;" 
-     onmousedown="startDrag(event)" ontouchstart="startDrag(event)" ondragstart="return false;">
-    🎵
+<style>
+    .mini-player-bg{position:fixed;bottom:75px;left:10px;right:10px;background:linear-gradient(135deg,rgba(29,185,84,.95),rgba(0,230,118,.95));border-radius:15px;padding:10px 15px;display:none;align-items:center;gap:12px;z-index:99;box-shadow:0 10px 30px rgba(29,185,84,.4);backdrop-filter:blur(20px);animation:slideUp .4s ease}
+    @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .mini-player-bg.show{display:flex}
+    .mini-cover{width:45px;height:45px;border-radius:10px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:1.5em}
+    .mini-info{flex:1;overflow:hidden}
+    .mini-title{font-weight:700;font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-artist{font-size:.7em;opacity:.8}
+    .mini-progress{position:absolute;bottom:0;left:0;height:3px;background:rgba(0,0,0,.3);border-radius:0 0 15px 15px;transition:width .3s}
+    .mini-progress-bar{height:100%;background:#ffd700;border-radius:0 0 15px 15px;width:0%;transition:width .1s linear}
+    .mini-btn-sm{background:none;border:none;color:white;font-size:1.3em;cursor:pointer;padding:5px}
+    
+    .music-panel{position:fixed;bottom:140px;left:15px;right:15px;background:#1a1a2e;border-radius:20px;z-index:200;display:none;box-shadow:0 -10px 40px rgba(0,0,0,.8);overflow:hidden;max-height:60vh}
+    .music-panel.show{display:block;animation:slideUp .3s ease}
+    .music-panel-header{background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;border-radius:20px 20px 0 0}
+    .music-search{padding:15px}
+    .music-search input{width:100%;padding:14px 20px;border-radius:30px;border:none;background:#333;color:white;font-size:1em;outline:none}
+    .music-search input::placeholder{color:#888}
+    .music-results{max-height:40vh;overflow-y:auto;padding:10px}
+    .music-track{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;cursor:pointer;margin:3px 0;transition:all .2s}
+    .music-track:hover{background:rgba(255,255,255,.05)}
+    .music-track img{width:50px;height:50px;border-radius:10px;object-fit:cover}
+    .music-track .info{flex:1;overflow:hidden}
+    .music-track .name{font-weight:600;font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .music-track .artist{font-size:.7em;opacity:.6}
+    .music-track .play-btn{color:#1DB954;font-size:1.5em}
+</style>
+
+<!-- MINI PLAYER -->
+<div class="mini-player-bg" id="miniPlayer">
+    <div class="mini-progress"><div class="mini-progress-bar" id="miniProgressBar"></div></div>
+    <div class="mini-cover" id="miniCover">🎵</div>
+    <div class="mini-info">
+        <div class="mini-title" id="miniTitle">Aucune musique</div>
+        <div class="mini-artist" id="miniArtist">---</div>
+    </div>
+    <button class="mini-btn-sm" onclick="togglePlay()" id="miniPlayBtn">▶️</button>
+    <button class="mini-btn-sm" onclick="nextTrack()">⏭</button>
+    <button class="mini-btn-sm" onclick="toggleMusicPanel()">🔍</button>
+    <button class="mini-btn-sm" onclick="stopMusic()" style="color:#ff5252">✕</button>
 </div>
 
-<div id="musicPanel" style="display:none;position:fixed;bottom:140px;right:20px;width:300px;max-height:400px;background:#1a1a2e;border-radius:15px;z-index:9997;box-shadow:0 10px 35px rgba(0,0,0,0.6);overflow:hidden;">
-    <div style="padding:12px 15px;background:#111;display:flex;justify-content:space-between;align-items:center;">
-        <span style="color:white;font-weight:bold;">🎵 Musique</span>
-        <button onclick="toggleMusic()" style="background:none;border:none;color:#f44336;font-size:1.2em;cursor:pointer;">✕</button>
+<!-- PANEL RECHERCHE -->
+<div class="music-panel" id="musicPanel">
+    <div class="music-panel-header">
+        <h4 style="color:white;">🎵 Rechercher</h4>
+        <button onclick="toggleMusicPanel()" style="background:none;border:none;color:white;font-size:1.5em;cursor:pointer;">✕</button>
     </div>
-    <div style="padding:10px;">
-        <input type="text" id="musicSearch" placeholder="🔍 Chercher une musique..." style="width:100%;padding:12px;border-radius:25px;border:none;background:#333;color:white;font-size:0.9em;outline:none;" onkeypress="if(event.key==='Enter')searchMusic()">
-        <button onclick="searchMusic()" style="width:100%;padding:10px;margin-top:8px;background:#1DB954;color:white;border:none;border-radius:25px;cursor:pointer;font-weight:bold;">🔍 Rechercher</button>
+    <div class="music-search">
+        <input type="text" id="musicSearch" placeholder="🔍 Titre, artiste..." onkeypress="if(event.key==='Enter')searchMusic()">
     </div>
-    <div id="musicResults" style="max-height:250px;overflow-y:auto;padding:0 10px 10px;"></div>
-    <div id="nowPlaying" style="padding:8px;background:#000;color:#1DB954;text-align:center;font-size:0.75em;display:none;">
-        🔊 <span id="nowPlayingText">---</span>
-        <button onclick="stopMusic()" style="background:none;border:none;color:#f44336;cursor:pointer;margin-left:8px;">⏹</button>
-    </div>
+    <div class="music-results" id="musicResults"></div>
 </div>
 
 <script>
-// ====== DRAG & DROP ======
-let dragBtn = document.getElementById('musicFloatBtn');
-let isDragging = false;
-let startX, startY, startLeft, startTop;
-
-function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-    dragBtn.style.cursor = 'grabbing';
+    var playlist = JSON.parse(localStorage.getItem('myPlaylist') || '[]');
+    var currentTrack = parseInt(localStorage.getItem('currentTrack') || '-1');
+    var isPlaying = false;
     
-    const touch = e.touches ? e.touches[0] : e;
-    startX = touch.clientX;
-    startY = touch.clientY;
+    if (!window._ga) window._ga = new Audio();
+    var audio = window._ga;
+    audio.volume = 0.8;
     
-    const rect = dragBtn.getBoundingClientRect();
-    startLeft = rect.left;
-    startTop = rect.top;
-    
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchmove', onDrag);
-    document.addEventListener('touchend', stopDrag);
-}
-
-function onDrag(e) {
-    if (!isDragging) return;
-    const touch = e.touches ? e.touches[0] : e;
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
-    
-    let newLeft = startLeft + dx;
-    let newTop = startTop + dy;
-    
-    // Limites de l'écran
-    newLeft = Math.max(0, Math.min(window.innerWidth - 55, newLeft));
-    newTop = Math.max(60, Math.min(window.innerHeight - 55, newTop));
-    
-    dragBtn.style.left = newLeft + 'px';
-    dragBtn.style.top = newTop + 'px';
-    dragBtn.style.right = 'auto';
-    dragBtn.style.bottom = 'auto';
-}
-
-function stopDrag() {
-    isDragging = false;
-    dragBtn.style.cursor = 'grab';
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', stopDrag);
-}
-
-// ====== MUSIQUE ======
-function toggleMusic() {
-    const p = document.getElementById('musicPanel');
-    p.style.display = p.style.display === 'none' || p.style.display === '' ? 'block' : 'none';
-}
-
-async function searchMusic() {
-    const q = document.getElementById('musicSearch').value.trim();
-    if (!q) return;
-    
-    const res = document.getElementById('musicResults');
-    res.innerHTML = '<p style="color:white;text-align:center;padding:20px;">🔍 Recherche...</p>';
-    
-    try {
-        const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=15`);
-        const d = await r.json();
-        
-        if (d.results && d.results.length > 0) {
-            res.innerHTML = d.results.map(t => `
-                <div style="display:flex;align-items:center;gap:8px;padding:8px;cursor:pointer;border-radius:8px;margin:2px 0;color:white;" 
-                     onmouseover="this.style.background='rgba(255,255,255,0.1)'" 
-                     onmouseout="this.style.background='transparent'"
-                     onclick="playTrack('${t.previewUrl || ''}', '${(t.trackName||'').replace(/'/g, "\\'")}', '${(t.artistName||'').replace(/'/g, "\\'")}')">
-                    <img src="${t.artworkUrl100}" style="width:45px;height:45px;border-radius:5px;" onerror="this.style.display='none'">
-                    <div style="flex:1;overflow:hidden;">
-                        <div style="font-size:0.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.trackName}</div>
-                        <div style="font-size:0.7em;color:#888;">${t.artistName}</div>
-                    </div>
-                    <span style="color:#1DB954;">${t.previewUrl ? '▶️' : '❌'}</span>
-                </div>
-            `).join('');
-        } else {
-            res.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Aucun résultat</p>';
-        }
-    } catch(e) {
-        res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur</p>';
+    // Restaurer l'état
+    if (currentTrack >= 0 && playlist[currentTrack]) {
+        var t = playlist[currentTrack];
+        audio.src = t.dataUrl;
+        updateMiniPlayer(t);
+        document.getElementById('miniPlayer').classList.add('show');
     }
-}
-
-function playTrack(url, title, artist) {
-    if (!url) { alert('Aperçu non disponible'); return; }
-    if (!window._globalAudio) { window._globalAudio = new Audio(); window._globalAudio.volume = 0.8; }
-    window._globalAudio.src = url;
-    window._globalAudio.play();
-    document.getElementById('nowPlaying').style.display = 'block';
-    document.getElementById('nowPlayingText').textContent = title + ' - ' + artist;
-}
-
-function stopMusic() {
-    if (window._globalAudio) { window._globalAudio.pause(); window._globalAudio.src = ''; }
-    document.getElementById('nowPlaying').style.display = 'none';
-}
+    
+    audio.addEventListener('timeupdate', function() {
+        if (audio.duration) {
+            document.getElementById('miniProgressBar').style.width = (audio.currentTime / audio.duration * 100) + '%';
+        }
+    });
+    
+    audio.addEventListener('play', function() {
+        isPlaying = true;
+        document.getElementById('miniPlayBtn').textContent = '⏸️';
+    });
+    
+    audio.addEventListener('pause', function() {
+        isPlaying = false;
+        document.getElementById('miniPlayBtn').textContent = '▶️';
+    });
+    
+    audio.addEventListener('ended', function() { nextTrack(); });
+    
+    function updateMiniPlayer(track) {
+        document.getElementById('miniTitle').textContent = track.title;
+        document.getElementById('miniArtist').textContent = track.artist;
+        document.getElementById('miniCover').textContent = '🎵';
+        document.getElementById('miniPlayer').classList.add('show');
+    }
+    
+    function togglePlay() {
+        if (playlist.length === 0) return;
+        if (currentTrack < 0) { playTrack(0); return; }
+        if (isPlaying) { audio.pause(); } else { audio.play(); }
+    }
+    
+    function playTrack(index) {
+        currentTrack = index;
+        var t = playlist[index];
+        audio.src = t.dataUrl;
+        audio.play();
+        updateMiniPlayer(t);
+        localStorage.setItem('currentTrack', index);
+    }
+    
+    function nextTrack() {
+        if (playlist.length === 0) return;
+        playTrack((currentTrack + 1) % playlist.length);
+    }
+    
+    function stopMusic() {
+        audio.pause(); audio.src = '';
+        currentTrack = -1;
+        isPlaying = false;
+        document.getElementById('miniPlayer').classList.remove('show');
+        localStorage.setItem('currentTrack', '-1');
+    }
+    
+    function toggleMusicPanel() {
+        document.getElementById('musicPanel').classList.toggle('show');
+        document.getElementById('musicSearch').focus();
+    }
+    
+    async function searchMusic() {
+        var q = document.getElementById('musicSearch').value.trim();
+        if (!q) return;
+        var res = document.getElementById('musicResults');
+        res.innerHTML = '<p style="color:white;text-align:center;padding:20px;">🔍 Recherche...</p>';
+        
+        try {
+            var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(q) + '&media=music&limit=20');
+            var d = await r.json();
+            if (d.results && d.results.length > 0) {
+                res.innerHTML = d.results.map(function(t) {
+                    return '<div class="music-track" onclick="addTrack(\'' + (t.previewUrl||'') + '\',\'' + (t.trackName||'').replace(/'/g,"") + '\',\'' + (t.artistName||'').replace(/'/g,"") + '\',\'' + (t.artworkUrl100||'') + '\')">' +
+                        '<img src="' + t.artworkUrl100 + '" onerror="this.style.display=\'none\'">' +
+                        '<div class="info"><div class="name">' + t.trackName + '</div><div class="artist">' + t.artistName + '</div></div>' +
+                        '<span class="play-btn">' + (t.previewUrl ? '▶️' : '❌') + '</span></div>';
+                }).join('');
+            } else {
+                res.innerHTML = '<p style="color:#888;text-align:center;padding:30px;">Aucun résultat</p>';
+            }
+        } catch(e) {
+            res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur réseau</p>';
+        }
+    }
+    
+    function addTrack(url, title, artist, cover) {
+        if (!url) { alert('Aperçu non disponible'); return; }
+        playlist.push({title: title, artist: artist, dataUrl: url, cover: cover});
+        localStorage.setItem('myPlaylist', JSON.stringify(playlist));
+        if (currentTrack < 0) playTrack(playlist.length - 1);
+        alert('✅ ' + title + ' ajouté !');
+    }
 </script>

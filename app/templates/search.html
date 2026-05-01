@@ -65,13 +65,12 @@
 </style>
 </head>
 <body>
-    <div class="nav">
-        <a href="/dashboard">🏠 Découvrir</a>
-        <a href="/matches">💕 Matches</a>
-        <a href="/search">🔍 Rechercher</a>
-        <a href="/profile">👤 Profil</a>
-        <a href="/features">➕ Plus</a>
-        <a href="{{ url_for('auth.logout') }}">🚪</a>
+        <div class="nav" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 5px 20px;background:rgba(13,13,32,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);z-index:100;">
+        <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+        <a href="/matches" class="nav-item"><span class="nav-icon">💕</span><span class="nav-label">Matches</span></a>
+        <a href="/wall" class="nav-item"><span class="nav-icon">📢</span><span class="nav-label">Mur</span></a>
+        <a href="/features" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Plus</span></a>
+        <a href="/profile" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
     </div>
 
     <div class="container">
@@ -138,5 +137,6 @@
 
 
 <script src="/static/js/unified-badge.js"></script>
+{% include 'music_float.html' %}
 </body>
 </html>

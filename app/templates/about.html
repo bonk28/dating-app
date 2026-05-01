@@ -21,7 +21,15 @@
         .social-btn:hover{background:#667eea;transform:translateY(-3px);}
         .version{color:#555;font-size:0.75em;margin-top:20px;}
         .back-link{color:#667eea;text-decoration:none;font-size:0.9em;display:block;margin-top:15px;}
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body>
     <div class="card">
@@ -73,5 +81,6 @@
     </div>
 
 <script src="/static/js/unified-badge.js"></script>
+{% include 'music_float.html' %}
 </body>
 </html>

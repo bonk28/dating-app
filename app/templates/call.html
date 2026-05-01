@@ -13,7 +13,15 @@
         .status{opacity:.7}.timer{font-size:1.5em;margin:20px 0}
         .btn{width:70px;height:70px;border-radius:50%;border:none;font-size:2em;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#f44336;color:white}
         .btn:active{transform:scale(.9)}
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body>
     <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
@@ -53,5 +61,6 @@
             });
         {% endif %}
     </script>
+{% include 'music_float.html' %}
 </body>
 </html>

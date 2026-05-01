@@ -17,7 +17,15 @@
         .stat-label { font-size: 0.8em; color: #aaa; margin-top: 5px; }
         .rank-badge { text-align: center; margin: 20px 0; }
         .rank-icon { font-size: 5em; }
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body>
     <div class="container">
@@ -62,5 +70,6 @@
     </div>
 
 <script src="/static/js/unified-badge.js"></script>
+{% include 'music_float.html' %}
 </body>
 </html>

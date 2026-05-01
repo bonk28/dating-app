@@ -34,7 +34,15 @@
         .connecting{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:white;text-align:center;z-index:5}
         .connecting .pulse{width:60px;height:60px;border-radius:50%;border:3px solid white;animation:connPulse 1.5s infinite;margin:0 auto 20px}
         @keyframes connPulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
-    </style>
+    
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:rgba(255,255,255,.4);font-size:.65em;transition:all .3s;padding:5px 10px;border-radius:10px}
+    .nav-item.active{color:#ff2d78}
+    .nav-icon{font-size:1.6em;transition:all .3s}
+    .nav-item.active .nav-icon{transform:scale(1.2)}
+    .nav-label{font-weight:500;letter-spacing:.5px}
+
+body{padding-bottom:80px;}
+</style>
 </head>
 <body class="{{ 'audio-only' if call_type == 'audio' else '' }}">
     
@@ -281,5 +289,6 @@
         // Démarrer l'appel
         startCall();
     </script>
+{% include 'music_float.html' %}
 </body>
 </html>
