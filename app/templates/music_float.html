@@ -1,6 +1,10 @@
-<div id="musicFloatBtn" style="position:fixed;bottom:20px;right:20px;width:55px;height:55px;border-radius:50%;background:#1DB954;color:white;border:none;font-size:1.5em;cursor:pointer;z-index:9998;box-shadow:0 5px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;" onclick="toggleMusic()">🎵</div>
+<!-- BOUTON MUSIQUE DÉPLAÇABLE -->
+<div id="musicFloatBtn" style="position:fixed;bottom:80px;right:20px;width:55px;height:55px;border-radius:50%;background:#1DB954;color:white;border:none;font-size:1.5em;cursor:grab;z-index:9998;box-shadow:0 5px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;" 
+     onmousedown="startDrag(event)" ontouchstart="startDrag(event)" ondragstart="return false;">
+    🎵
+</div>
 
-<div id="musicPanel" style="display:none;position:fixed;bottom:85px;right:20px;width:320px;max-height:450px;background:#1a1a2e;border-radius:15px;z-index:9997;box-shadow:0 10px 35px rgba(0,0,0,0.6);overflow:hidden;">
+<div id="musicPanel" style="display:none;position:fixed;bottom:140px;right:20px;width:300px;max-height:400px;background:#1a1a2e;border-radius:15px;z-index:9997;box-shadow:0 10px 35px rgba(0,0,0,0.6);overflow:hidden;">
     <div style="padding:12px 15px;background:#111;display:flex;justify-content:space-between;align-items:center;">
         <span style="color:white;font-weight:bold;">🎵 Musique</span>
         <button onclick="toggleMusic()" style="background:none;border:none;color:#f44336;font-size:1.2em;cursor:pointer;">✕</button>
@@ -17,6 +21,59 @@
 </div>
 
 <script>
+// ====== DRAG & DROP ======
+let dragBtn = document.getElementById('musicFloatBtn');
+let isDragging = false;
+let startX, startY, startLeft, startTop;
+
+function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    dragBtn.style.cursor = 'grabbing';
+    
+    const touch = e.touches ? e.touches[0] : e;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    
+    const rect = dragBtn.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchmove', onDrag);
+    document.addEventListener('touchend', stopDrag);
+}
+
+function onDrag(e) {
+    if (!isDragging) return;
+    const touch = e.touches ? e.touches[0] : e;
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    
+    let newLeft = startLeft + dx;
+    let newTop = startTop + dy;
+    
+    // Limites de l'écran
+    newLeft = Math.max(0, Math.min(window.innerWidth - 55, newLeft));
+    newTop = Math.max(60, Math.min(window.innerHeight - 55, newTop));
+    
+    dragBtn.style.left = newLeft + 'px';
+    dragBtn.style.top = newTop + 'px';
+    dragBtn.style.right = 'auto';
+    dragBtn.style.bottom = 'auto';
+}
+
+function stopDrag() {
+    isDragging = false;
+    dragBtn.style.cursor = 'grab';
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', stopDrag);
+}
+
+// ====== MUSIQUE ======
 function toggleMusic() {
     const p = document.getElementById('musicPanel');
     p.style.display = p.style.display === 'none' || p.style.display === '' ? 'block' : 'none';
@@ -30,61 +87,42 @@ async function searchMusic() {
     res.innerHTML = '<p style="color:white;text-align:center;padding:20px;">🔍 Recherche...</p>';
     
     try {
-        // API iTunes (gratuite, pas de clé API)
         const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=15`);
         const d = await r.json();
         
         if (d.results && d.results.length > 0) {
-            res.innerHTML = d.results.map((t, i) => `
+            res.innerHTML = d.results.map(t => `
                 <div style="display:flex;align-items:center;gap:8px;padding:8px;cursor:pointer;border-radius:8px;margin:2px 0;color:white;" 
                      onmouseover="this.style.background='rgba(255,255,255,0.1)'" 
                      onmouseout="this.style.background='transparent'"
-                     onclick="playTrack('${t.previewUrl ? t.previewUrl.replace(/'/g, "\\'") : ''}', '${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.artworkUrl100}')">
-                    <img src="${t.artworkUrl100}" style="width:45px;height:45px;border-radius:5px;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2245%22 height=%2245%22><rect fill=%22%23333%22 width=%2245%22 height=%2245%22/><text x=%2212%22 y=%2230%22 fill=%22white%22>🎵</text></svg>'">
+                     onclick="playTrack('${t.previewUrl || ''}', '${(t.trackName||'').replace(/'/g, "\\'")}', '${(t.artistName||'').replace(/'/g, "\\'")}')">
+                    <img src="${t.artworkUrl100}" style="width:45px;height:45px;border-radius:5px;" onerror="this.style.display='none'">
                     <div style="flex:1;overflow:hidden;">
                         <div style="font-size:0.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.trackName}</div>
                         <div style="font-size:0.7em;color:#888;">${t.artistName}</div>
                     </div>
-                    <span style="color:#1DB954;font-size:0.8em;">${t.previewUrl ? '▶️' : '❌'}</span>
+                    <span style="color:#1DB954;">${t.previewUrl ? '▶️' : '❌'}</span>
                 </div>
             `).join('');
         } else {
-            res.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Aucun résultat. Essaye autre chose !</p>';
+            res.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Aucun résultat</p>';
         }
     } catch(e) {
-        res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur réseau. Réessaie.</p>';
+        res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur</p>';
     }
 }
 
-function playTrack(url, title, artist, cover) {
-    if (!url) {
-        alert('🎵 Aperçu non disponible pour ce titre. Essaie une autre chanson.');
-        return;
-    }
-    
-    if (!window._globalAudio) {
-        window._globalAudio = new Audio();
-        window._globalAudio.volume = 0.8;
-    }
-    
+function playTrack(url, title, artist) {
+    if (!url) { alert('Aperçu non disponible'); return; }
+    if (!window._globalAudio) { window._globalAudio = new Audio(); window._globalAudio.volume = 0.8; }
     window._globalAudio.src = url;
-    window._globalAudio.play().catch(() => {
-        alert('Lecture bloquée par le navigateur. Clique sur une autre chanson.');
-    });
-    
+    window._globalAudio.play();
     document.getElementById('nowPlaying').style.display = 'block';
     document.getElementById('nowPlayingText').textContent = title + ' - ' + artist;
-    
-    window._globalAudio.onerror = () => {
-        document.getElementById('nowPlayingText').textContent = 'Erreur lecture - ' + title;
-    };
 }
 
 function stopMusic() {
-    if (window._globalAudio) {
-        window._globalAudio.pause();
-        window._globalAudio.src = '';
-    }
+    if (window._globalAudio) { window._globalAudio.pause(); window._globalAudio.src = ''; }
     document.getElementById('nowPlaying').style.display = 'none';
 }
 </script>
