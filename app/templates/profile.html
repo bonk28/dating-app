@@ -38,36 +38,14 @@
         .stat-label{font-size:0.8em;color:#666;}
     body { padding-bottom: 60px; }
 body{padding-bottom:60px;}
+
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:rgba(10,10,20,.98);padding:8px 5px 20px;z-index:100;border-top:1px solid rgba(255,255,255,.06)}
+.nav-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:rgba(255,255,255,.4);font-size:.6em;gap:2px;padding:5px}
+.nav-item span{font-size:1.4em}.nv{font-size:.75em}body{padding-bottom:65px}
 </style>
 </head>
 <body>
-            <div class="nav" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 5px 20px;background:rgba(13,13,32,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);z-index:100;">
-        <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
-        <a href="/matches" class="nav-item"><span class="nav-icon">💕</span><span class="nav-label">Matches</span></a>
-        <a href="/wall" class="nav-item"><span class="nav-icon">📢</span><span class="nav-label">Mur</span></a>
-        <a href="/features" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Plus</span></a>
-        <a href="/profile" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
-    </div>
-    <div class="container">
-        <div class="profile-header">
-            <div class="avatar">
-                {% if user.photo %}<img src="/static/uploads/{{ user.photo }}" alt="{{ user.username }}">
-                {% else %}👤{% endif %}
-            </div>
-            <h2>{{ user.username }}</h2>
-            <p style="color:#666;">{{ user.age }} ans • {{ user.location or 'Localisation non définie' }}</p>
-            <div class="badge-row">
-                {% if user.is_verified %}<span class="badge badge-verified">✅ Vérifié</span>{% endif %}
-                <span class="badge badge-premium">⭐ Membre</span>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="stats">
-                <div><div class="stat-value">{{ user.likes_received.count() }}</div><div class="stat-label">Likes reçus</div></div>
-                <div><div class="stat-value">{{ user.likes_sent.count() }}</div><div class="stat-label">Likes envoyés</div></div>
-                <div><div class="stat-value">{{ match_count }}</div><div class="stat-label">Matches</div></div>
-            </div>
+            
         </div>
 
         <div class="section">

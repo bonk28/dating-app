@@ -57,67 +57,14 @@
         .user-details { color: #666; font-size: 0.9em; }
         .no-results { text-align: center; padding: 50px 20px; color: #999; }
     body{padding-bottom:60px;}
+
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:rgba(10,10,20,.98);padding:8px 5px 20px;z-index:100;border-top:1px solid rgba(255,255,255,.06)}
+.nav-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:rgba(255,255,255,.4);font-size:.6em;gap:2px;padding:5px}
+.nav-item span{font-size:1.4em}.nv{font-size:.75em}body{padding-bottom:65px}
 </style>
 </head>
 <body>
-        <div class="nav" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 5px 20px;background:rgba(13,13,32,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);z-index:100;">
-        <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
-        <a href="/matches" class="nav-item"><span class="nav-icon">💕</span><span class="nav-label">Matches</span></a>
-        <a href="/wall" class="nav-item"><span class="nav-icon">📢</span><span class="nav-label">Mur</span></a>
-        <a href="/features" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Plus</span></a>
-        <a href="/profile" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
-    </div>
-
-    <div class="container">
-        <div class="search-box">
-            <h2>🔍 Recherche avancée</h2>
-            <form method="POST">
-                <div class="filter-group">
-                    <label>Tranche d'âge</label>
-                    <div class="range-group">
-                        <input type="number" name="min_age" placeholder="Âge min (18)" min="18" max="100">
-                        <input type="number" name="max_age" placeholder="Âge max (100)" min="18" max="100">
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label>Genre recherché</label>
-                    <select name="gender">
-                        <option value="">Peu importe</option>
-                        <option value="homme">Homme</option>
-                        <option value="femme">Femme</option>
-                        <option value="non-binaire">Non-binaire</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Localisation</label>
-                    <input type="text" name="location" placeholder="Ville, pays...">
-                </div>
-                <div class="filter-group">
-                    <label>Centres d'intérêt</label>
-                    <input type="text" name="interests" placeholder="Ex: sport, musique, voyage...">
-                </div>
-                <button type="submit">🔍 Rechercher</button>
-            </form>
-        </div>
-
-        {% if users %}
-        <div class="results">
-            <h3>📊 Résultats ({{ users|length }} profils trouvés)</h3>
-            {% for user in users %}
-            <div class="user-card" onclick="window.location.href='/profile/{{ user.id }}'">
-                <div class="user-avatar">
-                    {% if user.photo %}
-                    <img src="/static/uploads/{{ user.photo }}" alt="{{ user.username }}">
-                    {% else %}👤{% endif %}
-                </div>
-                <div class="user-info">
-                    <div class="user-name">{{ user.username }}, {{ user.age }} ans</div>
-                    <div class="user-details">
-                        {% if user.location %}📍 {{ user.location }}{% endif %}
-                        {% if user.interests %} • {{ user.interests[:50] }}{% endif %}
-                    </div>
-                </div>
-            </div>
+        
             {% endfor %}
         </div>
         {% elif request.method == 'POST' %}
