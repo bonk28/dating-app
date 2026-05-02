@@ -229,20 +229,14 @@ def delete_account():
         flash('Mot de passe incorrect.', 'error')
     return render_template('delete_account.html')
 
-@bp.route('/playlist')
-@login_required
-def playlist():
-    return render_template('playlist.html')
+
 
 @bp.route('/love-letter')
 @login_required
 def love_letter():
     return render_template('love_letter.html')
 
-@bp.route('/roulette')
-@login_required
-def roulette():
-    return render_template('roulette.html')
+
 
 @bp.route('/night-mode')
 @login_required

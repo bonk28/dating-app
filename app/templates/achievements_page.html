@@ -1,26 +1,48 @@
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Succès</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:sans-serif;background:#050510;color:white;padding-bottom:80px}
-.header{padding:20px;display:flex;align-items:center;gap:15px;background:#0d0d20}
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>🏆 Succès</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:sans-serif;background:#050510;color:white;padding-bottom:65px}
+.header{padding:15px 20px;display:flex;align-items:center;gap:15px;background:#0d0d20}
 .header a{color:white;text-decoration:none;font-size:1.2em}
 .container{max-width:500px;margin:20px auto;padding:15px}
 .ach-card{display:flex;align-items:center;gap:15px;padding:18px;background:#0d0d20;border-radius:15px;margin:10px 0;border:1px solid rgba(255,255,255,.05)}
 .ach-icon{font-size:2.5em}.ach-info{flex:1}.ach-name{font-weight:bold}.ach-desc{font-size:.8em;opacity:.6}
 .ach-card.locked{opacity:.4;filter:grayscale(1)}
 .badge-unlocked{color:#4CAF50;font-size:.8em}.badge-locked{color:#666;font-size:.8em}
-
-.nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:rgba(10,10,20,.98);padding:8px 5px 20px;z-index:100;border-top:1px solid rgba(255,255,255,.06)}
-.nav-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:rgba(255,255,255,.4);font-size:.6em;gap:2px;padding:5px}
-.nav-item span{font-size:1.4em}.nv{font-size:.75em}body{padding-bottom:65px}
+.stats{text-align:center;margin-bottom:20px;font-size:1.1em}
+.stats b{color:#ffd700}
 </style></head><body>
 <div class="header"><a href="/features">←</a><h2>🏆 Succès</h2></div>
-<div class="container" id="container">Chargement...</div>
+<div class="container">
+    <div class="stats">🎯 <b id="unlocked">0</b> / <span id="total">0</span> succès débloqués</div>
+    <div id="achievements"></div>
+</div>
 <script>
-fetch('/api/achievements').then(function(r){return r.json()}).then(function(a){
-    var u=a.filter(function(x){return x.unlocked}).length;
-    document.getElementById('container').innerHTML='<p style="text-align:center;opacity:.6;margin-bottom:20px;">'+u+' / '+a.length+' débloqués</p>'+
-    a.map(function(x){return'<div class="ach-card'+(x.unlocked?'':' locked')+'"><div class="ach-icon">'+x.icon+'</div><div class="ach-info"><div class="ach-name">'+x.name+'</div><div class="ach-desc">'+x.description+'</div></div><span class="'+(x.unlocked?'badge-unlocked':'badge-locked')+'">'+(x.unlocked?'✅ Débloqué':'🔒')+'</span></div>';}).join('');
-});
+var achievements = [
+    {icon:'🚀',name:'Premier Pas',desc:'Compléter son profil',condition:'profile_started'},
+    {icon:'✨',name:'Perfect Profile',desc:'Ajouter photo, bio et intérêts',condition:'perfect_profile'},
+    {icon:'🦋',name:'Social Butterfly',desc:'Envoyer 10 messages',condition:'messages_10'},
+    {icon:'👑',name:'Chat King',desc:'Envoyer 100 messages',condition:'messages_100'},
+    {icon:'💑',name:'Match Maker',desc:'Obtenir 5 matches',condition:'matches_5'},
+    {icon:'💝',name:'Match Master',desc:'Obtenir 20 matches',condition:'matches_20'},
+    {icon:'⭐',name:'Super Swiper',desc:'Faire 100 swipes',condition:'swipes_100'},
+    {icon:'🌅',name:'Early Bird',desc:'Se connecter avant 8h',condition:'early_login'},
+    {icon:'🦉',name:'Night Owl',desc:'Se connecter après minuit',condition:'late_login'},
+    {icon:'📸',name:'Story Teller',desc:'Publier 5 stories',condition:'stories_5'},
+    {icon:'🧊',name:'Ice Breaker',desc:'Utiliser 10 brise-glaces',condition:'icebreakers_10'},
+    {icon:'🌍',name:'Globe Trotter',desc:'Matcher avec 3 pays différents',condition:'international'}
+];
+
+// Récupérer les achievements débloqués du localStorage
+var unlocked = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+var unlockedCount = unlocked.length;
+
+document.getElementById('unlocked').textContent = unlockedCount;
+document.getElementById('total').textContent = achievements.length;
+
+document.getElementById('achievements').innerHTML = achievements.map(function(a){
+    var isUnlocked = unlocked.indexOf(a.condition) !== -1;
+    return '<div class="ach-card'+(isUnlocked?'':' locked')+'"><div class="ach-icon">'+a.icon+'</div><div class="ach-info"><div class="ach-name">'+a.name+'</div><div class="ach-desc">'+a.description+'</div></div><span class="'+(isUnlocked?'badge-unlocked':'badge-locked')+'">'+(isUnlocked?'✅ Débloqué':'🔒')+'</span></div>';
+}).join('');
 </script>
-<script src="/static/js/unified-badge.js"></script>
 </body></html>
