@@ -2,39 +2,128 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Plus</title>
+    <title>Plus</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#050510;color:white;padding-bottom:70px}
-        .header{padding:15px 20px;display:flex;align-items:center;gap:15px;background:#0d0d20}
+        :root{--bg:#050510;--surface:#0d0d20;--accent:#ff2d78;--card:#111122}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,sans-serif;background:var(--bg);color:white;padding-bottom:70px}
+        .header{padding:20px;display:flex;align-items:center;gap:15px}
         .header a{color:white;text-decoration:none;font-size:1.2em}
-        .container{max-width:500px;margin:15px auto;padding:15px}
-        h2{text-align:center;margin-bottom:20px}
-        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-        .card{background:#0d0d20;border-radius:15px;padding:20px 12px;text-align:center;text-decoration:none;color:white;border:1px solid rgba(255,255,255,.05);transition:all .3s}
-        .card:hover{border-color:#ff2d78;transform:translateY(-3px)}
-        .card .icon{font-size:2.5em;display:block;margin-bottom:8px}
-        .card .name{font-weight:600;font-size:.85em}.card .desc{font-size:.65em;opacity:.5;margin-top:4px}
-        .badge{display:inline-block;padding:3px 8px;border-radius:8px;font-size:.55em;font-weight:bold;margin-top:5px}
-        .b-new{background:#4CAF50;color:white}.b-hot{background:#ff2d78;color:white}
+        .header h2{font-size:1.3em}
+        .container{max-width:500px;margin:0 auto;padding:0 15px}
+        
+        .section-title{font-size:.7em;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin:25px 0 12px;padding-left:5px}
+        
+        .card{display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border-radius:14px;margin:6px 0;text-decoration:none;color:white;transition:all .2s;border:1px solid rgba(255,255,255,.03)}
+        .card:active{transform:scale(.98);background:#1a1a30}
+        .card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0}
+        .card-info{flex:1}
+        .card-title{font-weight:600;font-size:.9em}
+        .card-sub{font-size:.7em;opacity:.5;margin-top:2px}
+        .card-arrow{opacity:.3;font-size:1.2em}
+        
+        .icon-pink{background:rgba(255,45,120,.15);color:#ff2d78}
+        .icon-blue{background:rgba(0,229,255,.15);color:#00e5ff}
+        .icon-green{background:rgba(0,200,83,.15);color:#00c853}
+        .icon-gold{background:rgba(255,215,0,.15);color:#ffd700}
+        .icon-purple{background:rgba(156,39,176,.15);color:#9c27b0}
+        .icon-orange{background:rgba(255,152,0,.15);color:#ff9800}
+        
+        .badge{display:inline-block;padding:3px 8px;border-radius:8px;font-size:.6em;font-weight:700;margin-left:5px}
+        .badge-new{background:var(--accent);color:white}
+        .badge-hot{background:#ff9800;color:white}
+        
+        .footer{text-align:center;padding:30px 0;opacity:.3;font-size:.7em}
     </style>
 </head>
 <body>
-<div class="header"><a href="/dashboard">←</a><h2>✨ Plus</h2></div>
-<div class="container">
-    <div class="grid">
-        <a href="/stories" class="card"><span class="icon">📸</span><span class="name">Stories</span><span class="desc">Photos éphémères</span><span class="badge b-new">24h</span></a>
-        <a href="/blind-date" class="card"><span class="icon">🎭</span><span class="name">Blind Date</span><span class="desc">Chat mystère</span></a>
-        <a href="/wall" class="card"><span class="icon">📢</span><span class="name">Mur</span><span class="desc">Fil d'actualité</span></a>
-        <a href="/confessions" class="card"><span class="icon">💬</span><span class="name">Confessions</span><span class="desc">Messages anonymes</span></a>
-        <a href="/icebreakers-page" class="card"><span class="icon">🧊</span><span class="name">Ice Breakers</span><span class="desc">Brise-glaces</span></a>
-        <a href="/compliments" class="card"><span class="icon">💝</span><span class="name">Compliments</span><span class="desc">Messages doux</span></a>
-        <a href="/events" class="card"><span class="icon">🎪</span><span class="name">Événements</span><span class="desc">Speed dating</span></a>
-        <a href="/top-profiles" class="card"><span class="icon">🌟</span><span class="name">Top Profils</span><span class="desc">Les plus populaires</span></a>
-        <a href="/achievements-page" class="card"><span class="icon">🏆</span><span class="name">Succès</span><span class="desc">12 badges</span></a>
-        <a href="/my-stats" class="card"><span class="icon">📊</span><span class="name">Mes Stats</span><span class="desc">Statistiques</span></a>
-        <a href="/settings" class="card"><span class="icon">⚙️</span><span class="name">Paramètres</span><span class="desc">DND, thème</span></a>
-        <a href="/about" class="card"><span class="icon">👨‍💻</span><span class="name">À propos</span><span class="desc">Créateurs</span></a>
+    <div class="header">
+        <a href="/dashboard">←</a>
+        <h2>✨ Plus</h2>
     </div>
-</div>
+    <div class="container">
+        
+        <div class="section-title">📸 Contenu</div>
+        
+        <a href="/stories" class="card">
+            <div class="card-icon icon-pink">📸</div>
+            <div class="card-info"><div class="card-title">Stories</div><div class="card-sub">Photos éphémères 24h</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/wall" class="card">
+            <div class="card-icon icon-blue">📢</div>
+            <div class="card-info"><div class="card-title">Fil d'actualité</div><div class="card-sub">Publications et partages</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/confessions" class="card">
+            <div class="card-icon icon-purple">💬</div>
+            <div class="card-info"><div class="card-title">Confessions</div><div class="card-sub">Messages anonymes</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <div class="section-title">💘 Rencontres</div>
+        
+        <a href="/blind-date" class="card">
+            <div class="card-icon icon-gold">🎭</div>
+            <div class="card-info"><div class="card-title">Blind Date</div><div class="card-sub">Chat mystère sans photo</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/icebreakers-page" class="card">
+            <div class="card-icon icon-green">🧊</div>
+            <div class="card-info"><div class="card-title">Ice Breakers</div><div class="card-sub">Messages brise-glace</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/compliments" class="card">
+            <div class="card-icon icon-pink">💝</div>
+            <div class="card-info"><div class="card-title">Compliments</div><div class="card-sub">Messages doux à envoyer</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <div class="section-title">📊 Découvrir</div>
+        
+        <a href="/top-profiles" class="card">
+            <div class="card-icon icon-gold">🌟</div>
+            <div class="card-info"><div class="card-title">Top Profils</div><div class="card-sub">Les plus populaires</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/events" class="card">
+            <div class="card-icon icon-orange">🎪</div>
+            <div class="card-info"><div class="card-title">Événements</div><div class="card-sub">Speed dating & jeux</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <div class="section-title">⚙️ Compte</div>
+        
+        <a href="/achievements-page" class="card">
+            <div class="card-icon icon-green">🏆</div>
+            <div class="card-info"><div class="card-title">Succès</div><div class="card-sub">12 badges à débloquer</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/my-stats" class="card">
+            <div class="card-icon icon-blue">📊</div>
+            <div class="card-info"><div class="card-title">Mes Statistiques</div><div class="card-sub">Ton activité</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/settings" class="card">
+            <div class="card-icon icon-purple">⚙️</div>
+            <div class="card-info"><div class="card-title">Paramètres</div><div class="card-sub">DND, thème sombre</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <a href="/about" class="card">
+            <div class="card-icon icon-pink">👨‍💻</div>
+            <div class="card-info"><div class="card-title">À propos</div><div class="card-sub">Kevin Bonkoungou & Jules Ilboudo</div></div>
+            <span class="card-arrow">›</span>
+        </a>
+        
+        <div class="footer">© 2026 Dating App • Tous droits réservés</div>
+    </div>
 </body>
 </html>
