@@ -45,16 +45,6 @@ def profile():
         current_user.interests = request.form.get('interests')
         current_user.location = request.form.get('location')
         current_user.looking_for = request.form.get('looking_for')
-        current_user.signe = request.form.get('signe')
-        current_user.animal = request.form.get('animal')
-        current_user.voyage = request.form.get('voyage')
-        current_user.pays = request.form.get('pays')
-        current_user.serie = request.form.get('serie')
-        current_user.musique = request.form.get('musique')
-        current_user.plat = request.form.get('plat')
-        current_user.loisir = request.form.get('loisir')
-        current_user.profession = request.form.get('profession')
-        current_user.citation = request.form.get('citation')
         current_user.max_distance = request.form.get('max_distance', 50, type=int)
         if 'photo' in request.files:
             file = request.files['photo']
@@ -62,13 +52,13 @@ def profile():
                 filename = secure_filename(f"{current_user.id}_{int(datetime.now().timestamp())}_{file.filename}")
                 filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-                photo = UserPhoto(filename=filename, user_id=current_user.id, is_primary=not current_user.photos.first())
-                db.session.add(photo)
                 current_user.photo = filename
         db.session.commit()
-        flash('Profil mis à jour !', 'success')
+        flash('Profil mis à jour!', 'success')
         return redirect(url_for('main.profile'))
-    from app.models import Match; match_count = Match.query.filter((Match.user1_id == current_user.id) | (Match.user2_id == current_user.id)).count(); return render_template('profile.html', user=current_user, match_count=match_count)
+    from app.models import Match
+    match_count = Match.query.filter((Match.user1_id == current_user.id) | (Match.user2_id == current_user.id)).count()
+    return render_template('profile.html', user=current_user, match_count=match_count)
 
 @bp.route('/matches')
 @login_required
