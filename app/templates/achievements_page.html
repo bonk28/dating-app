@@ -1,81 +1,21 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dating App | Succès - Dating App</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
-        .header {
-            background: white; padding: 20px; display: flex;
-            justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header a { color: #667eea; text-decoration: none; font-size: 1.5em; }
-        .container { max-width: 500px; margin: 20px auto; padding: 20px; }
-        .achievement-card {
-            background: white; border-radius: 15px; padding: 20px;
-            margin-bottom: 10px; display: flex; align-items: center;
-            gap: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        .achievement-icon { font-size: 2.5em; min-width: 60px; text-align: center; }
-        .achievement-info { flex: 1; }
-        .achievement-name { font-weight: bold; color: #333; }
-        .achievement-desc { font-size: 0.9em; color: #666; }
-        .achievement-card.locked { opacity: 0.5; filter: grayscale(100%); }
-        .achievement-card.unlocked { border-left: 4px solid #4CAF50; }
-        .badge-unlocked { color: #4CAF50; font-size: 0.8em; font-weight: bold; }
-        .badge-locked { color: #999; font-size: 0.8em; }
-    body{padding-bottom:60px;}
-
-    
-    .nav-item.active{color:#ff2d78}
-    
-    .nav-item.active 
-    
-
-</style>
-</head>
-<body>
-    <div class="header">
-        <a href="/features">←</a>
-        <h2>🏆 Succès</h2>
-        <div></div>
-    </div>
-
-    <div class="container" id="achievements-container">
-        Chargement...
-    </div>
-
-    <script>
-        fetch('/api/achievements')
-            .then(r => r.json())
-            .then(achievements => {
-                const container = document.getElementById('achievements-container');
-                const unlocked = achievements.filter(a => a.unlocked).length;
-                
-                container.innerHTML = `
-                    <p style="text-align:center;margin-bottom:20px;color:#666;">
-                        ${unlocked} / ${achievements.length} succès débloqués
-                    </p>
-                    ${achievements.map(a => `
-                        <div class="achievement-card ${a.unlocked ? 'unlocked' : 'locked'}">
-                            <div class="achievement-icon">${a.icon}</div>
-                            <div class="achievement-info">
-                                <div class="achievement-name">${a.name}</div>
-                                <div class="achievement-desc">${a.description}</div>
-                            </div>
-                            <div class="${a.unlocked ? 'badge-unlocked' : 'badge-locked'}">
-                                ${a.unlocked ? '✅ Débloqué' : '🔒'}
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
-            });
-    </script>
-
-<script src="/static/js/unified-badge.js"></script>
-{% include 'music_float.html' %}
-</body>
-</html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Succès</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:sans-serif;background:#050510;color:white;padding-bottom:80px}
+.header{padding:20px;display:flex;align-items:center;gap:15px;background:#0d0d20}
+.header a{color:white;text-decoration:none;font-size:1.2em}
+.container{max-width:500px;margin:20px auto;padding:15px}
+.ach-card{display:flex;align-items:center;gap:15px;padding:18px;background:#0d0d20;border-radius:15px;margin:10px 0;border:1px solid rgba(255,255,255,.05)}
+.ach-icon{font-size:2.5em}.ach-info{flex:1}.ach-name{font-weight:bold}.ach-desc{font-size:.8em;opacity:.6}
+.ach-card.locked{opacity:.4;filter:grayscale(1)}
+.badge-unlocked{color:#4CAF50;font-size:.8em}.badge-locked{color:#666;font-size:.8em}
+</style></head><body>
+<div class="header"><a href="/features">←</a><h2>🏆 Succès</h2></div>
+<div class="container" id="container">Chargement...</div>
+<script>
+fetch('/api/achievements').then(function(r){return r.json()}).then(function(a){
+    var u=a.filter(function(x){return x.unlocked}).length;
+    document.getElementById('container').innerHTML='<p style="text-align:center;opacity:.6;margin-bottom:20px;">'+u+' / '+a.length+' débloqués</p>'+
+    a.map(function(x){return'<div class="ach-card'+(x.unlocked?'':' locked')+'"><div class="ach-icon">'+x.icon+'</div><div class="ach-info"><div class="ach-name">'+x.name+'</div><div class="ach-desc">'+x.description+'</div></div><span class="'+(x.unlocked?'badge-unlocked':'badge-locked')+'">'+(x.unlocked?'✅ Débloqué':'🔒')+'</span></div>';}).join('');
+});
+</script>
+</body></html>

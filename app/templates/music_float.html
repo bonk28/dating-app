@@ -1,210 +1,208 @@
 <style>
-    .mini-player-bg{position:fixed;bottom:75px;left:10px;right:10px;background:linear-gradient(135deg,rgba(29,185,84,.95),rgba(0,230,118,.95));border-radius:15px;padding:10px 15px;display:none;align-items:center;gap:12px;z-index:99;box-shadow:0 10px 30px rgba(29,185,84,.4);backdrop-filter:blur(20px);animation:slideUp .4s ease}
-    @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .mini-player-bg.show{display:flex}
-    .mini-cover{width:45px;height:45px;border-radius:10px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:1.5em}
-    .mini-info{flex:1;overflow:hidden}
-    .mini-title{font-weight:700;font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .mini-artist{font-size:.7em;opacity:.8}
-    .mini-progress{position:absolute;bottom:0;left:0;height:3px;background:rgba(0,0,0,.3);border-radius:0 0 15px 15px;transition:width .3s}
-    .mini-progress-bar{height:100%;background:#ffd700;border-radius:0 0 15px 15px;width:0%;transition:width .1s linear}
-    .mini-btn-sm{background:none;border:none;color:white;font-size:1.3em;cursor:pointer;padding:5px}
+    #musicFloatingBtn {
+        position:fixed;bottom:100px;right:15px;width:50px;height:50px;
+        border-radius:50%;background:linear-gradient(135deg,#1DB954,#00e676);
+        color:white;border:none;font-size:1.3em;cursor:grab;z-index:9998;
+        box-shadow:0 5px 25px rgba(29,185,84,.5);
+        display:flex;align-items:center;justify-content:center;
+        touch-action:none;user-select:none;transition:transform .2s;
+    }
+    #musicFloatingBtn:active{cursor:grabbing;transform:scale(1.1);}
+    #musicFloatingBtn.dragging{cursor:grabbing;}
     
-    .music-panel{position:fixed;bottom:140px;left:15px;right:15px;background:#1a1a2e;border-radius:20px;z-index:200;display:none;box-shadow:0 -10px 40px rgba(0,0,0,.8);overflow:hidden;max-height:60vh}
-    .music-panel.show{display:block;animation:slideUp .3s ease}
-    .music-panel-header{background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;border-radius:20px 20px 0 0}
-    .music-search{padding:15px}
-    .music-search input{width:100%;padding:14px 20px;border-radius:30px;border:none;background:#333;color:white;font-size:1em;outline:none}
-    .music-search input::placeholder{color:#888}
-    .music-results{max-height:40vh;overflow-y:auto;padding:10px}
-    .music-track{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;cursor:pointer;margin:3px 0;transition:all .2s}
-    .music-track:hover{background:rgba(255,255,255,.05)}
-    .music-track img{width:50px;height:50px;border-radius:10px;object-fit:cover}
-    .music-track .info{flex:1;overflow:hidden}
-    .music-track .name{font-weight:600;font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .music-track .artist{font-size:.7em;opacity:.6}
-    .music-track .play-btn{color:#1DB954;font-size:1.5em}
-
-    .nav {
-        position:fixed !important;
-        bottom:0 !important;
-        left:0 !important;
-        right:0 !important;
-        display:flex !important;
-        justify-content:space-around !important;
-        align-items:center !important;
-        padding:8px 10px 22px !important;
-        background:rgba(10,10,20,.98) !important;
-        backdrop-filter:blur(30px) !important;
-        -webkit-backdrop-filter:blur(30px) !important;
-        border-top:1px solid rgba(255,255,255,.08) !important;
-        z-index:100 !important;
+    #musicMiniBar {
+        position:fixed;bottom:75px;left:10px;right:10px;
+        background:rgba(10,10,20,.98);border-radius:15px;
+        padding:8px 12px;display:none;align-items:center;gap:10px;
+        z-index:99;border:1px solid rgba(255,255,255,.1);
+        backdrop-filter:blur(20px);animation:slideUp .3s ease;
     }
-    .nav-item {
-        display:flex !important;
-        flex-direction:column !important;
-        align-items:center !important;
-        gap:3px !important;
-        text-decoration:none !important;
-        color:rgba(255,255,255,.4) !important;
-        font-size:.6em !important;
-        font-weight:500 !important;
-        transition:all .3s !important;
-        padding:6px 12px !important;
-        border-radius:12px !important;
-        letter-spacing:.3px !important;
+    @keyframes slideUp{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
+    #musicMiniBar.show{display:flex;}
+    #musicMiniBar .cover{width:38px;height:38px;border-radius:8px;background:#1DB954;display:flex;align-items:center;justify-content:center;font-size:1.2em;}
+    #musicMiniBar .info{flex:1;overflow:hidden;}
+    #musicMiniBar .title{font-size:.8em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    #musicMiniBar .artist{font-size:.65em;opacity:.6;}
+    #musicMiniBar button{background:none;border:none;color:white;font-size:1.2em;cursor:pointer;padding:5px;}
+    
+    #musicSearchPanel {
+        position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;
+        border-radius:25px 25px 0 0;z-index:200;display:none;
+        max-height:65vh;overflow-y:auto;box-shadow:0 -20px 50px rgba(0,0,0,.8);
     }
-    .nav-item.active {
-        color:#ff2d78 !important;
-    }
-    .nav-item.active .nav-icon {
-        transform:scale(1.2) !important;
-        filter:drop-shadow(0 0 8px rgba(255,45,120,.6)) !important;
-    }
-    .nav-icon {
-        font-size:1.5em !important;
-        transition:all .3s !important;
-        display:block !important;
-    }
-    .nav-label {
-        font-weight:500 !important;
-        letter-spacing:.5px !important;
-        font-size:.7em !important;
-    }
-
-body{padding-bottom:85px;}
+    #musicSearchPanel.show{display:block;animation:slideUp .3s ease;}
 </style>
 
-<!-- MINI PLAYER -->
-<div class="mini-player-bg" id="miniPlayer">
-    <div class="mini-progress"><div class="mini-progress-bar" id="miniProgressBar"></div></div>
-    <div class="mini-cover" id="miniCover">🎵</div>
-    <div class="mini-info">
-        <div class="mini-title" id="miniTitle">Aucune musique</div>
-        <div class="mini-artist" id="miniArtist">---</div>
+<div id="musicFloatingBtn" onmousedown="startDragMusic(event)" ontouchstart="startDragMusic(event)">🎵</div>
+
+<div id="musicMiniBar">
+    <div class="cover" id="miniCover">🎵</div>
+    <div class="info">
+        <div class="title" id="miniTitle">Aucune musique</div>
+        <div class="artist" id="miniArtist">---</div>
     </div>
-    <button class="mini-btn-sm" onclick="togglePlay()" id="miniPlayBtn">▶️</button>
-    <button class="mini-btn-sm" onclick="nextTrack()">⏭</button>
-    <button class="mini-btn-sm" onclick="toggleMusicPanel()">🔍</button>
-    <button class="mini-btn-sm" onclick="stopMusic()" style="color:#ff5252">✕</button>
+    <button onclick="toggleMusicPlay()" id="miniPlay">▶️</button>
+    <button onclick="nextMusicTrack()">⏭</button>
+    <button onclick="openMusicSearch()">🔍</button>
+    <button onclick="stopAllMusic()" style="color:#ff5252;">✕</button>
 </div>
 
-<!-- PANEL RECHERCHE -->
-<div class="music-panel" id="musicPanel">
-    <div class="music-panel-header">
+<div id="musicSearchPanel">
+    <div style="background:#111;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;border-radius:25px 25px 0 0;">
         <h4 style="color:white;">🎵 Rechercher</h4>
-        <button onclick="toggleMusicPanel()" style="background:none;border:none;color:white;font-size:1.5em;cursor:pointer;">✕</button>
+        <button onclick="closeMusicSearch()" style="background:none;border:none;color:white;font-size:1.3em;cursor:pointer;">✕</button>
     </div>
-    <div class="music-search">
-        <input type="text" id="musicSearch" placeholder="🔍 Titre, artiste..." onkeypress="if(event.key==='Enter')searchMusic()">
+    <div style="padding:15px;">
+        <input type="text" id="musicSearchInput" placeholder="🔍 Titre ou artiste..." style="width:100%;padding:14px;border-radius:25px;border:none;background:#333;color:white;font-size:1em;outline:none;" onkeypress="if(event.key==='Enter')searchMusicOnline()">
     </div>
-    <div class="music-results" id="musicResults"></div>
+    <div id="musicSearchResults" style="padding:10px;max-height:50vh;overflow-y:auto;"></div>
 </div>
+
+<audio id="globalAudio" style="display:none;"></audio>
 
 <script>
-    var playlist = JSON.parse(localStorage.getItem('myPlaylist') || '[]');
-    var currentTrack = parseInt(localStorage.getItem('currentTrack') || '-1');
+(function(){
+    var audio = document.getElementById('globalAudio');
+    var playlist = JSON.parse(localStorage.getItem('globalPlaylist') || '[]');
+    var currentIndex = parseInt(localStorage.getItem('globalTrackIndex') || '-1');
     var isPlaying = false;
-    
-    if (!window._ga) window._ga = new Audio();
-    var audio = window._ga;
     audio.volume = 0.8;
     
-    // Restaurer l'état
-    if (currentTrack >= 0 && playlist[currentTrack]) {
-        var t = playlist[currentTrack];
-        audio.src = t.dataUrl;
-        updateMiniPlayer(t);
-        document.getElementById('miniPlayer').classList.add('show');
+    // Restaurer si une musique était en cours
+    if (currentIndex >= 0 && playlist[currentIndex]) {
+        audio.src = playlist[currentIndex].dataUrl;
+        var t = playlist[currentIndex];
+        document.getElementById('miniTitle').textContent = t.title;
+        document.getElementById('miniArtist').textContent = t.artist;
+        document.getElementById('musicMiniBar').classList.add('show');
+        audio.currentTime = parseFloat(localStorage.getItem('globalTrackTime') || '0');
     }
     
-    audio.addEventListener('timeupdate', function() {
-        if (audio.duration) {
-            document.getElementById('miniProgressBar').style.width = (audio.currentTime / audio.duration * 100) + '%';
-        }
-    });
+    audio.ontimeupdate = function() {
+        localStorage.setItem('globalTrackTime', audio.currentTime);
+    };
     
-    audio.addEventListener('play', function() {
-        isPlaying = true;
-        document.getElementById('miniPlayBtn').textContent = '⏸️';
-    });
+    audio.onplay = function() { isPlaying = true; document.getElementById('miniPlay').textContent = '⏸️'; };
+    audio.onpause = function() { isPlaying = false; document.getElementById('miniPlay').textContent = '▶️'; };
+    audio.onended = function() { nextMusicTrack(); };
     
-    audio.addEventListener('pause', function() {
-        isPlaying = false;
-        document.getElementById('miniPlayBtn').textContent = '▶️';
-    });
-    
-    audio.addEventListener('ended', function() { nextTrack(); });
-    
-    function updateMiniPlayer(track) {
-        document.getElementById('miniTitle').textContent = track.title;
-        document.getElementById('miniArtist').textContent = track.artist;
-        document.getElementById('miniCover').textContent = '🎵';
-        document.getElementById('miniPlayer').classList.add('show');
+    function saveState() {
+        localStorage.setItem('globalPlaylist', JSON.stringify(playlist));
+        localStorage.setItem('globalTrackIndex', currentIndex);
+        localStorage.setItem('globalTrackTime', audio.currentTime);
     }
     
-    function togglePlay() {
-        if (playlist.length === 0) return;
-        if (currentTrack < 0) { playTrack(0); return; }
+    window.toggleMusicPlay = function() {
+        if (currentIndex < 0 && playlist.length > 0) { playTrack(0); return; }
         if (isPlaying) { audio.pause(); } else { audio.play(); }
-    }
+    };
     
-    function playTrack(index) {
-        currentTrack = index;
+    window.playTrack = function(index) {
+        if (index < 0 || index >= playlist.length) return;
+        currentIndex = index;
         var t = playlist[index];
         audio.src = t.dataUrl;
         audio.play();
-        updateMiniPlayer(t);
-        localStorage.setItem('currentTrack', index);
-    }
+        document.getElementById('miniTitle').textContent = t.title;
+        document.getElementById('miniArtist').textContent = t.artist;
+        document.getElementById('miniCover').textContent = '🎵';
+        document.getElementById('musicMiniBar').classList.add('show');
+        saveState();
+    };
     
-    function nextTrack() {
+    window.nextMusicTrack = function() {
         if (playlist.length === 0) return;
-        playTrack((currentTrack + 1) % playlist.length);
-    }
+        playTrack((currentIndex + 1) % playlist.length);
+    };
     
-    function stopMusic() {
+    window.stopAllMusic = function() {
         audio.pause(); audio.src = '';
-        currentTrack = -1;
-        isPlaying = false;
-        document.getElementById('miniPlayer').classList.remove('show');
-        localStorage.setItem('currentTrack', '-1');
-    }
+        currentIndex = -1; isPlaying = false;
+        document.getElementById('musicMiniBar').classList.remove('show');
+        localStorage.removeItem('globalTrackIndex');
+        localStorage.removeItem('globalTrackTime');
+    };
     
-    function toggleMusicPanel() {
-        document.getElementById('musicPanel').classList.toggle('show');
-        document.getElementById('musicSearch').focus();
-    }
+    window.openMusicSearch = function() {
+        document.getElementById('musicSearchPanel').classList.add('show');
+        document.getElementById('musicSearchInput').focus();
+    };
     
-    async function searchMusic() {
-        var q = document.getElementById('musicSearch').value.trim();
+    window.closeMusicSearch = function() {
+        document.getElementById('musicSearchPanel').classList.remove('show');
+    };
+    
+    window.searchMusicOnline = async function() {
+        var q = document.getElementById('musicSearchInput').value.trim();
         if (!q) return;
-        var res = document.getElementById('musicResults');
+        var res = document.getElementById('musicSearchResults');
         res.innerHTML = '<p style="color:white;text-align:center;padding:20px;">🔍 Recherche...</p>';
-        
         try {
-            var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(q) + '&media=music&limit=20');
+            var r = await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=25');
             var d = await r.json();
             if (d.results && d.results.length > 0) {
-                res.innerHTML = d.results.map(function(t) {
-                    return '<div class="music-track" onclick="addTrack(\'' + (t.previewUrl||'') + '\',\'' + (t.trackName||'').replace(/'/g,"") + '\',\'' + (t.artistName||'').replace(/'/g,"") + '\',\'' + (t.artworkUrl100||'') + '\')">' +
-                        '<img src="' + t.artworkUrl100 + '" onerror="this.style.display=\'none\'">' +
-                        '<div class="info"><div class="name">' + t.trackName + '</div><div class="artist">' + t.artistName + '</div></div>' +
-                        '<span class="play-btn">' + (t.previewUrl ? '▶️' : '❌') + '</span></div>';
+                res.innerHTML = d.results.map(function(t){
+                    return '<div onclick="addGlobalTrack(\''+(t.previewUrl||'')+'\',\''+(t.trackName||'').replace(/'/g,'')+'\',\''+(t.artistName||'').replace(/'/g,'')+'\')" style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;cursor:pointer;color:white;"><img src="'+t.artworkUrl100+'" style="width:45px;height:45px;border-radius:8px;" onerror="this.style.display=\'none\'"><div style="flex:1;overflow:hidden;"><div style="font-weight:600;font-size:.9em;">'+t.trackName+'</div><div style="font-size:.7em;opacity:.6;">'+t.artistName+'</div></div><span style="color:#1DB954;">'+(t.previewUrl?'▶️':'❌')+'</span></div>';
                 }).join('');
             } else {
                 res.innerHTML = '<p style="color:#888;text-align:center;padding:30px;">Aucun résultat</p>';
             }
         } catch(e) {
-            res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur réseau</p>';
+            res.innerHTML = '<p style="color:#f44336;text-align:center;padding:20px;">Erreur</p>';
         }
+    };
+    
+    window.addGlobalTrack = function(url, title, artist) {
+        if (!url) { alert('Aperçu non disponible'); return; }
+        playlist.push({title:title, artist:artist, dataUrl:url});
+        saveState();
+        if (currentIndex < 0) playTrack(playlist.length-1);
+        closeMusicSearch();
+    };
+    
+    // ---- DRAG & DROP ----
+    var btn = document.getElementById('musicFloatingBtn');
+    var isDragging = false, startX, startY, startLeft, startTop;
+    
+    window.startDragMusic = function(e) {
+        isDragging = false;
+        var t = e.touches ? e.touches[0] : e;
+        startX = t.clientX; startY = t.clientY;
+        var rect = btn.getBoundingClientRect();
+        startLeft = rect.left; startTop = rect.top;
+        document.addEventListener('mousemove', onDragMusic);
+        document.addEventListener('mouseup', stopDragMusic);
+        document.addEventListener('touchmove', onDragMusic);
+        document.addEventListener('touchend', stopDragMusic);
+    };
+    
+    function onDragMusic(e) {
+        var t = e.touches ? e.touches[0] : e;
+        var dx = t.clientX - startX, dy = t.clientY - startY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) isDragging = true;
+        if (!isDragging) return;
+        btn.style.left = Math.max(0, Math.min(window.innerWidth-50, startLeft+dx)) + 'px';
+        btn.style.top = Math.max(60, Math.min(window.innerHeight-50, startTop+dy)) + 'px';
+        btn.style.right = 'auto'; btn.style.bottom = 'auto';
     }
     
-    function addTrack(url, title, artist, cover) {
-        if (!url) { alert('Aperçu non disponible'); return; }
-        playlist.push({title: title, artist: artist, dataUrl: url, cover: cover});
-        localStorage.setItem('myPlaylist', JSON.stringify(playlist));
-        if (currentTrack < 0) playTrack(playlist.length - 1);
-        alert('✅ ' + title + ' ajouté !');
+    function stopDragMusic() {
+        document.removeEventListener('mousemove', onDragMusic);
+        document.removeEventListener('mouseup', stopDragMusic);
+        document.removeEventListener('touchmove', onDragMusic);
+        document.removeEventListener('touchend', stopDragMusic);
+        if (!isDragging) openMusicSearch();
     }
+    
+    // Sauvegarder la position du bouton
+    btn.addEventListener('mouseup', function() {
+        if (!isDragging) {
+            localStorage.setItem('musicBtnPos', JSON.stringify({left:btn.style.left,top:btn.style.top}));
+        }
+    });
+    
+    // Restaurer la position
+    var savedPos = JSON.parse(localStorage.getItem('musicBtnPos') || '{}');
+    if (savedPos.left) { btn.style.left = savedPos.left; btn.style.top = savedPos.top; btn.style.right = 'auto'; btn.style.bottom = 'auto'; }
+})();
 </script>

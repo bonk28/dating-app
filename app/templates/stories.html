@@ -76,13 +76,14 @@
             reader.readAsDataURL(file);
         }
         
+        function delStory(i){stories.splice(i,1);localStorage.setItem('stories',JSON.stringify(stories));render();}
         function render() {
             var g = document.getElementById('grid');
             g.innerHTML = '<div class="card add" onclick="document.getElementById(\'file\').click()"><span style="font-size:3em;">➕</span><small style="color:#888;">Ajouter</small></div>' +
                 stories.map(function(s, i) {
                     return '<div class="card" onclick="view('+i+')">' +
                         (s.type === 'video' ? '<video src="'+s.dataUrl+'"></video>' : '<img src="'+s.dataUrl+'">') +
-                        '<div class="info"><b>Moi</b><br><small>'+s.reactions.length+' réactions</small></div></div>';
+                        '<div class="info"><b>Moi</b> <span onclick="delStory(<br><small>'+s.reactions.length+' réactions</small></div></div>';
                 }).join('');
         }
         
