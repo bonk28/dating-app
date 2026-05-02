@@ -1,53 +1,40 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dating App | ✨ Plus</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Plus</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:#f5f5f5; padding-bottom:30px; }
-        
-        .nav a { text-decoration:none; color:#667eea; font-weight:bold; font-size:0.8em; }
-        .container { max-width:650px; margin:15px auto; padding:15px; }
-        h2 { text-align:center; margin-bottom:10px; }
-        .cat-title { color:#999; margin:20px 0 10px; font-size:0.8em; text-transform:uppercase; letter-spacing:2px; }
-        .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-        .card { background:white; border-radius:12px; padding:15px 6px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.06); cursor:pointer; transition:all 0.2s; text-decoration:none; color:inherit; }
-        .card:active { transform:scale(0.95); }
-        .icon { font-size:1.8em; margin-bottom:4px; display:block; }
-        .title { font-weight:600; font-size:0.7em; color:#333; }
-        .badge { display:inline-block; padding:2px 5px; border-radius:6px; font-size:0.55em; margin-top:2px; color:white; }
-        .b-new { background:#4CAF50; } .b-hot { background:#f44336; } .b-fun { background:#FF9800; }
-    body{padding-bottom:60px;}
-
-.nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:rgba(10,10,20,.98);padding:8px 5px 20px;z-index:100;border-top:1px solid rgba(255,255,255,.06)}
-.nav-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:rgba(255,255,255,.4);font-size:.6em;gap:2px;padding:5px}
-.nav-item span{font-size:1.4em}.nv{font-size:.75em}body{padding-bottom:65px}
-</style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#050510;color:white;padding-bottom:70px}
+        .header{padding:15px 20px;display:flex;align-items:center;gap:15px;background:#0d0d20}
+        .header a{color:white;text-decoration:none;font-size:1.2em}
+        .container{max-width:500px;margin:15px auto;padding:15px}
+        h2{text-align:center;margin-bottom:20px}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+        .card{background:#0d0d20;border-radius:15px;padding:20px 12px;text-align:center;text-decoration:none;color:white;border:1px solid rgba(255,255,255,.05);transition:all .3s}
+        .card:hover{border-color:#ff2d78;transform:translateY(-3px)}
+        .card .icon{font-size:2.5em;display:block;margin-bottom:8px}
+        .card .name{font-weight:600;font-size:.85em}.card .desc{font-size:.65em;opacity:.5;margin-top:4px}
+        .badge{display:inline-block;padding:3px 8px;border-radius:8px;font-size:.55em;font-weight:bold;margin-top:5px}
+        .b-new{background:#4CAF50;color:white}.b-hot{background:#ff2d78;color:white}
+    </style>
 </head>
 <body>
-                <div class="nav">
-        <a href="/dashboard" class="nav-item"><span>🏠</span><span class="nv">Accueil</span></a>
-        <a href="/matches" class="nav-item"><span>💕</span><span class="nv">Matches</span></a>
-        <a href="/wall" class="nav-item"><span>📢</span><span class="nv">Mur</span></a>
-        <a href="/features" class="nav-item"><span>➕</span><span class="nv">Plus</span></a>
-        <a href="/profile" class="nav-item"><span>👤</span><span class="nv">Profil</span></a>
+<div class="header"><a href="/dashboard">←</a><h2>✨ Plus</h2></div>
+<div class="container">
+    <div class="grid">
+        <a href="/stories" class="card"><span class="icon">📸</span><span class="name">Stories</span><span class="desc">Photos éphémères</span><span class="badge b-new">24h</span></a>
+        <a href="/blind-date" class="card"><span class="icon">🎭</span><span class="name">Blind Date</span><span class="desc">Chat mystère</span></a>
+        <a href="/wall" class="card"><span class="icon">📢</span><span class="name">Mur</span><span class="desc">Fil d'actualité</span></a>
+        <a href="/confessions" class="card"><span class="icon">💬</span><span class="name">Confessions</span><span class="desc">Messages anonymes</span></a>
+        <a href="/icebreakers-page" class="card"><span class="icon">🧊</span><span class="name">Ice Breakers</span><span class="desc">Brise-glaces</span></a>
+        <a href="/compliments" class="card"><span class="icon">💝</span><span class="name">Compliments</span><span class="desc">Messages doux</span></a>
+        <a href="/events" class="card"><span class="icon">🎪</span><span class="name">Événements</span><span class="desc">Speed dating</span></a>
+        <a href="/top-profiles" class="card"><span class="icon">🌟</span><span class="name">Top Profils</span><span class="desc">Les plus populaires</span></a>
+        <a href="/achievements-page" class="card"><span class="icon">🏆</span><span class="name">Succès</span><span class="desc">12 badges</span></a>
+        <a href="/my-stats" class="card"><span class="icon">📊</span><span class="name">Mes Stats</span><span class="desc">Statistiques</span></a>
+        <a href="/settings" class="card"><span class="icon">⚙️</span><span class="name">Paramètres</span><span class="desc">DND, thème</span></a>
+        <a href="/about" class="card"><span class="icon">👨‍💻</span><span class="name">À propos</span><span class="desc">Créateurs</span></a>
     </div>
-    <div class="container">
-        <h2>✨ Fonctionnalités</h2>
-        
-        <p class="cat-title">💘 Rencontres</p>
-        <div class="grid">
-            
-            
-            <a href="/settings" class="card"><span class="icon">⚙️</span><span class="title">Paramètres</span></a>
-        </div>
-    </div>
-<script src="/static/js/global-player.js"></script>
-
-
-<script src="/static/js/unified-badge.js"></script>
-
+</div>
 </body>
 </html>
