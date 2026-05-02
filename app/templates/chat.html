@@ -4,49 +4,50 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>{{ other_user.username }}</title>
     <style>
-        :root{--bg:#e8eef2;--sent:#e91e63;--recv:#fff;--text:#2d3436;--header:#fff}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,sans-serif;background:var(--bg);height:100vh;display:flex;flex-direction:column}
+        body{font-family:-apple-system,sans-serif;background:#e8eef2;height:100vh;display:flex;flex-direction:column}
         
-        .header{background:var(--header);padding:10px 15px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-        .back{color:var(--sent);text-decoration:none;font-size:1.2em}
-        .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#e91e63,#ff6b9d);display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .header{background:linear-gradient(135deg,#e91e63,#ff6b9d);color:white;padding:12px 15px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(233,30,99,.3)}
+        .back{color:white;text-decoration:none;font-size:1.3em}
+        .avatar{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid rgba(255,255,255,.5)}
         .avatar img{width:100%;height:100%;object-fit:cover}
-        .info{flex:1}.name{font-weight:600;font-size:.95em;color:var(--text)}.sub{font-size:.65em;color:#999}
-        .hbtn{color:var(--sent);text-decoration:none;font-size:1.1em;padding:8px;border:none;background:none;cursor:pointer}
+        .info{flex:1}.name{font-weight:700;font-size:1em}.sub{font-size:.65em;opacity:.8}
+        .hbtn{color:white;text-decoration:none;font-size:1.2em;padding:8px;background:rgba(255,255,255,.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
         
-        .messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:4px}
-        .msg{max-width:70%;padding:8px 12px;border-radius:14px;font-size:.9em;line-height:1.4;position:relative}
-        .sent{background:var(--sent);color:white;align-self:flex-end;border-bottom-right-radius:4px}
-        .recv{background:var(--recv);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-        .time{font-size:.6em;opacity:.6;text-align:right;margin-top:3px}
-        .media{max-width:200px;border-radius:10px}
+        .messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:5px;background:#e8eef2}
+        .date-sep{text-align:center;margin:10px 0;font-size:.7em}
+        .date-sep span{background:rgba(0,0,0,.06);padding:4px 14px;border-radius:12px;color:#888}
+        .msg{max-width:72%;padding:10px 14px;font-size:.9em;line-height:1.4;position:relative;animation:show .3s}
+        @keyframes show{from{opacity:0;transform:translateY(10px)}}
+        .sent{background:linear-gradient(135deg,#e91e63,#ff6b9d);color:white;align-self:flex-end;border-radius:18px 18px 4px 18px;margin-left:50px}
+        .recv{background:white;align-self:flex-start;border-radius:18px 18px 18px 4px;box-shadow:0 1px 2px rgba(0,0,0,.06);margin-right:50px}
+        .time{font-size:.6em;opacity:.7;text-align:right;margin-top:3px}
+        .media{max-width:220px;border-radius:12px;cursor:pointer}
         
-        .input-bar{background:var(--header);padding:8px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 -1px 3px rgba(0,0,0,.05)}
-        .btn{background:none;border:none;color:#888;font-size:1.2em;cursor:pointer;padding:8px;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
-        .btn.accent{background:var(--sent);color:white}
-        input{flex:1;padding:10px 16px;border:none;border-radius:25px;background:#f0f0f0;font-size:.9em;outline:none;color:var(--text)}
+        .input-area{background:white;padding:10px 15px;display:flex;align-items:center;gap:8px;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+        .input-btn{background:none;border:none;color:#e91e63;font-size:1.3em;cursor:pointer;padding:6px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+        .input-btn.game-btn{background:linear-gradient(135deg,#ffd700,#ff8c00);color:white;border-radius:50%}
+        input{flex:1;padding:12px 18px;border:none;border-radius:30px;background:#f0f0f0;font-size:.9em;outline:none}
         input::placeholder{color:#aaa}
+        .send-btn{background:none;border:none;color:#e91e63;font-size:1.5em;cursor:pointer;padding:6px}
         
-        .game-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:white;z-index:200;border-radius:20px 20px 0 0;max-height:60vh;overflow-y:auto;box-shadow:0 -5px 30px rgba(0,0,0,.15)}
-        .gp-header{background:var(--sent);color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0}
+        .game-panel{display:none;position:fixed;bottom:70px;left:0;right:0;background:white;z-index:50;border-radius:20px 20px 0 0;max-height:50vh;overflow-y:auto;box-shadow:0 -5px 30px rgba(0,0,0,.15)}
+        .gp-header{background:linear-gradient(135deg,#e91e63,#ff6b9d);color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0}
         .game-card{display:flex;align-items:center;gap:15px;padding:18px 20px;cursor:pointer;border-bottom:1px solid #f0f0f0}
-        .game-card:active{background:#f9f9f9}
-        .game-icon{font-size:2.5em}.game-arrow{color:#ccc}
+        .game-card:active{background:#f9f9f9}.game-icon{font-size:2.5em}.game-arrow{color:#ccc;font-size:1.3em}
         .btn-action{padding:12px 25px;border:none;border-radius:25px;font-weight:600;cursor:pointer;margin:5px;font-size:.9em}
-        .btn-primary{background:var(--sent);color:white}.btn-success{background:#4CAF50;color:white}.btn-danger{background:#f44336;color:white}
+        .btn-pink{background:#e91e63;color:white}.btn-green{background:#4CAF50;color:white}.btn-red{background:#f44336;color:white}
         .rps-btn{font-size:4em;padding:20px;border-radius:20px;background:#f5f5f5;border:3px solid transparent;cursor:pointer}
-        .rps-btn.selected{border-color:var(--sent);background:#fce4ec}
+        .rps-btn.selected{border-color:#e91e63;background:#fce4ec}
         .rps-btn:disabled{opacity:.3}
-        .result{text-align:center;padding:20px;font-size:1.2em}
     </style>
 </head>
 <body>
     <div class="header">
         <a href="/matches" class="back">←</a>
-        <a href="/profile/{{ other_user.id }}" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none">
+        <a href="/profile/{{ other_user.id }}" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;color:white">
             <div class="avatar">{% if other_user.photo %}<img src="/static/uploads/{{ other_user.photo }}">{% else %}👤{% endif %}</div>
-            <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">Dating App</div></div>
+            <div class="info"><div class="name">{{ other_user.username }}</div><div class="sub">💎 Dating App</div></div>
         </a>
         <button onclick="callUser('video')" class="hbtn">📹</button>
         <button onclick="callUser('voice')" class="hbtn">📞</button>
@@ -54,18 +55,18 @@
 
     <div class="messages" id="messages"></div>
 
-    <div class="input-bar">
-        <button class="btn accent" onclick="openGamePanel()">🎮</button>
-        <label class="btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
-        <input id="msgInput" placeholder="Message..." onkeypress="if(event.key==='Enter')sendMsg()">
-        <button class="btn" onclick="sendMsg()" style="color:var(--sent);font-size:1.4em;">➤</button>
+    <div class="input-area">
+        <button class="input-btn game-btn" onclick="openGamePanel()">🎮</button>
+        <label class="input-btn">📷<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this.files[0])"></label>
+        <input id="msgInput" placeholder="Écris un message..." onkeypress="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
 
     <div class="game-panel" id="gamePanel">
         <div class="gp-header"><h3>🎮 Jeux</h3><button onclick="closeGamePanel()" style="background:none;border:none;color:white;font-size:1.5em;cursor:pointer;">✕</button></div>
         <div id="gameMenu">
-            <div class="game-card" onclick="inviteRPS()"><div class="game-icon">✊</div><div><b>Pierre Feuille Ciseaux</b><br><small style="color:#888;">Duel + Gage</small></div><span class="game-arrow">›</span></div>
-            <div class="game-card" onclick="inviteAV()"><div class="game-icon">🎯</div><div><b>Action ou Vérité</b><br><small style="color:#888;">200 défis</small></div><span class="game-arrow">›</span></div>
+            <div class="game-card" onclick="inviteRPS()"><span class="game-icon">✊</span><div><b>Pierre Feuille Ciseaux</b><br><small style="color:#888;">Manches • Gage • Duel</small></div><span class="game-arrow">›</span></div>
+            <div class="game-card" onclick="inviteAV()"><span class="game-icon">🎯</span><div><b>Action ou Vérité</b><br><small style="color:#888;">200 défis aléatoires</small></div><span class="game-arrow">›</span></div>
         </div>
         <div id="gameContent" style="padding:15px;"></div>
     </div>
@@ -77,41 +78,42 @@
         
         function sendMsg(){const v=document.getElementById('msgInput').value.trim();if(!v)return;fetch('/api/messages/'+mid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v})}).then(r=>r.json()).then(d=>{if(d.success){document.getElementById('msgInput').value='';load();}});}
         function sendMedia(f){if(!f)return;const t=f.type.startsWith('video')?'video':'image';const fd=new FormData();fd.append('media',f);fd.append('type',t);fetch('/api/messages/media/'+mid,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)load();});}
-        function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div style="text-align:center;margin:10px 0"><span style="background:rgba(0,0,0,.05);padding:3px 12px;border-radius:10px;font-size:.7em;">${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="color:#ccc;">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="opacity:.5;">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}${sent?` ✓✓`:''}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
+        function load(){fetch('/api/messages/'+mid).then(r=>r.json()).then(msgs=>{const c=document.getElementById('messages'),today=new Date().toLocaleDateString('fr-FR');let ld='';c.innerHTML=msgs.map(m=>{const d=new Date(m.created_at).toLocaleDateString('fr-FR'),sep=d!==ld?`<div class="date-sep"><span>${d===today?"Aujourd'hui":d}</span></div>`:'';ld=d;const sent=m.sender_id===uid;let cnt=m.content;if(m.message_type==='image')cnt=`<img src="/static/uploads/${m.content}" class="media">`;else if(m.message_type==='video')cnt=`<video src="/static/uploads/${m.content}" class="media" controls></video>`;else if(m.is_deleted)cnt='<i style="color:#bbb;">Message supprimé</i>';return sep+`<div class="msg ${sent?'sent':'recv'}">${cnt}${m.is_edited?' <small style="opacity:.5;">modifié</small>':''}<div class="time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`;}).join('');c.scrollTop=c.scrollHeight;});}
         
-        function callUser(type){if(confirm('Appeler {{ other_user.username }} ?')){socket.emit('invite_call',{to_user:oid,call_type:type,from_user:'{{ current_user.username }}'});window.location.href='/call/'+type+'/'+mid;}}
+        function callUser(type){if(confirm('📞 Appeler {{ other_user.username }} ?')){socket.emit('invite_call',{to_user:oid,call_type:type,from_user:'{{ current_user.username }}'});window.location.href='/call/'+type+'/'+mid;}}
         socket.on('incoming_call',function(data){if(confirm(data.from+' vous appelle!')){window.location.href='/call/'+data.call_type+'/'+mid;}});
         
         function openGamePanel(){document.getElementById('gamePanel').style.display='block';}
         function closeGamePanel(){document.getElementById('gamePanel').style.display='none';document.getElementById('gameContent').innerHTML='';document.getElementById('gameMenu').style.display='block';}
         
-        // RPS
+        // RPS (version courte)
         let rM=3,rMS=0,rOS=0,rC=0,rMC=null,rG='';
-        function inviteRPS(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">✊ Pierre ✋ Feuille ✌️ Ciseaux</h4><div style="margin:15px 0;"><label>Manches:</label><select id="rm" style="padding:8px;border-radius:8px;border:1px solid #ddd;margin-left:10px;"><option>3</option><option>5</option><option>7</option></select></div><div style="margin:15px 0;"><label>Gage:</label><input id="rg" placeholder="Ex: chanter..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:5px;"></div><button class="btn-action btn-primary" onclick="sendRPS()" style="width:100%;">📤 Envoyer</button>`;}
-        function sendRPS(){rM=parseInt(document.getElementById('rm').value);rG=document.getElementById('rg').value.trim()||'Gage';socket.emit('rps_invite',{match_id:mid,to_user:oid,manches:rM,gage:rG});document.getElementById('gameContent').innerHTML='<p style="text-align:center;padding:30px;">📤 Invitation envoyée...</p>';}
-        socket.on('rps_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div style="text-align:center;padding:30px;"><p style="font-size:1.2em;">🎮 {{ other_user.username }} vous défie!</p><p>Manches: <b>${d.manches}</b> | Gage: <b>${d.gage}</b></p><div style="margin-top:20px;"><button class="btn-action btn-success" onclick="acceptRPS(${d.manches},'${d.gage.replace(/'/g,"\\'")}')">✅ Accepter</button><button class="btn-action btn-danger" onclick="declineRPS()">❌ Refuser</button></div></div>`;});
-        function acceptRPS(m,g){rM=m;rG=g;rMS=0;rOS=0;rC=0;socket.emit('rps_accept',{match_id:mid,to_user:oid,manches:m,gage:g});startRound();}
+        function inviteRPS(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">✊ ✋ ✌️</h4><div style="margin:10px 0;"><select id="rm" style="padding:8px;"><option>3</option><option>5</option><option>7</option></select> manches</div><div style="margin:10px 0;"><input id="rg" placeholder="Gage perdant..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;"></div><button class="btn-action btn-pink" onclick="sendRPS()" style="width:100%;">📤 Envoyer</button>`;}
+        function sendRPS(){rM=parseInt(document.getElementById('rm').value);rG=document.getElementById('rg').value.trim()||'Gage';socket.emit('rps_invite',{match_id:mid,to_user:oid,manches:rM,gage:rG});document.getElementById('gameContent').innerHTML='<p style="text-align:center;padding:30px;">📤 En attente...</p>';}
+        socket.on('rps_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div style="text-align:center;padding:30px;"><p style="font-size:1.2em;">🎮 {{ other_user.username }} vous défie!</p><p>${d.manches} manches • ${d.gage}</p><button class="btn-action btn-green" onclick="acceptRPS(${d.manches},'${d.gage.replace(/'/g,"\\'")}')">✅ Accepter</button><button class="btn-action btn-red" onclick="declineRPS()">❌ Refuser</button></div>`;});
+        function acceptRPS(m,g){rM=m;rG=g;rMS=0;rOS=0;rC=0;socket.emit('rps_accept',{match_id:mid,to_user:oid});startRound();}
         function declineRPS(){socket.emit('rps_decline',{match_id:mid,to_user:oid});closeGamePanel();}
-        socket.on('rps_accepted',(d)=>{rM=d.manches;rG=d.gage;rMS=0;rOS=0;rC=0;document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#4CAF50;">✅ Accepté!</p>';setTimeout(startRound,1000);});
-        function startRound(){rC++;rMC=null;if(rC>rM){endRPS();return;}document.getElementById('gameContent').innerHTML=`<div style="text-align:center;margin:15px 0;">Moi: <b>${rMS}</b> | Manche ${rC}/${rM} | Lui: <b>${rOS}</b></div><div style="display:flex;justify-content:center;gap:15px;margin:15px 0;"><button class="rps-btn" onclick="pickRPS('rock')">✊</button><button class="rps-btn" onclick="pickRPS('paper')">✋</button><button class="rps-btn" onclick="pickRPS('scissors')">✌️</button></div><p id="rpsS" style="text-align:center;color:#888;"></p><div id="rpsR"></div>`;}
+        socket.on('rps_accepted',()=>{document.getElementById('gameContent').innerHTML='<p style="text-align:center;color:#4CAF50;">✅ GO!</p>';setTimeout(startRound,800);});
+        function startRound(){rC++;rMC=null;if(rC>rM){endRPS();return;}document.getElementById('gameContent').innerHTML=`<div style="text-align:center;">Moi <b>${rMS}</b> - Manche ${rC}/${rM} - Lui <b>${rOS}</b></div><div style="display:flex;justify-content:center;gap:10px;margin:15px 0;"><button class="rps-btn" onclick="pickRPS('rock')">✊</button><button class="rps-btn" onclick="pickRPS('paper')">✋</button><button class="rps-btn" onclick="pickRPS('scissors')">✌️</button></div><p id="rpsS" style="text-align:center;color:#888;"></p><div id="rpsR"></div>`;}
         function pickRPS(c){if(rMC)return;rMC=c;document.querySelectorAll('.rps-btn').forEach(b=>{b.disabled=true;b.classList.remove('selected');});event.target.classList.add('selected');document.getElementById('rpsS').textContent='✅ En attente...';socket.emit('rps_round_choice',{match_id:mid,choice:c});}
-        socket.on('rps_round_result',(d)=>{const e={rock:'✊',paper:'✋',scissors:'✌️'};let r='';if(d.winner===uid){rMS++;r='🎉 Gagné!';}else if(d.winner==='draw'){r='🤝 Égalité';}else{rOS++;r='😢 Perdu...';}document.getElementById('rpsR').innerHTML=`<div class="result">${e[rMC]} vs ${e[d.opponent_choice]}<br><b>${r}</b><br><button class="btn-action btn-primary" onclick="startRound()">▶ Suite</button></div>`;});
-        function endRPS(){const w=rMS>rOS;document.getElementById('gameContent').innerHTML=`<div class="result"><h3>${w?'👑 Victoire!':'Défaite'}</h3><p>${rMS} - ${rOS}</p><p>${w?'🎉 '+rG:'😢 '+rG}</p><button class="btn-action btn-primary" onclick="document.getElementById(\'gameContent\').innerHTML=\'\';document.getElementById(\'gameMenu\').style.display=\'block\';">🔄 Rejouer</button></div>`;}
+        socket.on('rps_round_result',(d)=>{const e={rock:'✊',paper:'✋',scissors:'✌️'};let r='';if(d.winner===uid){rMS++;r='🎉 Gagné!';}else if(d.winner==='draw'){r='🤝 Égalité';}else{rOS++;r='😢 Perdu...';}document.getElementById('rpsR').innerHTML=`<div style="text-align:center;padding:10px;">${e[rMC]} vs ${e[d.opponent_choice]}<br><b>${r}</b><br><button class="btn-action btn-pink" onclick="startRound()">▶ Suite</button></div>`;});
+        function endRPS(){const w=rMS>rOS;document.getElementById('gameContent').innerHTML=`<div style="text-align:center;padding:20px;"><h3>${w?'👑 Victoire!':'💀 Défaite'}</h3><p style="font-size:1.5em;">${rMS}-${rOS}</p><p>${w?'Tu gagnes: '+rG:'Tu dois: '+rG}</p><button class="btn-action btn-pink" onclick="document.getElementById(\'gameContent\').innerHTML=\'\';document.getElementById(\'gameMenu\').style.display=\'block\';">🔄 Rejouer</button></div>`;}
         
         // AV
-        const avA=["Fais 10 pompes","Imite célébrité","Danse 30s","Chante","Cri animal","Mime métier","Accent","Grimace selfie","Blague mimée","Playback"];
-        const avV=["Ton rêve?","Ta peur?","Pire date?","Premier crush?","Talent caché?","Loto?","Mensonge?","Film préféré?","Souvenir?","Regret?"];
-        function inviteAV(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">🎯 Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;margin:20px;"><button class="btn-action btn-success" onclick="sendAVI('classic')">🎯 Classique</button><button class="btn-action btn-danger" onclick="sendAVI('adult')">🔞 Adulte</button></div>`;}
-        function sendAVI(v){socket.emit('av_invite',{match_id:mid,to_user:oid,version:v});document.getElementById('gameContent').innerHTML='<p style="text-align:center;padding:30px;">📤 Invitation...</p>';}
-        socket.on('av_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div style="text-align:center;padding:30px;"><p style="font-size:1.2em;">🎯 {{ other_user.username }} vous invite!</p><button class="btn-action btn-success" onclick="acceptAV('${d.version}')">✅ Accepter</button><button class="btn-action btn-danger" onclick="declineAV()">❌ Refuser</button></div>`;});
-        function acceptAV(v){socket.emit('av_accept',{match_id:mid,to_user:oid,version:v});showAV(v);}
+        const avA=["10 pompes","Imite célébrité","Danse 30s","Chante","Cri animal","Mime métier","Accent","Grimace","Blague","Playback"];
+        const avV=["Ton rêve?","Ta peur?","Pire date?","Crush?","Talent?","Loto?","Mensonge?","Film?","Souvenir?","Regret?"];
+        function inviteAV(){document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">🎯 Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;margin:15px;"><button class="btn-action btn-green" onclick="sendAVI('classic')">Classique</button><button class="btn-action btn-red" onclick="sendAVI('adult')">Adulte 🔞</button></div>`;}
+        function sendAVI(v){socket.emit('av_invite',{match_id:mid,to_user:oid,version:v});document.getElementById('gameContent').innerHTML='<p style="text-align:center;padding:30px;">📤 En attente...</p>';}
+        socket.on('av_invite_received',(d)=>{document.getElementById('gamePanel').style.display='block';document.getElementById('gameMenu').style.display='none';document.getElementById('gameContent').innerHTML=`<div style="text-align:center;padding:30px;"><p>{{ other_user.username }} vous invite!</p><button class="btn-action btn-green" onclick="acceptAV('${d.version}')">✅ Accepter</button><button class="btn-action btn-red" onclick="declineAV()">❌ Refuser</button></div>`;});
+        function acceptAV(v){socket.emit('av_accept',{match_id:mid,to_user:oid});showAV(v);}
         function declineAV(){socket.emit('av_decline',{match_id:mid,to_user:oid});closeGamePanel();}
         socket.on('av_accepted',(d)=>{showAV(d.version);});
-        function showAV(v){document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">${v==='adult'?'🔞 ':''}Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;margin:15px;"><button class="btn-action btn-primary" onclick="pickAV('${v}','action')">⚡ Action</button><button class="btn-action btn-primary" onclick="pickAV('${v}','verite')">💬 Vérité</button></div><div id="avR" style="text-align:center;padding:15px;"></div>`;}
-        function pickAV(v,t){const l=t==='action'?avA:avV;const r=l[Math.floor(Math.random()*l.length)];document.getElementById('avR').innerHTML=`<div style="background:#f9f9f9;padding:20px;border-radius:15px;border:2px solid ${t==='action'?'#ff9800':'#2196F3'}"><b>${t==='action'?'⚡ ACTION':'💬 VÉRITÉ'}</b><br><span style="font-size:1.2em;">${r}</span></div><button class="btn-action btn-primary" onclick="pickAV('${v}','${t}')" style="margin-top:10px;">🔄 Relancer</button>`;socket.emit('av_send',{match_id:mid,to_user:oid,type:t,challenge:r});}
+        function showAV(v){document.getElementById('gameContent').innerHTML=`<h4 style="text-align:center;">${v==='adult'?'🔞 ':''}Action ou Vérité</h4><div style="display:flex;gap:10px;justify-content:center;margin:10px;"><button class="btn-action btn-pink" onclick="pickAV('${v}','action')">⚡ Action</button><button class="btn-action btn-pink" onclick="pickAV('${v}','verite')">💬 Vérité</button></div><div id="avR" style="text-align:center;padding:10px;"></div>`;}
+        function pickAV(v,t){const l=t==='action'?avA:avV;const r=l[Math.floor(Math.random()*l.length)];document.getElementById('avR').innerHTML=`<div style="background:#f9f9f9;padding:20px;border-radius:15px;border:2px solid ${t==='action'?'#ff9800':'#2196F3'}"><b>${t==='action'?'⚡ ACTION':'💬 VÉRITÉ'}</b><br><span style="font-size:1.2em;">${r}</span></div><button class="btn-action btn-pink" onclick="pickAV('${v}','${t}')">🔄 Relancer</button>`;socket.emit('av_send',{match_id:mid,to_user:oid,type:t,challenge:r});}
         socket.on('av_receive',(d)=>{document.getElementById('avR').innerHTML=`<div style="background:#f9f9f9;padding:20px;border-radius:15px;border:2px solid ${d.type==='action'?'#ff9800':'#2196F3'}">📩 <b>${d.type==='action'?'ACTION':'VÉRITÉ'} reçu</b><br><span style="font-size:1.2em;">${d.challenge}</span></div>`;});
         
-        setInterval(load,2000);load();setTimeout(()=>{document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
+        setInterval(load,2000);load();
+        setTimeout(function(){document.getElementById('messages').scrollTop=99999;document.getElementById('msgInput').focus();},500);
     </script>
 </body>
 </html>
