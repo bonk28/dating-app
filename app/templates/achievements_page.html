@@ -18,4 +18,5 @@ fetch('/api/achievements').then(function(r){return r.json()}).then(function(a){
     a.map(function(x){return'<div class="ach-card'+(x.unlocked?'':' locked')+'"><div class="ach-icon">'+x.icon+'</div><div class="ach-info"><div class="ach-name">'+x.name+'</div><div class="ach-desc">'+x.description+'</div></div><span class="'+(x.unlocked?'badge-unlocked':'badge-locked')+'">'+(x.unlocked?'✅ Débloqué':'🔒')+'</span></div>';}).join('');
 });
 </script>
+<script src="/static/js/unified-badge.js"></script>
 </body></html>
